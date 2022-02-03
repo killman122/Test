@@ -1,31 +1,14 @@
 /*
-京东极速版签到+赚现金任务
-每日9毛左右，满3，10，50可兑换无门槛红包
-⚠️⚠️⚠️一个号需要运行40分钟左右
-
-活动时间：长期
-活动入口：京东极速版app-现金签到
-已支持IOS双京东账号,Node.js支持N个京东账号
-脚本兼容: QuantumultX, Surge, Loon, JSBox, Node.js
-============Quantumultx===============
-[task_local]
-#京东极速版
-21 3,8 * * * https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_speed_sign.js, tag=京东极速版, img-url=https://raw.githubusercontent.com/Orz-3/task/master/jd.png, enabled=true
-
-================Loon==============
-[Script]
-cron "21 3,8 * * *" script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_speed_sign.js,tag=京东极速版
-
-===============Surge=================
-京东极速版 = type=cron,cronexp="21 3,8 * * *",wake-system=1,timeout=33600,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_speed_sign.js
-
-============小火箭=========
-京东极速版 = type=cron,script-path=https://raw.githubusercontent.com/Aaron-lv/sync/jd_scripts/jd_speed_sign.js, cronexpr="21 3,8 * * *", timeout=33600, enable=true
+cron "0 6 * * *" jd_speed_sign_Mod.js, tag:京东极速版任务
 */
-const $ = new Env('京东极速版');
+ //详细说明参考 https://github.com/ccwav/QLScript2.
+const $ = new Env('京东极速版任务');
+
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+
+let llAPIError=false;
 let cookiesArr = [], cookie = '', message;
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
@@ -36,12 +19,15 @@ if ($.isNode()) {
 } else {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
+
 const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
+
+
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
     return;
-  }
+  }  
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -61,7 +47,12 @@ const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
         continue
       }
       await jdGlobal()
-      await $.wait(2*1000)
+      await $.wait(10*1000)
+	  
+	  if (llAPIError){
+		console.log(`黑IP了，赶紧重新拨号换个IP吧`);
+		break;
+	  }
     }
   }
 })()
@@ -74,15 +65,26 @@ const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
 
 async function jdGlobal() {
   try {
+	 
     await richManIndex()
+
     await wheelsHome()
     await apTaskList()
     await wheelsHome()
+
+    //await signInit()
+    //await sign()
     $.score = 0
     $.total = 0
     await taskList()
     await queryJoy()
+    // await signInit()
     await cash()
+	var date = new Date();
+	if(new Date(date.getFullYear(), date.getMonth()+1, 0).getDate() == date.getDate()){
+		console.log('月底了,自动领下单红包奖励')
+		await orderReward()
+	}	
     await showMsg()
   } catch (e) {
     $.logErr(e)
@@ -108,7 +110,7 @@ async function signInit() {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`signInit API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -135,7 +137,7 @@ async function sign() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`sign API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -155,6 +157,68 @@ async function sign() {
   })
 }
 
+async function orderReward(type) {
+  let t = +new Date()
+  var headers = {
+    'Host': 'api.m.jd.com',
+    'accept': 'application/json, text/plain, */*',
+    'content-type': 'application/x-www-form-urlencoded',
+    'origin': 'https://palace.m.jd.com',
+    'accept-language': 'zh-cn',
+    'user-agent': $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+    'referer': 'https://palace.m.jd.com/?lng=110.917107&lat=22.2706&sid=abefac3cfbcb550b542e4c064dbcabfw&un_area=19_1684_1687_6233',
+    'Cookie': cookie
+  };
+  if (type) {
+    var dataString = `functionId=OrderRewardService&body={"method":"receiveReward","data":{"orderQty":${type}}}&_t=${t}&appid=market-task-h5&eid=`;
+  } else {
+    var dataString = `functionId=OrderRewardService&body={"method":"queryRewards","data":{}}&_t=${t}&appid=market-task-h5&eid=`;
+  }
+  var options = {
+    url: `https://api.m.jd.com/`,
+    headers: headers,
+    body: dataString
+  };
+  $.post(options, async (err, resp, data) => {
+    try {
+      if (err) {
+        console.log(`${JSON.stringify(err)}`)
+        console.log(`orderReward API请求失败，请检查网路重试`)
+      } else {
+        if (safeGet(data)) {
+          data = JSON.parse(data);
+          if (data.code === 0 && data.isSuccess) {
+            if (data.data.details) {
+              $.details = data.data.details
+              for (let item of $.details) {
+                if (item.status === 2) {
+                  console.log(`\n检测到【下单领红包】有奖励可领取，开始领取奖励`)
+                  await orderReward(item.orderQty);
+                  await $.wait(2000)
+                } else if (item.status === 1) {
+                  console.log(`\n【下单领红包】暂无奖励可领取，再下${data.data.needOrderQty}单可领取${data.data.rewardAmount}元`)
+                  break
+                }
+              }
+            } else {
+              if (data.code === 0) {
+                console.log(`奖励领取结果，获得${data.data.rewardAmount}元`)
+              } else {
+                console.log(`奖励领取结果：获得${JSON.stringify(data)}`)
+              }
+            }
+          } else {
+            console.log(`\n其他情况：${JSON.stringify(data)}`)
+          }
+        }
+      }
+    } catch (e) {
+      $.logErr(e, resp)
+    }
+  })
+}
+
+
 async function taskList() {
   return new Promise(resolve => {
     $.get(taskUrl('ClientHandleService.execute', {
@@ -166,12 +230,12 @@ async function taskList() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`taskList API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
               for (let task of data.data) {
-                $.taskName = task.taskInfo.mainTitle
+                $.taskName = task.taskInfo.mainTitle;
                 if (task.taskInfo.status === 0) {
                   if (task.taskType >= 1000) {
                     await doTask(task.taskType)
@@ -189,6 +253,9 @@ async function taskList() {
                 } else {
                   console.log(`${task.taskInfo.mainTitle}已完成`)
                 }
+				
+				if (llAPIError)
+					break;				
               }
             }
           }
@@ -210,7 +277,8 @@ async function doTask(taskId) {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`doTask API请求失败，请检查网路重试`)
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -237,7 +305,7 @@ async function queryJoy() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`queryJoy API请求失败，请检查网路重试`)			
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -266,7 +334,7 @@ async function rewardTask(id, taskId) {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`rewardTask API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -297,7 +365,9 @@ async function queryItem(activeType = 1) {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`queryItem API请求失败，请检查网路重试`)
+		  $.canStartNewItem = false;
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -333,7 +403,9 @@ async function startItem(activeId, activeType) {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`startItem API请求失败，请检查网路重试`)
+		  $.canStartNewItem = false;
+		  llAPIError=true;
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -344,7 +416,9 @@ async function startItem(activeId, activeType) {
                   videoBrowsing = activeType === 1 ? 5 : 10
                 console.log(`【${taskCompletionProgress + 1}/${taskCompletionLimit}】浏览商品任务记录成功，等待${videoBrowsing}秒`)
                 await $.wait(videoBrowsing * 1000)
+				await $.wait(3000);
                 await endItem(data.data.uuid, activeType, activeId, activeType === 3 ? videoBrowsing : "")
+				await $.wait(1000);
               } else {
                 console.log(`${$.taskName}任务已达上限`)
                 $.canStartNewItem = false
@@ -382,7 +456,8 @@ async function endItem(uuid, activeType, activeId = "", videoTimeLength = "") {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`endItem API请求失败，请检查网路重试`)
+		  
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -420,7 +495,7 @@ async function rewardItem(uuid, activeType, activeId = "", videoTimeLength = "")
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`rewardItem API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -449,7 +524,7 @@ async function cash() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`cash API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -474,7 +549,7 @@ function wheelsHome() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`wheelsHome API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -504,7 +579,7 @@ function wheelsLottery() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`wheelsLottery API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -533,7 +608,7 @@ function apTaskList() {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`apTaskList API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -566,7 +641,7 @@ function apDoTask(taskType,taskId,channel,itemId) {
         try {
           if (err) {
             console.log(`${JSON.stringify(err)}`)
-            console.log(`${$.name} API请求失败，请检查网路重试`)
+            console.log(`apDoTask API请求失败，请检查网路重试`)
           } else {
             if (safeGet(data)) {
               data = JSON.parse(data);
@@ -592,7 +667,7 @@ function richManIndex() {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`richManIndex API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -619,7 +694,7 @@ function shootRichManDice() {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`shootRichManDice API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -677,7 +752,7 @@ function TotalBean() {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`TotalBean API请求失败，请检查网路重试`)
         } else {
           if (data) {
             data = JSON.parse(data);
