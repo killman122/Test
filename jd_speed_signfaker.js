@@ -75,20 +75,13 @@ const JD_API_HOST = 'https://api.m.jd.com/', actCode = 'visa-card-001';
 async function jdGlobal() {
   try {
     await richManIndex()
-
     await wheelsHome()
     await apTaskList()
     await wheelsHome()
-
-    // await signInit()
-    // await sign()
-    await invite()
-    await invite2()
     $.score = 0
     $.total = 0
     await taskList()
     await queryJoy()
-    // await signInit()
     await cash()
     await showMsg()
   } catch (e) {
@@ -663,63 +656,6 @@ function taskGetUrl(function_id, body) {
       "referer": "https://an.jd.com/babelDiy/Zeus/q1eB6WUB8oC4eH1BsCLWvQakVsX/index.html"
     }
   }
-}
-
-function invite2() {
-  let inviterIdArr = [
-    "5V7vHE23qh2EkdBHXRFDuA==",
-    "wXX9SjXOdYMWe5Ru/1+x9A==",
-    "4AVQao+eH8Q8kvmXnWmkG8ef/fNr5fdejnD9+9Ugbec=",
-    "jbGBRBPo5DmwB9ntTCSVOGXuh1YQyccCuZpWwb3PlIc="
-  ]
-  let inviterId = inviterIdArr[Math.floor((Math.random() * inviterIdArr.length))]
-  let options = {
-    url: "https://api.m.jd.com/",
-    body: `functionId=TaskInviteService&body=${JSON.stringify({"method":"participateInviteTask","data":{"channel":"1","encryptionInviterPin":encodeURIComponent(inviterId),"type":1}})}&appid=market-task-h5&uuid=&_t=${Date.now()}`,
-    headers: {
-      "Host": "api.m.jd.com",
-      "Accept": "application/json, text/plain, */*",
-      "Content-Type": "application/x-www-form-urlencoded",
-      "Origin": "https://assignment.jd.com",
-      "Accept-Language": "zh-CN,zh-Hans;q=0.9",
-      "User-Agent": $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-      "Referer": "https://assignment.jd.com/",
-      "Accept-Encoding": "gzip, deflate, br",
-      "Cookie": cookie
-    }
-  }
-  $.post(options, (err, resp, data) => {
-    // console.log(data)
-  })
-}
-
-function invite() {
-  let t = +new Date()
-  let inviterIdArr = [
-    "5V7vHE23qh2EkdBHXRFDuA==",
-    "wXX9SjXOdYMWe5Ru/1+x9A==",
-    "4AVQao+eH8Q8kvmXnWmkG8ef/fNr5fdejnD9+9Ugbec=",
-    "jbGBRBPo5DmwB9ntTCSVOGXuh1YQyccCuZpWwb3PlIc="
-  ]
-  let inviterId = inviterIdArr[Math.floor((Math.random() * inviterIdArr.length))]
-  let options = {
-    url: `https://api.m.jd.com/?t=${t}`,
-    body: `functionId=InviteFriendChangeAssertsService&body=${JSON.stringify({"method":"attendInviteActivity","data":{"inviterPin":encodeURIComponent(inviterId),"channel":1,"token":"","frontendInitStatus":""}})}&referer=-1&eid=eidI9b2981202fsec83iRW1nTsOVzCocWda3YHPN471AY78%2FQBhYbXeWtdg%2F3TCtVTMrE1JjM8Sqt8f2TqF1Z5P%2FRPGlzA1dERP0Z5bLWdq5N5B2VbBO&aid=&client=ios&clientVersion=14.4.2&networkType=wifi&fp=-1&uuid=ab048084b47df24880613326feffdf7eee471488&osVersion=14.4.2&d_brand=iPhone&d_model=iPhone10,2&agent=-1&pageClickKey=-1&platform=3&lang=zh_CN&appid=market-task-h5&_t=${t}`,
-    headers: {
-      "Host": "api.m.jd.com",
-      "Accept": "application/json, text/plain, */*",
-      "Content-type": "application/x-www-form-urlencoded",
-      "Origin": "https://invite-reward.jd.com",
-      "Accept-Language": "zh-CN,zh-Hans;q=0.9",
-      "User-Agent": $.isNode() ? (process.env.JS_USER_AGENT ? process.env.JS_USER_AGENT : (require('./JS_USER_AGENTS').USER_AGENT)) : ($.getdata('JSUA') ? $.getdata('JSUA') : "'jdltapp;iPad;3.1.0;14.4;network/wifi;Mozilla/5.0 (iPad; CPU OS 14_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-      "Referer": 'https://invite-reward.jd.com/',
-      "Accept-Encoding": "gzip, deflate, br",
-      "Cookie": cookie
-    }
-  }
-  $.post(options, (err, resp, data) => {
-    // console.log(data)
-  })
 }
 
 function TotalBean() {
