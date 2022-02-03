@@ -6,7 +6,8 @@ TG https://t.me/duckjobs
 
 一天3次
 
-10 6,10,12 * * * jd_mpdzcar.js
+cron:22 5,11,13 * * *
+22 5,11,13 * * * https://raw.githubusercontent.com/TongLin138/Test/main/jd_mpdzcar_game.js
 */
 const $ = new Env('头文字J 游戏');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';

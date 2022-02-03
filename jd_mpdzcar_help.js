@@ -6,7 +6,8 @@ TG https://t.me/duckjobs
 
 新人助力10,老用户5
 
-10 3 * * * jd_mpdzcar.js
+cron:15 2 * * *
+15 2 * * * https://raw.githubusercontent.com/TongLin138/Test/main/jd_mpdzcar_help.js
 */
 const $ = new Env('头文字J 助力');
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
