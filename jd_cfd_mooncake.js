@@ -84,11 +84,11 @@ if ($.isNode()) {
       await $.wait(2000);
     }
   }
-  let res = await getAuthorShareCode('https://raw.githubusercontent.com/Aaron-lv/updateTeam/master/shareCodes/cfd.json')
+  let res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/TongLin138/Test@main/utils/empty.json')
   if (!res) {
-    $.http.get({url: 'https://purge.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json'}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
+    $.http.get({url: 'https://purge.jsdelivr.net/gh/TongLin138/Test@main/utils/empty.json'}).then((resp) => {}).catch((e) => console.log('刷新CDN异常', e));
     await $.wait(1000)
-    res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/Aaron-lv/updateTeam@master/shareCodes/cfd.json')
+    res = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/TongLin138/Test@main/utils/empty.json')
   }
   $.strMyShareIds = [...(res && res.shareId || [])]
   await shareCodesFormat()
@@ -469,7 +469,7 @@ function getAuthorShareCode(url) {
 // 获取用户信息
 function getUserInfo(showInvite = true) {
   return new Promise(async (resolve) => {
-    $.get(taskUrl(`user/QueryUserInfo`, `ddwTaskId=&strShareId=&strMarkList=${encodeURIComponent('guider_step,collect_coin_auth,guider_medal,guider_over_flag,build_food_full,build_sea_full,build_shop_full,build_fun_full,medal_guider_show,guide_guider_show,guide_receive_vistor,daily_task,guider_daily_task')}&strPgUUNum=${token['farm_jstoken']}&strPgtimestamp=${token['timestamp']}&strPhoneID=${token['phoneid']}`), async (err, resp, data) => {
+    $.get(taskUrl(`user/QueryUserInfo`, `ddwTaskId=&strShareId=&strMarkList=${encodeURIComponent('guider_step,collect_coin_auth,guider_medal,guider_over_flag,build_food_full,build_sea_full,build_shop_full,build_fun_full,medal_guider_show,guide_guider_show,guide_receive_vistor,daily_task,guider_daily_task,cfd_has_show_selef_point,choose_goods_has_show,daily_task_win,new_user_task_win,guider_new_user_task,guider_daily_task_icon,guider_nn_task_icon,tool_layer,new_ask_friend_m')}&strPgtimestamp=${token['timestamp']}&strPhoneID=${token['phoneid']}&strPgUUNum=${token['farm_jstoken']}&strVersion=1.0.1&dwIsReJoin=1`), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
@@ -641,7 +641,7 @@ function showMsg() {
 
 function readShareCode() {
   return new Promise(async resolve => {
-    $.get({url: `http://transfer.nz.lu/cfd`, timeout: 10000}, (err, resp, data) => {
+    $.get({url: `https://cdn.jsdelivr.net/gh/TongLin138/Test@main/utils/empty.json`, timeout: 10000}, (err, resp, data) => {
       try {
         if (err) {
           console.log(JSON.stringify(err))
@@ -658,7 +658,7 @@ function readShareCode() {
         resolve(data);
       }
     })
-    await $.wait(10000);
+    await $.wait(30 * 1000);
     resolve()
   })
 }
