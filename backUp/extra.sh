@@ -1,5 +1,5 @@
 #!/bin/bash
-# Update: 2022-02-08
+# Update: 2022-02-18
 # Content: add  
 
 ##############################  京  东  商  城  ##############################
@@ -13,7 +13,7 @@
 
 ##############################  主  要  代  码  ##############################
 NEWLINE="\n          "
-UpdateDate="2022-02-08"
+UpdateDate="2022-02-18"
 UpdateContent="add"
 
 ## 作者
@@ -132,7 +132,7 @@ for author in $author_list; do
         ;;
       *)
         if [[ -z ${script_cron_standard} ]]; then
-          tmp1=$(grep -E "cron|script-path|tag|\* \*|$name" $ScriptsDir/$name | grep -Ev "^http.*:|^function " | head -1 | perl -pe '{s|[a-zA-Z\"\.\=\:\_]||g;}')
+          tmp1=$(grep -E "^cron|script-path=|tag=|[0-9] \* \*|^[0-9]\*.*$name" $ScriptsDir/$name | grep -Ev "^http.*:|^function " | head -1 | perl -pe '{s|[a-zA-Z\"\.\=\:\_]||g;}')
           ## 判断开头
           tmp2=$(echo "${tmp1}" | awk -F '[0-9]' '{print$1}' | sed 's/\*/\\*/g; s/\./\\./g')
           ## 判断表达式的第一个数字（分钟）
@@ -173,7 +173,7 @@ for del in ${DeleteCacheFiles}; do
 done
 
 ## 删除脚本和定时
-DeleteScripts="jd_festival.js"
+DeleteScripts=""
 for del in ${DeleteScripts}; do
   [ -f $ScriptsDir/$del ] && rm -rf $ScriptsDir/$del && sed -i "/ $TaskCmd $(echo "$del" | awk -F\. '{print $1}' | perl -pe "{s|^jd_||; s|^jx_||; s|^jr_||;}")/d" $ListCrontabUser
 done
