@@ -1,7 +1,7 @@
 /*
 店铺签到
 活动时间：长期
-更新时间：2022-02-18
+更新时间：2022-02-19
 活动地址：https://h5.m.jd.com/babelDiy/Zeus/2PAAf74aG3D61qvfKUM5dxUssJQ9/index.html?token=<TOKEN>
 脚本兼容: QuantumultX, Surge,Loon, JSBox, Node.js
 脚本容易黑IP，建议多台环境轮流错开跑定时任务
@@ -47,6 +47,7 @@ const token = [
   "186ACAEA426F9C07CB2E0BC790DA78FA",
   "E5254610D0CF9752133E206292D83256",
   "F98343185FAFB04F0776238CD1BE1E51",
+  "957842018D611DAB5D1C8377C2BFD5C4",
   "428D0D4607EE334A7AB74FFB2639795C"
 ]
 
