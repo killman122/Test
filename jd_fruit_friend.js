@@ -62,6 +62,7 @@ let llhelp=true;
 		  option = {};
 		  $.retry = 0;
 		  await GetCollect();
+		  await $.wait(1500);
 		}
 	  }
   }
@@ -87,6 +88,7 @@ let llhelp=true;
       option = {};
       $.retry = 0;
       await jdFruit();
+			await $.wait(20 * 1000);
     }
   }
   if ($.isNode() && allMessage && $.ctrTemp) {
