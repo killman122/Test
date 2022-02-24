@@ -36,6 +36,7 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let cookiesArr = [], cookie = '', message;
 let UA, UAInfo = {}, isLoginInfo = {};
 $.shareCodes = [];
+$.appId = "0ac98";
 $.blackInfo = {}
 $.appId = "0ac98";
 const JX_FIRST_RUNTASK = $.isNode() ? (process.env.JX_FIRST_RUNTASK && process.env.JX_FIRST_RUNTASK === 'xd' ? '5' : '1000') : ($.getdata('JX_FIRST_RUNTASK') && $.getdata('JX_FIRST_RUNTASK') === 'xd' ? '5' : '1000')
