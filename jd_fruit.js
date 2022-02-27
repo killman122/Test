@@ -656,7 +656,7 @@ async function turntableFarm() {
         break;
       }
     }
-    console.log(`---天天抽奖次数remainLotteryTimes----${remainLotteryTimes}次`)
+    console.log(`---天天抽奖次数----${remainLotteryTimes}次`)
     //抽奖
     if (remainLotteryTimes > 0) {
       console.log('开始抽奖')
@@ -1199,8 +1199,8 @@ async function gotStageAwardForFarm(type) {
 }
 //浇水API
 async function waterGoodForFarm() {
-  await $.wait(2000);
-  console.log('等待了2秒');
+  await $.wait(3000);
+  console.log('等待了3秒');
 
   const functionId = arguments.callee.name.toString();
   $.waterResult = await request(functionId);
