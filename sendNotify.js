@@ -2,19 +2,19 @@
  * @Author: lxk0301 https://gitee.com/lxk0301
  * @Date: 2020-08-19 16:12:40
  * @Last Modified by: whyour
- * @Last Modified time: 2022-2-18 8:13:20
- * @sendNotify 推送通知功能
+ * @Last Modified time: 2021-5-1 15:00:54
+ * sendNotify 推送通知功能
  * @param text 通知头
  * @param desp 通知体
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
- * @详细说明参考 https://github.com/ccwav/QLScript2.
  */
+//详细说明参考 https://github.com/ccwav/QLScript2.
 const querystring = require('querystring');
 const exec = require('child_process').exec;
 const $ = new Env();
 const timeout = 15000; //超时时间(单位毫秒)
-console.log("加载sendNotify，当前版本: 20220218");
+console.log("加载sendNotify，当前版本: 20220302");
 // =======================================go-cqhttp通知设置区域===========================================
 //gobot_url 填写请求地址http://127.0.0.1/send_private_msg
 //gobot_token 填写在go-cqhttp文件设置的访问密钥
@@ -1587,7 +1587,7 @@ function getQLinfo(strCK, intcreated, strTimestamp, strRemark) {
     var strCheckCK = strCK.match(/pt_key=([^; ]+)(?=;?)/) && strCK.match(/pt_key=([^; ]+)(?=;?)/)[1];
     var strPtPin = decodeURIComponent(strCK.match(/pt_pin=([^; ]+)(?=;?)/) && strCK.match(/pt_pin=([^; ]+)(?=;?)/)[1]);
     var strReturn = "";
-    if (strCheckCK.substring(0, 4) == "AAJh") {
+    if (strCheckCK.substring(0, 3) == "AAJ") {
         var DateCreated = new Date(intcreated);
         var DateTimestamp = new Date(strTimestamp);
         var DateToday = new Date();
