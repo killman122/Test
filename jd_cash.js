@@ -20,10 +20,17 @@ cron "2 0-23/4 * * *" script-path=jd_cash.js,tag=签到领现金
 ============小火箭=========
 签到领现金 = type=cron,script-path=jd_cash.js, cronexpr="2 0-23/4 * * *", timeout=3600, enable=true
  */
-const $ = new Env('签到领现金');
+const $ = new Env('签到领现金潘达接口版');
 const notify = $.isNode() ? require('./sendNotify') : '';
+//Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+let jdNotify = true;//是否关闭通知，false打开通知推送，true关闭通知推送
+//IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
+let helpAuthor = true;
+const randomCount = $.isNode() ? 5 : 5;
+let cash_exchange = false;//是否消耗2元红包兑换200京豆，默认否
+const inviteCodes = []
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item])
@@ -39,13 +46,8 @@ let allMessage = '';
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
     return;
   }
-  await requireConfig()
-  $.authorCode = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/TongLin138/Test@main/function/empty.json')
-  if (!$.authorCode) {
-    $.http.get({url: 'https://purge.jsdelivr.net/gh/TongLin138/Test@main/function/empty.json'}).then((resp) => {}).catch((e) => $.log('刷新CDN异常', e));
-    await $.wait(1000)
-    $.authorCode = await getAuthorShareCode('https://cdn.jsdelivr.net/gh/TongLin138/Test@main/function/empty.json') || []
-  }
+ // await requireConfig()
+  
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -78,24 +80,27 @@ let allMessage = '';
     .finally(() => {
       $.done();
     })
-
 async function jdCash() {
   $.signMoney = 0;
+
   await appindex()
   await index()
+
+  $.exchangeBeanNum = 0;
+  cash_exchange = $.isNode() ? (process.env.CASH_EXCHANGE ? process.env.CASH_EXCHANGE : `${cash_exchange}`) : ($.getdata('cash_exchange') ? $.getdata('cash_exchange') : `${cash_exchange}`);
+
   await appindex(true)
 }
 
 async function appindex(info=false) {
   let functionId = "cash_homePage"
-  let body = {}
-  let sign = await getSign(functionId, body)
+  let sign = `body=%7B%7D&build=167968&client=apple&clientVersion=10.4.0&d_brand=apple&d_model=iPhone13%2C3&ef=1&eid=eidI25488122a6s9Uqq6qodtQx6rgQhFlHkaE1KqvCRbzRnPZgP/93P%2BzfeY8nyrCw1FMzlQ1pE4X9JdmFEYKWdd1VxutadX0iJ6xedL%2BVBrSHCeDGV1&ep=%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22screen%22%3A%22CJO3CMeyDJCy%22%2C%22osVersion%22%3A%22CJUkDK%3D%3D%22%2C%22openudid%22%3A%22CJSmCWU0DNYnYtS0DtGmCJY0YJcmDwCmYJC0DNHwZNc5ZQU2DJc3Zq%3D%3D%22%2C%22area%22%3A%22CJZpCJCmC180ENcnCv80ENc1EK%3D%3D%22%2C%22uuid%22%3A%22aQf1ZRdxb2r4ovZ1EJZhcxYlVNZSZz09%22%7D%2C%22ts%22%3A1648428189%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D&ext=%7B%22prstate%22%3A%220%22%2C%22pvcStu%22%3A%221%22%7D&isBackground=N&joycious=104&lang=zh_CN&networkType=3g&networklibtype=JDNetworkBaseAF&partner=apple&rfs=0000&scope=11&sign=98c0ea91318ef1313786d86d832f1d4d&st=1648428208392&sv=101&uemps=0-0&uts=0f31TVRjBSv7E8yLFU2g86XnPdLdKKyuazYDek9RnAdkKCbH50GbhlCSab3I2jwM04d75h5qDPiLMTl0I3dvlb3OFGnqX9NrfHUwDOpTEaxACTwWl6n//EOFSpqtKDhg%2BvlR1wAh0RSZ3J87iAf36Ce6nonmQvQAva7GoJM9Nbtdah0dgzXboUL2m5YqrJ1hWoxhCecLcrUWWbHTyAY3Rw%3D%3D`
   return new Promise((resolve) => {
     $.post(apptaskUrl(functionId, sign), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`appindex API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -109,8 +114,15 @@ async function appindex(info=false) {
                 return
               }
               $.signMoney = data.data.result.totalMoney;
+              // console.log(`您的助力码为${data.data.result.invitedCode}`)
               console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${data.data.result.invitedCode}\n`);
+              let helpInfo = {
+                'inviteCode': data.data.result.invitedCode,
+                'shareDate': data.data.result.shareDate
+              }
               $.shareDate = data.data.result.shareDate;
+              // $.log(`shareDate: ${$.shareDate}`)
+              // console.log(helpInfo)
               for (let task of data.data.result.taskInfos) {
                 if (task.type === 4) {
                   for (let i = task.doTimes; i < task.times; ++i) {
@@ -149,14 +161,13 @@ async function appindex(info=false) {
     })
   })
 }
-
 function index() {
   return new Promise((resolve) => {
     $.get(taskUrl("cash_mob_home"), async (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`index API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -203,13 +214,14 @@ function index() {
 async function appdoTask(type,taskInfo) {
   let functionId = 'cash_doTask'
   let body = {"type":type,"taskInfo":taskInfo}
-  let sign = await getSign(functionId, body)
+  let sign = await getSignfromPanda(functionId, body)  
+
   return new Promise((resolve) => {
     $.post(apptaskUrl(functionId, sign), (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`appdoTask API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -229,14 +241,13 @@ async function appdoTask(type,taskInfo) {
     })
   })
 }
-
 function doTask(type,taskInfo) {
   return new Promise((resolve) => {
     $.get(taskUrl("cash_doTask",{"type":type,"taskInfo":taskInfo}), (err, resp, data) => {
       try {
         if (err) {
           console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
+          console.log(`doTask API请求失败，请检查网路重试`)
         } else {
           if (safeGet(data)) {
             data = JSON.parse(data);
@@ -256,38 +267,69 @@ function doTask(type,taskInfo) {
     })
   })
 }
+function getSignfromPanda(functionId, body) {	
+    var strsign = '';
+	let data = {
+      "fn":functionId,
+      "body": body
+    }
+    return new Promise((resolve) => {
+        let url = {
+            url: "https://api.jds.codes/jd/sign",
+            body: JSON.stringify(data),
+		    followRedirect: false,
+		    headers: {
+		        'Accept': '*/*',
+		        "accept-encoding": "gzip, deflate, br",
+		        'Content-Type': 'application/json',
+		    },
+		    timeout: 30000
+        }
+        $.post(url, async(err, resp, data) => {
+            try {				
+                data = JSON.parse(data);				
+				strsign=data.data.sign;
+				
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+				resolve(strsign);
+			}
+        })
+    })
+}
 
-function getSign(functionId, body) {
-  return new Promise(async resolve => {
-    let data = {
-      functionId,
-      body: JSON.stringify(body),
-      "client":"apple",
-      "clientVersion":"10.3.0"
-    }
-    let Host = ""
-    let HostArr = ['jdsign.cf', 'signer.nz.lu']
-    if (process.env.SIGN_URL) {
-      Host = process.env.SIGN_URL
+
+function randomString(e) {
+  e = e || 32;
+  let t = "abcdefghijklmnopqrstuvwxyz0123456789", a = t.length, n = "";
+  for (let i = 0; i < e; i++)
+    n += t.charAt(Math.floor(Math.random() * a));
+  return n
+}
+function showMsg() {
+  return new Promise(resolve => {
+    if (!jdNotify) {
+      $.msg($.name, '', `${message}`);
     } else {
-      Host = HostArr[Math.floor((Math.random() * HostArr.length))]
+      $.log(`京东账号${$.index}${$.nickName}\n${message}`);
     }
-    let options = {
-      url: `https://cdn.nz.lu/ddo`,
-      body: JSON.stringify(data),
-      headers: {
-        Host,
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-      },
-      timeout: 30 * 1000
-    }
-    $.post(options, (err, resp, data) => {
+    resolve()
+  })
+}
+function readShareCode() {
+  console.log(`开始`)
+  return new Promise(async resolve => {
+    $.get({url: `http://code.chiang.fun/api/v1/jd/jdcash/read/${randomCount}/`, 'timeout': 30000}, (err, resp, data) => {
       try {
         if (err) {
-          console.log(JSON.stringify(err))
-          console.log(`${$.name} getSign API请求失败，请检查网路重试`)
+          console.log(`${JSON.stringify(err)}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
         } else {
-
+          if (data) {
+            console.log(`随机取${randomCount}个码放到您固定的互助码后面(不影响已有固定互助)`)
+            data = JSON.parse(data);
+          }
         }
       } catch (e) {
         $.logErr(e, resp)
@@ -295,9 +337,10 @@ function getSign(functionId, body) {
         resolve(data);
       }
     })
+    await $.wait(30000);
+    resolve()
   })
 }
-
 function requireConfig() {
   return new Promise(resolve => {
     console.log(`开始获取${$.name}配置文件\n`);
@@ -326,6 +369,23 @@ function requireConfig() {
     console.log(`您提供了${$.shareCodesArr.length}个账号的${$.name}助力码\n`);
     resolve()
   })
+}
+function deepCopy(obj) {
+  let objClone = Array.isArray(obj) ? [] : {};
+  if (obj && typeof obj === "object") {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        //判断ojb子元素是否为对象，如果是，递归复制
+        if (obj[key] && typeof obj[key] === "object") {
+          objClone[key] = deepCopy(obj[key]);
+        } else {
+          //如果不是，简单复制
+          objClone[key] = obj[key];
+        }
+      }
+    }
+  }
+  return objClone;
 }
 
 function apptaskUrl(functionId = "", body = "") {
@@ -393,7 +453,6 @@ function getAuthorShareCode(url) {
     })
   })
 }
-
 function TotalBean() {
   return new Promise(async resolve => {
     const options = {
