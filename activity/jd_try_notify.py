@@ -1,141 +1,142 @@
-#Source::https://github.com/Hyper-Beast/JD_Scripts
+/*
+cron "22 15 * * *" jd_try_notify.js
+ */
+const $ = new Env('京东试用待领取通知')
+const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+const notify = $.isNode() ? require('./sendNotify') : '';
+let trialActivityIdList = []
+let trialActivityTitleList = []
+let notifyMsg = ''
+let size = 1;
+$.isPush = true;
+$.isLimit = false;
+$.isForbidden = false;
+$.wrong = false;
+$.giveupNum = 0;
+$.successNum = 0;
+$.completeNum = 0;
+$.getNum = 0;
+$.try = true;
+$.sentNum = 0;
+$.notifyMsg = ''
 
-"""
-cron: 20 20 * * *
-new Env('京东试用成功通知');
-"""
+let cookiesArr = [], cookie = '', message;
+if ($.isNode()) {
+  Object.keys(jdCookieNode).forEach((item) => {
+    cookiesArr.push(jdCookieNode[item])
+  })
+  if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => { };
+} else {
+  cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
+}
 
+!(async () => {
+    if (!cookiesArr[0]) {
+        $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/', {
+            "open-url": "https://bean.m.jd.com/"
+        })
+        return
+    }
+    // for (let i = 0; i < 200; i++) {
+		  for (let i = 0; i < cookiesArr.length; i++) {
+			if (cookiesArr[i]) {
+			  cookie = cookiesArr[i];
+			  $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+			  $.index = i + 1;
+			  $.isLogin = true;
+			  $.nickName = '';
+			  message = '';
+			  console.log(`\n******开始【京东账号${$.index}】${$.nickName || $.UserName}*********\n`);
+			  if (!$.isLogin) {
+				$.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, { "open-url": "https://bean.m.jd.com/bean/signIndex.action" });
 
-import requests
-import json
-import time
-import os
-import re
-import sys
-import random
-import string
-import urllib
-
-
-
-#以下部分参考Curtin的脚本：https://github.com/curtinlv/JD-Script
-
-def randomuserAgent():
-    global uuid,addressid,iosVer,iosV,clientVersion,iPhone,area,ADID,lng,lat
-    uuid=''.join(random.sample(['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9','a','b','c','z'], 40))
-    addressid = ''.join(random.sample('1234567898647', 10))
-    iosVer = ''.join(random.sample(["15.1.1","14.5.1", "14.4", "14.3", "14.2", "14.1", "14.0.1"], 1))
-    iosV = iosVer.replace('.', '_')
-    clientVersion=''.join(random.sample(["10.3.0", "10.2.7", "10.2.4"], 1))
-    iPhone = ''.join(random.sample(["8", "9", "10", "11", "12", "13"], 1))
-    area=''.join(random.sample('0123456789', 2)) + '_' + ''.join(random.sample('0123456789', 4)) + '_' + ''.join(random.sample('0123456789', 5)) + '_' + ''.join(random.sample('0123456789', 4))
-    ADID = ''.join(random.sample('0987654321ABCDEF', 8)) + '-' + ''.join(random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(random.sample('0987654321ABCDEF', 4)) + '-' + ''.join(random.sample('0987654321ABCDEF', 12))
-    lng='119.31991256596'+str(random.randint(100,999))
-    lat='26.1187118976'+str(random.randint(100,999))
-    UserAgent=''
-    if not UserAgent:
-        return f'jdapp;iPhone;10.0.4;{iosVer};{uuid};network/wifi;ADID/{ADID};model/iPhone{iPhone},1;addressid/{addressid};appBuild/167707;jdSupportDarkMode/0;Mozilla/5.0 (iPhone; CPU iPhone OS {iosV} like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/null;supportJDSHWK/1'
-    else:
-        return UserAgent
-
-#以上部分参考Curtin的脚本：https://github.com/curtinlv/JD-Script
-
-def load_send():
-    global send
-    cur_path = os.path.abspath(os.path.dirname(__file__))
-    sys.path.append(cur_path)
-    if os.path.exists(cur_path + "/sendNotify.py"):
-        try:
-            from sendNotify import send
-        except:
-            send=False
-            print("加载通知服务失败~")
-    else:
-        send=False
-        print("加载通知服务失败~")
-load_send()
-
-
-def printf(text):
-    print(text)
-    sys.stdout.flush()
-
-def get_remarkinfo():
-    url='http://127.0.0.1:5600/api/envs'
-    try:
-        with open('/ql/config/auth.json', 'r') as f:
-            token=json.loads(f.read())['token']
-        headers={
-            'Accept':'application/json',
-            'authorization':'Bearer '+token,
+				if ($.isNode()) {
+				  await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+				}
+				continue
+			  }
+            let data = await try_list()
+            try {
+                list = data.data.list
+                for (let j = 0; j < list.length; j++) {
+                    item = list[j]
+                    if (item.leftTime) {
+                        if (new Date().getTime() < item.endTime + 60 * 60 * 24 * 1000 * 2) {
+                            let title=item.trialName.length>15?item.trialName.substr(0,30)+'...':item.trialName
+                            $.notifyMsg += `【账号】${$.index}.${$.UserName}  可免费领取-${title}\n入口:京东-我的-更多工具-新品试用\n`;
+                        } else {
+                            console.log("开始领取两天后不再推")
+                        }
+                    }
+                }
+            } catch (e) {
             }
-        response=requests.get(url=url,headers=headers)
+            await $.wait(5000);
+        }
+    }
+    //console.log($.notifyMsg)
+	if ($.isNode() && $.notifyMsg) {
+		await notify.sendNotify(`${$.name}`, `${$.notifyMsg}`);
+    }
+    
+})().catch((e) => {
+    console.error(`❗️ ${$.name} 运行错误！\n${e}`)
+}).finally(() => $.done())
 
-        for i in range(len(json.loads(response.text)['data'])):
-            if json.loads(response.text)['data'][i]['name']=='JD_COOKIE':
-                try:
-                    if json.loads(response.text)['data'][i]['remarks'].find('@@')==-1:
-                        remarkinfos[json.loads(response.text)['data'][i]['value'].split(';')[1].replace('pt_pin=','')]=json.loads(response.text)['data'][i]['remarks'].replace('remark=','')
-                    else:
-                        remarkinfos[json.loads(response.text)['data'][i]['value'].split(';')[1].replace('pt_pin=','')]=json.loads(response.text)['data'][i]['remarks'].split("@@")[0].replace('remark=','').replace(';','')
-                except:
-                    pass
-    except:
-        print('读取auth.json文件出错，跳过获取备注')
+async function try_list() {
+    return new Promise((resolve, reject) => {
+        console.log(`拉取申请成功列表...`)
+        let option = taskurl_xh()
+        $.post(option, (err, resp, data) => {
+            try {
+                if (err) {
+                    console.log('err', err)
+                } else {
+                    data = JSON.parse(data);
+                }
+            } catch (e) {
+                reject(`⚠️ ${arguments.callee.name.toString()} API返回结果解析出错\n${e}\n${JSON.stringify(data)}`)
+            } finally {
+                resolve(data)
+            }
+        })
+    })
+}
 
-def get_succeedinfo(ck):
-    url='https://api.m.jd.com/client.action'
-    headers={
-    'accept':'application/json, text/plain, */*',
-    'content-type':'application/x-www-form-urlencoded',
-    'origin':'https://prodev.m.jd.com',
-    'content-length':'249',
-    'accept-language':'zh-CN,zh-Hans;q=0.9',
-    'User-Agent':UserAgent,
-    'referer':'https://prodev.m.jd.com/',
-    'accept-encoding':'gzip, deflate, br',
-    'cookie':ck
-	    }    
-    data=f'appid=newtry&functionId=try_MyTrials&uuid={uuid}&clientVersion={clientVersion}&client=wh5&osVersion={iosVer}&area={area}&networkType=wifi&body=%7B%22page%22%3A1%2C%22selected%22%3A2%2C%22previewTime%22%3A%22%22%7D'
-    response=requests.post(url=url,headers=headers,data=data)
-    isnull=True
-    try:
-        for i in range(len(json.loads(response.text)['data']['list'])):
-            if(json.loads(response.text)['data']['list'][i]['text']['text']).find('试用资格将保留')!=-1:
-                print(json.loads(response.text)['data']['list'][i]['trialName'])
-                try:
-                    send("京东试用待领取物品通知",'账号名称：'+remarkinfos[ptpin]+'\n'+'商品名称:'+json.loads(response.text)['data']['list'][i]['trialName']+"\n"+"商品链接:https://item.jd.com/"+json.loads(response.text)['data']['list'][i]['skuId']+".html")
-                    isnull=False
-                except:
-                     send("京东试用待领取物品通知",'账号名称：'+urllib.parse.unquote(ptpin)+'\n'+'商品名称:'+json.loads(response.text)['data']['list'][i]['trialName']+"\n"+"商品链接:https://item.jd.com/"+json.loads(response.text)['data']['list'][i]['skuId']+".html")
-                     isnull=False 
-        if isnull==True:
-            print("没有在有效期内待领取的试用品\n\n")
-    except:
-        print('获取信息出错，可能是账号已过期')
-if __name__ == '__main__':
-    remarkinfos={}
-    try:
-        get_remarkinfo()
-    except:
-        pass
-    try:
-        cks = os.environ["JD_COOKIE"].split("&")
-    except:
-        f = open("/jd/config/config.sh", "r", encoding='utf-8')
-        cks = re.findall(r'Cookie[0-9]*="(pt_key=.*?;pt_pin=.*?;)"', f.read())
-        f.close()
-    for ck in cks:
-        ck = ck.strip()
-        if ck[-1] != ';':
-            ck += ';'
-        ptpin = re.findall(r"pt_pin=(.*?);", ck)[0]
-        try:
-            if remarkinfos[ptpin]!='':
-                printf("--账号:" + remarkinfos[ptpin] + "--")
-            else:
-                printf("--无备注账号:" + urllib.parse.unquote(ptpin) + "--")
-        except Exception as e:
-            printf("--账号:" + urllib.parse.unquote(ptpin) + "--")
-        UserAgent=randomuserAgent()
-        get_succeedinfo(ck)
+function taskurl_xh() {
+    return {
+        "url": "https://api.m.jd.com/client.action",
+        'headers': {
+            'authority': 'api.m.jd.com',
+            'sec-ch-ua': '" Not;A Brand";v="99", "Google Chrome";v="97", "Chromium";v="97"',
+            'accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'sec-ch-ua-mobile': '?0',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'sec-ch-ua-platform': '"Windows"',
+            'origin': 'https://prodev.m.jd.com',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
+            'referer': 'https://prodev.m.jd.com/',
+            'accept-language': 'zh-CN,zh;q=0.9',
+            "cookie": $.cookie,
+        },
+        "body": "appid=newtry&functionId=try_MyTrials&uuid=1618382783803957689511&clientVersion=&client=wh5&osVersion=&area=&networkType=&body=%7B%22page%22%3A1%2C%22selected%22%3A2%2C%22previewTime%22%3A%22%22%7D",
+    }
+}
+
+function jsonParse(str) {
+    if (typeof str == "string") {
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+            console.log(e);
+            $.msg($.name, '', '请勿随意在BoxJs输入框修改内容\n建议通过脚本去获取cookie')
+            return [];
+        }
+    }
+}
+
+// prettier-ignore
+function Env(t,e){class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,i)=>{s.call(this,t,(t,s,r)=>{t?i(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.encoding="utf-8",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}isShadowrocket(){return"undefined"!=typeof $rocket}isStash(){return"undefined"!=typeof $environment&&$environment["stash-version"]}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const i=this.getdata(t);if(i)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,i)=>e(i))})}runScript(t,e){return new Promise(s=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[o,h]=i.split("@"),n={url:`http://${h}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":o,Accept:"*/*"}};this.post(n,(t,e,i)=>s(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e);if(!s&&!i)return{};{const i=s?t:e;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):i?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const i=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of i)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,i)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[i+1])>>0==+e[i+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,i]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,i,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,i,r]=/^@(.*?)\.(.*?)$/.exec(e),o=this.getval(i),h=i?"null"===o?null:o||"{}":"{}";try{const e=JSON.parse(h);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),i)}catch(e){const o={};this.lodash_set(o,r,t),s=this.setval(JSON.stringify(o),i)}}else s=this.setval(t,e);return s}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,e){return this.isSurge()||this.isLoon()?$persistentStore.write(t,e):this.isQuanX()?$prefs.setValueForKey(t,e):this.isNode()?(this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0):this.data&&this.data[e]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){if(t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)});else if(this.isQuanX())this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t));else if(this.isNode()){let s=require("iconv-lite");this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();s&&this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:i,statusCode:r,headers:o,rawBody:h}=t;e(null,{status:i,statusCode:r,headers:o,rawBody:h},s.decode(h,this.encoding))},t=>{const{message:i,response:r}=t;e(i,r,r&&s.decode(r.rawBody,this.encoding))})}}post(t,e=(()=>{})){const s=t.method?t.method.toLocaleLowerCase():"post";if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),t.headers&&delete t.headers["Content-Length"],this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient[s](t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status),e(t,s,i)});else if(this.isQuanX())t.method=s,this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t));else if(this.isNode()){let i=require("iconv-lite");this.initGotEnv(t);const{url:r,...o}=t;this.got[s](r,o).then(t=>{const{statusCode:s,statusCode:r,headers:o,rawBody:h}=t;e(null,{status:s,statusCode:r,headers:o,rawBody:h},i.decode(h,this.encoding))},t=>{const{message:s,response:r}=t;e(s,r,r&&i.decode(r.rawBody,this.encoding))})}}time(t,e=null){const s=e?new Date(e):new Date;let i={"M+":s.getMonth()+1,"d+":s.getDate(),"H+":s.getHours(),"m+":s.getMinutes(),"s+":s.getSeconds(),"q+":Math.floor((s.getMonth()+3)/3),S:s.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(s.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in i)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?i[e]:("00"+i[e]).substr((""+i[e]).length)));return t}msg(e=t,s="",i="",r){const o=t=>{if(!t)return t;if("string"==typeof t)return this.isLoon()?t:this.isQuanX()?{"open-url":t}:this.isSurge()?{url:t}:void 0;if("object"==typeof t){if(this.isLoon()){let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}if(this.isQuanX()){let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl,i=t["update-pasteboard"]||t.updatePasteboard;return{"open-url":e,"media-url":s,"update-pasteboard":i}}if(this.isSurge()){let e=t.url||t.openUrl||t["open-url"];return{url:e}}}};if(this.isMute||(this.isSurge()||this.isLoon()?$notification.post(e,s,i,o(r)):this.isQuanX()&&$notify(e,s,i,o(r))),!this.isMuteLog){let t=["","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];t.push(e),s&&t.push(s),i&&t.push(i),console.log(t.join("\n")),this.logs=this.logs.concat(t)}}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){const s=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();s?this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${s} \u79d2`),this.log(),(this.isSurge()||this.isQuanX()||this.isLoon())&&$done(t)}}(t,e)}
