@@ -1,6 +1,6 @@
 /*
 女装盲盒
-活动时间：2021-3-2至2021-3-31
+活动时间：2021-4-1至2021-4-30
 活动地址：https://anmp.jd.com/babelDiy/Zeus/3z12ngsd27UR1KfRqdMrMSSg3uxg/index.html
 活动入口：京东app-女装馆-赢京豆
 已支持IOS双京东账号,Node.js支持N个京东账号
@@ -40,8 +40,8 @@ if ($.isNode()) {
     return;
   }
   console.log('女装盲盒\n' +
-      '活动时间：2021-3-2至2021-3-31\n' +
-      '活动地址：https://anmp.jd.com/babelDiy/Zeus/3z12ngsd27UR1KfRqdMrMSSg3uxg/index.html');
+      '活动时间：2022-4-1至2022-4-30\n' +
+      '活动地址：https://anmp.jd.com/babelDiy/Zeus/3qshXVjiSE2M9rfaCpntAXfkg166/index.html');
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -61,7 +61,7 @@ if ($.isNode()) {
         continue
       }
       try {
-        await jdMh('https://anmp.jd.com/babelDiy/Zeus/3z12ngsd27UR1KfRqdMrMSSg3uxg/index.html')
+        await jdMh('https://anmp.jd.com/babelDiy/Zeus/3qshXVjiSE2M9rfaCpntAXfkg166/index.html')
       } catch (e) {
         $.logErr(e)
       }
