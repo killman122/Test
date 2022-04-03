@@ -27,7 +27,6 @@ const $ = new Env('领券中心签到');
 const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-let jdNotify = true;//是否关闭通知，false打开通知推送，true关闭通知推送
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
 if ($.isNode()) {
@@ -39,7 +38,6 @@ if ($.isNode()) {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
-let allMessage = '';
 !(async () => {
   if (!cookiesArr[0]) {
     $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
@@ -147,43 +145,59 @@ async function ccSign(functionId, body) {
     })
   })
 }
-function getSign(functionId, body) {	
-    var strsign = '';
-	let data = {
-      "fn":functionId,
-      "body": body
+
+function getSign(functionId, body) {
+  var strsign = '';
+  let data = {
+    "fn":functionId,
+    "body": body
+  }
+  return new Promise((resolve) => {
+    let url = {
+      url: "https://api.jds.codes/jd/sign",
+      body: JSON.stringify(data),
+      followRedirect: false,
+      headers: {
+        'Accept': '*/*',
+        "accept-encoding": "gzip, deflate, br",
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + jdPandaToken
+      },
+      timeout: 30000
     }
-    return new Promise((resolve) => {
-        let url = {
-            url: "https://api.jds.codes/jd/sign",
-            body: JSON.stringify(data),
-		    followRedirect: false,
-		    headers: {
-		        'Accept': '*/*',
-		        "accept-encoding": "gzip, deflate, br",
-		        'Content-Type': 'application/json',
-		    },
-		    timeout: 30000
+    $.post(url, async(err, resp, data) => {
+      try {
+        data = JSON.parse(data);
+        if (data && data.code === 200) {
+          lnrequesttimes = data.request_times;
+          console.log("连接Panda服务成功，当前Token使用次数为" + lnrequesttimes);
+          if (data && data.code === 401)
+            console.log("未授权,请联系 https://t.me/pang_da_bot 获取授权");
+          if (data.data.sign)
+            strsign = data.data.sign || '';
+          if (strsign !== '')
+            resolve(strsign);
+          else
+            console.log("签名获取失败,可能Token使用次数上限或被封.");
+        } else {
+          console.log("签名获取失败.");
         }
-        $.post(url, async(err, resp, data) => {
-            try {				
-                data = JSON.parse(data);				
-				strsign=data.data.sign;
-				
-            }catch (e) {
-                $.logErr(e, resp);
-            }finally {
-				resolve(strsign);
-			}
-        })
+
+      }catch (e) {
+        $.logErr(e, resp);
+      }finally {
+        resolve(strsign);
+      }
     })
+  })
 }
+
 function getsecretPin(pin) {
   return new Promise(async resolve => {
     let data = {
       "pt_pin": pin
     }
-    let Host = ""
+    let Host
     let HostArr = ['jdsign.cf', 'signer.nz.lu']
     if (process.env.SIGN_URL) {
       Host = process.env.SIGN_URL
@@ -213,17 +227,6 @@ function getsecretPin(pin) {
         resolve(data);
       }
     })
-  })
-}
-
-function showMsg() {
-  return new Promise(resolve => {
-    if (!jdNotify) {
-      $.msg($.name, '', `${message}`);
-    } else {
-      $.log(`京东账号${$.index}${$.nickName}\n${message}`);
-    }
-    resolve()
   })
 }
 
@@ -286,17 +289,7 @@ function TotalBean() {
     })
   })
 }
-function safeGet(data) {
-  try {
-    if (typeof JSON.parse(data) == "object") {
-      return true;
-    }
-  } catch (e) {
-    console.log(e);
-    console.log(`京东服务器访问数据为空，请检查自身设备网络情况`);
-    return false;
-  }
-}
+
 function jsonParse(str) {
   if (typeof str == "string") {
     try {
