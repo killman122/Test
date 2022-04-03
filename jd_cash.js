@@ -265,6 +265,13 @@ function doTask(type,taskInfo) {
 }
 
 function getSign(functionId, body) {
+  let Token;
+  let TokenArr = ['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODU1OTE3NDIyLCJpYXQiOjE2NDg5NjgwMDEsImV4cCI6MTY4MDUwNDAwMX0.ncZ9fdATeQ7K-AIfD0kiOYaPRlR0aj4DdvsjfiKlb0s', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUxNTg5MTUyMCwiaWF0IjoxNjQ4OTY4MDMyLCJleHAiOjE2ODA1MDQwMzJ9.FTdNtMHkF8zMCxCOU5987Dx1uaxycfrZF4-pBf6cP24', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTg4MjI2MDI5NCwiaWF0IjoxNjQ4OTY4MDg3LCJleHAiOjE2ODA1MDQwODd9.mJpvIB5RpTsQTzLg79uc-vPc3G9xmeMbM3oJNaaxXJc']
+  Token = TokenArr[Math.floor((Math.random() * TokenArr.length))]
+  if (!Token) {
+    console.log('Token随机获取出错');
+    return;
+  }
   var strsign = '';
   let data = {
     "fn":functionId,
@@ -300,7 +307,6 @@ function getSign(functionId, body) {
           } else {
             console.log("签名获取失败.");
           }
-				
       }catch (e) {
         $.logErr(e, resp);
       }finally {
