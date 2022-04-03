@@ -273,6 +273,7 @@ function doTask(type,taskInfo) {
     })
   })
 }
+
 function getSignfromPanda(functionId, body) {	
   var strsign = '';
   let data = {
@@ -309,9 +310,9 @@ function getSignfromPanda(functionId, body) {
             } else {
                 console.log("签名获取失败，原因未知");
             }	
-      }catch (e) {
-        $.logErr(e, resp);
-      }finally {
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
         resolve(strsign);
       }
     })
