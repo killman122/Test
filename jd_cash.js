@@ -37,12 +37,6 @@ if ($.isNode()) {
 }
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 let allMessage = '';
-let jdPandaToken = '';
-jdPandaToken = $.isNode() ? (process.env.PandaToken ? process.env.PandaToken : `${jdPandaToken}`) : ($.getdata('PandaToken') ? $.getdata('PandaToken') : `${jdPandaToken}`);
-if (!jdPandaToken) {
-    console.log('请填写Panda获取的Token,变量是PandaToken');
-	return;
-}
 
 !(async () => {
   if (!cookiesArr[0]) {
@@ -286,7 +280,7 @@ function getSign(functionId, body) {
         'Accept': '*/*',
         "accept-encoding": "gzip, deflate, br",
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + jdPandaToken
+        'Authorization': 'Bearer ' + Token
       },
       timeout: 30000
     }
