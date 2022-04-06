@@ -24,7 +24,6 @@ if ($.isNode()) {
   })
   if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
   };
-  if (JSON.stringify(process.env).indexOf('GITHUB') > -1) process.exit(0)
 } else {
   cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
 }
@@ -33,6 +32,7 @@ const JD_API_HOST = 'https://api.m.jd.com/api';
 const activeEndTime = '2022/4/23 00:00:00+08:00';//活动结束时间
 let nowTime = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000;
 !(async () => {
+    console.log(`\n入口：https://welfare.m.jd.com/#/home\n`);
     if (!cookiesArr[0]) {
       $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
       return;
@@ -42,43 +42,6 @@ let nowTime = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 
       $.msg($.name, '活动已结束', `该活动累计获得京豆：${$.jingBeanNum}个\n请删除此脚本\n咱江湖再见`);
       if ($.isNode()) await notify.sendNotify($.name + '活动已结束', `请删除此脚本\n咱江湖再见`);
       return
-    }
-    await updateShareCodesCDN();
-
-    for (let i = 0; i < cookiesArr.length; i++) {
-      if (cookiesArr[i]) {
-        cookie = cookiesArr[i];
-        $.index = i + 1;
-        $.canHelp = true;//能否助力
-        $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-        getUA()
-        await supportList();//助力情况
-        await getHelp();//获取邀请码
-        if ($.updatePkActivityIdRes && $.updatePkActivityIdRes.length) {
-          $.temp = [...new Set([...$.temp, ...$.updatePkActivityIdRes])]
-        }
-      }
-    }
-
-    console.log('助力排队:', $.temp)
-    for (let i = 0; i < cookiesArr.length; i++) {
-      cookie = cookiesArr[i];
-      $.index = i + 1;
-      $.canHelp = true;//能否助力
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      getUA()
-      if ((cookiesArr && cookiesArr.length >= 1) && $.canHelp) {
-        console.log(`\n先自己账号内部相互邀请助力\n`);
-        for (let item of $.temp) {
-          console.log(`\n${$.UserName} 去参助力 ${item}`);
-          const helpRes = await toHelp(item.trim());
-          if (helpRes.data.status === 5) {
-            console.log(`助力机会已耗尽，跳出助力`);
-            $.canHelp = false;
-            break;
-          }
-        }
-      }
     }
 
     for (let i = 0; i < cookiesArr.length; i++) {
@@ -387,98 +350,6 @@ function indexInfo(flag = false) {
   });
 }
 
-//获取助力信息
-function supportList() {
-  const options = taskPostUrl('/khc/index/supportList', {})
-  return new Promise((resolve) => {
-    $.post(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data);
-          if (data.code === 200) {
-            console.log(`助力情况：${data['data']['supportedNums']}/${data['data']['supportNeedNums']}`);
-            message += `邀请好友助力：${data['data']['supportedNums']}/${data['data']['supportNeedNums']}\n`
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp);
-      } finally {
-        resolve();
-      }
-    })
-  });
-}
-
-//积分抽奖
-function lottery() {
-  const options = taskPostUrl('/khc/record/lottery', {})
-  return new Promise((resolve) => {
-    $.post(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data);
-          if (data.code === 200) {
-            if (data.data.prizeId !== 8) {
-              //已中奖
-              const url = 'https://carnivalcity.m.jd.com/#/integralDetail';
-              console.log(`积分抽奖获得:${data.data.prizeName}`);
-              message += `积分抽奖获得：${data.data.prizeName}\n`;
-              $.msg($.name, '', `京东账号 ${$.index} ${$.nickName || $.UserName}\n积分抽奖获得：${data.data.prizeName}\n兑换地址：${url}`, {'open-url': url});
-              if ($.isNode()) await notify.sendNotify($.name, `京东账号 ${$.index} ${$.nickName || $.UserName}\n积分抽奖获得：${data.data.prizeName}\n兑换地址：${url}`);
-            } else {
-              console.log(`积分抽奖结果:${data['data']['prizeName']}}`);
-            }
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp);
-      } finally {
-        resolve();
-      }
-    })
-  });
-}
-
-//查询抽奖记录(未兑换的)
-function check() {
-  const options = taskPostUrl('/khc/record/convertRecord', {pageNum: 1})
-  return new Promise((resolve) => {
-    $.post(options, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data);
-          let str = '';
-          if (data.code === 200) {
-            for (let obj of data.data) {
-              if (obj.hasOwnProperty('fillStatus') && obj.fillStatus !== true) {
-                str += JSON.stringify(obj);
-              }
-            }
-          }
-          if (str.length > 0) {
-            const url = 'https://carnivalcity.m.jd.com/#/integralDetail';
-            $.msg($.name, '', `京东账号 ${$.index} ${$.nickName || $.UserName}\n积分抽奖获得：${str}\n兑换地址：${url}`, {'open-url': url});
-            if ($.isNode()) await notify.sendNotify($.name, `京东账号 ${$.index} ${$.nickName || $.UserName}\n积分抽奖获得：${str}\n兑换地址：${url}`);
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp);
-      } finally {
-        resolve();
-      }
-    })
-  });
-}
-
 function myRank() {
   return new Promise(resolve => {
     const options = taskPostUrl("/khc/rank/myPastRanks", {});
@@ -545,94 +416,6 @@ function saveJbean(date) {
   })
 }
 
-async function doHelp() {
-  console.log(`\n开始助力好友`);
-  for (let i in $.newShareCodes) {
-    let item = $.newShareCodes[i]
-    console.log('好友助力码：', item)
-    if (!item) continue;
-    const helpRes = await toHelp(item.trim());
-    if (helpRes.data.status === 5) {
-      console.log(`助力机会已耗尽，跳出助力`);
-      break;
-    } else if (helpRes.data.status === 4) {
-      console.log(`该助力码[${item}]已达上限`);
-      $.newShareCodes[i] = ''
-    }
-  }
-}
-
-//助力API
-function toHelp(code) {
-  return new Promise(resolve => {
-    const body = {"shareId": `${code}`};
-    const options = taskPostUrl('/khc/task/doSupport', body)
-    $.post(options, (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          console.log(`助力结果:${data}`);
-          data = JSON.parse(data);
-          if (data && data['code'] === 200) {
-            if (data['data']['status'] === 6) console.log(`助力成功\n`)
-            if (data['data']['jdNums']) $.beans += data['data']['jdNums'];
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-
-//获取邀请码API
-function getHelp() {
-  return new Promise(resolve => {
-    const body = {"apiMapping": "/khc/task/getSupport"}
-    $.get(taskUrl(body), async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data);
-          if (data.code === 200) {
-            console.log(`\n\n${$.name}互助码每天都变化,旧的不可继续使用`);
-            $.log(`【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${data.data.shareId}\n\n`);
-            $.temp.push(data.data.shareId);
-          } else {
-            console.log(`获取邀请码失败：${JSON.stringify(data)}`);
-            if (data.code === 1002) $.blockAccount = true;
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
-
-function taskUrl(body = {}) {
-  return {
-    url: `${JD_API_HOST}?appid=guardian-starjd&functionId=carnivalcity_jd_prod&body=${JSON.stringify(body)}&t=${Date.now()}&loginType=2`,
-    headers: {
-      "accept": "application/json, text/plain, */*",
-      "accept-encoding": "gzip, deflate, br",
-      "accept-language": "zh-cn",
-      "referer": "https://carnivalcity.m.jd.com/",
-      "origin": "https://carnivalcity.m.jd.com",
-      "Cookie": cookie,
-      "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
-    }
-  }
-}
-
 //获取当前活动总京豆数量
 function getListJbean() {
   return new Promise(resolve => {
@@ -680,11 +463,6 @@ function getListIntegral() {
           if (data.code === 200) {
             $.integralCount = data.data.integralNum || 0;//累计活动积分
             message += `累计获得积分：${$.integralCount}\n`;
-            console.log(`开始抽奖，当前积分可抽奖${parseInt($.integralCount / 50)}次\n`);
-            // for (let i = 0; i < parseInt($.integralCount / 50); i++) {
-            //   await lottery();
-            //   await $.wait(500);
-            // }
           } else {
             console.log(`integralRecord失败：${JSON.stringify(data)}`);
           }
@@ -731,30 +509,6 @@ function getListRank() {
   })
 }
 
-function updateShareCodesCDN() {
-  return new Promise(resolve => {
-    $.get({
-      url: "https://longuet.bargain138.workers.dev/https://raw.githubusercontent.com/TongLin138/Test/main/utils/empty.json",
-      headers: {"User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")},
-      timeout: 10000
-    }, async (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${JSON.stringify(err)}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          data = JSON.parse(data)
-          $.updatePkActivityIdRes = data.data;
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
 function taskPostUrl(a, t = {}) {
   const body = $.toStr({...t, "apiMapping": `${a}`})
   return {
@@ -773,9 +527,9 @@ function taskPostUrl(a, t = {}) {
 
 async function showMsg() {
   if ($.beans) {
-    allMessage += `京东账号${$.index} ${$.nickName || $.UserName}\n本次运行获得：${$.beans}京豆\n${message}活动地址：https://carnivalcity.m.jd.com${$.index !== cookiesArr.length ? '\n\n' : ''}`
+    allMessage += `京东账号${$.index} ${$.nickName || $.UserName}\n本次运行获得：${$.beans}京豆\n${message}活动地址：https://welfare.m.jd.com/#/home${$.index !== cookiesArr.length ? '\n\n' : ''}`
   }
-  $.msg($.name, `京东账号${$.index} ${$.nickName || $.UserName}`, `${message}具体详情点击弹窗跳转后即可查看`, {"open-url": "https://carnivalcity.m.jd.com"});
+  $.msg($.name, `京东账号${$.index} ${$.nickName || $.UserName}`, `${message}具体详情点击弹窗跳转后即可查看`, {"open-url": "https://welfare.m.jd.com/#/home"});
 }
 
 function getUA() {
