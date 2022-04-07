@@ -109,7 +109,8 @@ async function JD818() {
   try {
     await supportList();//助力情况
     await getHelp();//获取邀请码
-    if ($.blockAccount)
+    if ($.blockAccount) return
+    //await showMsg()
   } catch (e) {
     $.logErr(e)
   }
