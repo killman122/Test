@@ -55,7 +55,7 @@ if($.isNode()){
 async function main(){
     try{
         await channelUserSignInfo_xh();
-        await queryMission_xh();
+        // await queryMission_xh();
         await channelUserSubsidyInfo_xh();
     } catch(e){
         $.logErr(e)
