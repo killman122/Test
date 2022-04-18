@@ -471,33 +471,35 @@ function pandaLogs(){
     })
 }
 function rabbitLogs(){
-  var logs = '';
-  return new Promise((resolve) => {
-    let url = {
-      url:`${RabbitUrl}`,
-      followRedirect: false,
-      timeout: 30000
-    }
-    $.get(url, async(err, resp, data) => {
-      try {
-        data = JSON.parse(data);
-        if (data && data.data.status === 0) {
-          logs = {
-            random: data.data.random,
-            log: data.data.log
-          }
-        } else if (data.data.error === '\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86') {
-          console.log("\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86");
-        } else {
-          console.log("Log获取失败");
+    var logs = '';
+    return new Promise((resolve) => {
+        let url = {
+            url:`${RabbitUrl}`,
+            followRedirect: false,
+            timeout: 30000
         }
-      }catch (e) {
-        $.logErr(e, resp);
-      }finally {
-        resolve(logs);
-      }
+        $.get(url, async(err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if (data && data.data.status === 0) {
+                    logs = {
+                        random: data.data.random,
+                        log: data.data.log
+                    }
+                } else if (data.data.error === '\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86') {
+                    console.log("\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86");
+                } else if (data.success === false) {
+                    console.log("获取Log次数达到上限");
+                } else {
+                    console.log("Log获取失败");
+                }
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+                resolve(logs);
+            }
+        })
     })
-  })
 }
 function jsonParse(str) {
   if (typeof str == "string") {

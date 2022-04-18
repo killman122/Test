@@ -291,6 +291,8 @@ function rabbitLogs(){
                     }
                 } else if (data.data.error === '\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86') {
                     console.log("\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86");
+                } else if (data.success === false) {
+                    console.log("获取Log次数达到上限");
                 } else {
                     console.log("Log获取失败");
                 }
