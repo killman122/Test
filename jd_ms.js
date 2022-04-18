@@ -471,38 +471,33 @@ function pandaLogs(){
     })
 }
 function rabbitLogs(){
-    var logs = '';
-    return new Promise((resolve) => {
-        let url = {
-            url:`${RabbitUrl}`,
-            followRedirect: false,
-            timeout: 30000
+  var logs = '';
+  return new Promise((resolve) => {
+    let url = {
+      url:`${RabbitUrl}`,
+      followRedirect: false,
+      timeout: 30000
+    }
+    $.get(url, async(err, resp, data) => {
+      try {
+        data = JSON.parse(data);
+        if (data && data.data.status === 0) {
+          logs = {
+            random: data.data.random,
+            log: data.data.log
+          }
+        } else if (data.data.error === '\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86') {
+          console.log("\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86");
+        } else {
+          console.log("Log获取失败");
         }
-        $.get(url, async(err, resp, data) => {
-            try {
-                data = JSON.parse(data);
-                if (data && data.status == 0) {
-                    lnrequesttimes = data.request_times;
-                    logs = {
-                        random: data.random,
-                        log: data.log
-                    }
-                    //console.info(logs['random']+"----"+logs['log'])
-                    if (logs != '')
-                        resolve(logs);
-                    else
-                        console.log("log获取失败.");
-                } else {
-                    console.log("log获取失败.");
-                }
-
-            }catch (e) {
-                $.logErr(e, resp);
-            }finally {
-                resolve(logs);
-            }
-        })
+      }catch (e) {
+        $.logErr(e, resp);
+      }finally {
+        resolve(logs);
+      }
     })
+  })
 }
 function jsonParse(str) {
   if (typeof str == "string") {
