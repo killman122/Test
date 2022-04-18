@@ -26,9 +26,11 @@ cron "30 8 * * *" script-path=jd_ms.js, tag=秒秒币
 秒秒币 = type=cron,script-path=jd_ms.js, cronexpr="30 8 * * *", timeout=3600, enable=true
  */
 const $ = new Env('秒秒币-LOG接口版');
-let notify;
+
+const notify = $.isNode() ? require('./sendNotify') : '';
 //Node.js用户请在jdCookie.js处填写京东ck;
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+var timestamp = Math.round(new Date().getTime()).toString();
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
 let RabbitUrl = process.env.Rabbit_Url ?? ""; // logurl
@@ -87,7 +89,6 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 
 async function jdMs() {
   $.score = 0
-  await requireConfig()
   await getActInfo()
   await getUserInfo()
   await getActInfo()
@@ -224,37 +225,9 @@ function getTaskList() {
   })
 }
 
-async function requireConfig() {
-    return new Promise(resolve => {
-        notify = $.isNode() ? require('./sendNotify') : '';
-        const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-        const scriptsLog = $.isNode() ? require('./ql_jlhb_log.js') : '';
-        if ($.isNode()) {
-            Object.keys(jdCookieNode).forEach((item) => {
-                if (jdCookieNode[item]) {
-                    cookiesArr.push(jdCookieNode[item])
-                }
-            })
-            Object.keys(scriptsLog).forEach((item) => {
-                if (scriptsLog[item]) {
-                    scriptsLogArr.push(scriptsLog[item])
-                }
-            })
-
-            if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
-            };
-        } else {
-            cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
-        }
-        console.log(`共${cookiesArr.length}个京东账号\n`)
-        resolve()
-    })
-}
-
 async function doTask(body) {
-  logs = await getLog()
-  //let random = decodeURIComponent(logs.match(/"random":"(\d+)"/)[1]),log = decodeURIComponent(logs.match(/"log":"(.*)"/)[1])
-  let random = logs.substring(10,18),log = logs.substring(27,logs.length-1)
+  logs = await getJinliLogs()
+  let random = logs["random"].toString(),log =logs["log"].toString()
   body = {...body, "encryptProjectId": $.encryptProjectId, "sourceCode": sourceCode, "ext": {},"extParam":{"businessData":{"random":random},"signStr":log,"sceneid":"MShPageh5"} }
   return new Promise(resolve => {
     $.post(taskPostUrl('doInteractiveAssignment', body), (err, resp, data) => {
@@ -278,12 +251,97 @@ async function doTask(body) {
   })
 }
 
-async function getLog() {
-    var num = Math.floor(Math.random() * (scriptsLogArr.length - 0 + 1) + 0);
-    logs = scriptsLogArr[num]
-    return logs
+function tttsign() {
+  return new Promise(resolve => {
+      body = 'appid=babelh5&body=%7B%22encryptProjectId%22%3A%224NzhoLbAJtBXbyRj5zGwprtf6GDv%22%2C%22encryptAssignmentId%22%3A%223yRMFkp3SN8nXpX49xAdCWsdy5XP%22%2C%22completionFlag%22%3Atrue%2C%22itemId%22%3A%221%22%2C%22sourceCode%22%3A%22aceaceqingzhan%22%7D&sign=11&t=1642929553660'
+    $.post(ttt(body), (err, resp, data) => {
+      try {
+        if (err) {
+          console.log(`${err},${jsonParse(resp.body)['message']}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          if (safeGet(data)) {
+            data = JSON.parse(data)
+            if (data.code === 0) {
+              rewardsInfo = data.rewardsInfo.failRewards[0].msg
+              console.log(`${rewardsInfo}`)
+            }else console.log(data.msg)
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data);
+      }
+    })
+  })
 }
+async function readpacksign() {
+	logs = await getJinliLogs()
+	let random = logs["random"].toString(),log =logs["log"].toString()
+  return new Promise(resolve => {
+      body = 'uuid=16488990475261100141756.111.1650014649515&clientVersion=10.3.0&client=wh5&osVersion=&area=4_48201_54794_0&networkType=unknown&functionId=signRedPackage&body={"random":random,"log":log,"sceneid":"MShPageh5","ext":{"platform":"1","eid":"","referUrl":-1,"userAgent":-1}}&appid=SecKill2020'
+    $.post(readpack(body), (err, resp, data) => {
+    
+      try {
+        if (err) {
+          console.log(`${err},${jsonParse(resp.body)['message']}`)
+          console.log(`${$.name} API请求失败，请检查网路重试`)
+        } else {
+          if (safeGet(data)) {
+            data = JSON.parse(data)
+			console.log(data)
+            if (data.code === 200) {
+              rewardsInfo = data.result.msg
+              console.log(`${rewardsInfo}`)
+            }else console.log("今日签到红包已领")
+          }
+        }
+      } catch (e) {
+        $.logErr(e, resp)
+      } finally {
+        resolve(data);
+      }
+    })
+  })
+}
+function showMsg() {
+  return new Promise(resolve => {
+    message += `本次运行获得秒秒币${$.score-$.cur}枚，共${$.score}枚`;
+    $.msg($.name, '', `京东账号${$.index}${$.nickName}\n${message}`);
+    resolve()
+  })
+}
+function ttt(body) {
+  let url = `${JD_API_HOST}client.action?functionId=doInteractiveAssignment`;
 
+  return {
+    url,
+    body: body,
+    headers: {
+      "Cookie": cookie,
+      "origin": "https://prodev.m.jd.com",
+     
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+    }
+  }
+}
+function readpack(body) {
+  let url = `${JD_API_HOST}client.action`;
+
+  return {
+    url,
+    body: body,
+    headers: {
+      "Cookie": cookie,
+      "origin": "https://h5.m.jd.com",
+     
+      'Content-Type': 'application/x-www-form-urlencoded',
+      "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
+    }
+  }
+}
 function taskPostUrl(function_id, body = {}, extra = '', function_id2) {
   let url = `${JD_API_HOST}`;
   if (function_id2) {
@@ -358,8 +416,94 @@ function safeGet(data) {
     return false;
   }
 }
+function getJinliLogs() {
+    if (jdPandaToken && RabbitUrl){
+        console.info('进入rabbit接口获取log!')
+        return rabbitLogs();
+    }
+    if(jdPandaToken && !RabbitUrl){
+        console.info('进入panda接口获取log!')
+        return pandaLogs();
+    }
+    if(RabbitUrl && !jdPandaToken){
+        console.info('进入rabbit接口获取log!')
+        return rabbitLogs();
+    }
+    return '';
+}
+function pandaLogs(){
+    var logs = '';
+    return new Promise((resolve) => {
+        let url = {
+            url: "https://api.jds.codes/jd/log",
+            followRedirect: false,
+            headers: {
+                'Accept': '*/*',
+                "accept-encoding": "gzip, deflate, br",
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + jdPandaToken
+            },
+            timeout: 30000
+        }
+        $.get(url, async(err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if (data && data.code == 200) {
+                    lnrequesttimes = data.request_times;
+                    console.log("连接Panda服务成功，当前Token使用次数为" + lnrequesttimes);
+                    if (data.data)
+                        logs = data.data || '';
+                    //console.info(logs['random']+"----"+logs['log'])
+                    if (logs != '')
+                        resolve(logs);
+                    else
+                        console.log("签名获取失败,可能Token使用次数上限或被封.");
+                } else {
+                    console.log("签名获取失败.");
+                }
 
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+                resolve(logs);
+            }
+        })
+    })
+}
+function rabbitLogs(){
+    var logs = '';
+    return new Promise((resolve) => {
+        let url = {
+            url:`${RabbitUrl}`,
+            followRedirect: false,
+            timeout: 30000
+        }
+        $.get(url, async(err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if (data && data.status == 0) {
+                    lnrequesttimes = data.request_times;
+                    logs = {
+                        random: data.random,
+                        log: data.log
+                    }
+                    //console.info(logs['random']+"----"+logs['log'])
+                    if (logs != '')
+                        resolve(logs);
+                    else
+                        console.log("log获取失败.");
+                } else {
+                    console.log("log获取失败.");
+                }
 
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+                resolve(logs);
+            }
+        })
+    })
+}
 function jsonParse(str) {
   if (typeof str == "string") {
     try {
