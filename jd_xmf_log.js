@@ -25,6 +25,7 @@ const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '';
+var timestamp = Math.round(new Date().getTime()).toString();
 $.shareCodes = [];
 let RabbitUrl = process.env.Rabbit_Url ?? ""; // logurl
 let jdPandaToken = '';
@@ -79,28 +80,42 @@ async function main() {
   await queryInteractiveInfo($.projectId)
   if ($.taskList) {
     for (const vo of $.taskList) {
-      if (vo.ext.extraType !== 'brandMemberList' && vo.ext.extraType !== 'assistTaskDetail') {
-        if (vo.completionCnt < vo.assignmentTimesLimit) {
+      $.risk = false
+	  if (vo.ext.extraType !== 'brandMemberList' && vo.ext.extraType !== 'assistTaskDetail') {
+		if (vo.completionCnt < vo.assignmentTimesLimit) {
           console.log(`任务：${vo.assignmentName},去完成`);
           if (vo.ext) {
             if (vo.ext.extraType === 'sign1') {
               await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vo.ext.sign1.itemId)
+			  if($.risk === true) {
+			  return;
+			  }
             }
             for (let vi of vo.ext.productsInfo ?? []) {
               if (vi.status === 1) {
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.itemId)
+				if($.risk === true) {
+				  return;
+				}
               }
             }
             for (let vi of vo.ext.shoppingActivity ?? []) {
               if (vi.status === 1) {
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.advId, 1)
+				if($.risk === true) {
+				  return;
+				}
                 await $.wait(6000)
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.advId, 0)
+
               }
             }
             for (let vi of vo.ext.browseShop ?? []) {
               if (vi.status === 1) {
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.itemId, 1)
+				if($.risk === true) {
+				  return;
+				}
                 await $.wait(6000)
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.itemId, 0)
               }
@@ -108,6 +123,9 @@ async function main() {
             for (let vi of vo.ext.addCart ?? []) {
               if (vi.status === 1) {
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.itemId, 1)
+				if($.risk === true) {
+				  return;
+				}
                 await $.wait(6000)
                 await doInteractiveAssignment($.projectId, vo.encryptAssignmentId, vi.itemId, 0)
               }
@@ -115,6 +133,7 @@ async function main() {
           }
         } else {
           console.log(`任务：${vo.assignmentName},已完成`);
+		  
         }
       }
     }
@@ -123,9 +142,8 @@ async function main() {
   }
 }
 async function doInteractiveAssignment(projectId, encryptAssignmentId, itemId, actionType) {
-  await $.wait(1000)
+  $.xmferr = ''
   logs = await getJinliLogs()
-  await $.wait(1000)
   let random = logs["random"].toString(),log =logs["log"].toString()
   let body = { "encryptProjectId": projectId, "encryptAssignmentId": encryptAssignmentId, "sourceCode": "acexinpin0823", "itemId": itemId, "actionType": actionType, "completionFlag": "", "ext": {},"extParam":{"businessData":{"random":random},"signStr":log,"sceneid":"XMFhPageh5"} }
   return new Promise(resolve => {
@@ -139,6 +157,10 @@ async function doInteractiveAssignment(projectId, encryptAssignmentId, itemId, a
           if (data) {
             data = JSON.parse(data);
             console.log(data.msg);
+			$.xmferr = data.msg
+			if ($.xmferr === '风险等级未通过'){
+			  $.risk = true;
+            }
           } else {
             console.log("没有返回数据")
           }
