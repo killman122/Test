@@ -1,33 +1,35 @@
 /*
 愤怒的锦鲤
-更新时间：2022-04-05
+更新时间：2022-04-13
 备注：高速并发请求，专治偷助力。在kois环境变量中填入需要助力的pt_pin，有多个请用@符号连接
-接入了代理 https://www.xiequ.cn/ 可以去嫖携趣的 每日1000免费ip 选择1个ip txt文本返回即可
 
-LingFeng魔改版
+作者：LingFeng魔改版
+
+需要安装依赖：
+pnpm install -g global-agent
+pnpm install -g bootstrap
 
 改用以下变量
 #雨露均沾，若配置，则车头外的ck随机顺序，这样可以等概率的随到前面来
 export  KOI_FAIR_MODE="true"
 #其他变量
 export kois ="pt_pin@pt_pin@pt_pin" 指定车头pin
-export KOI_LOG_URL ="" 锦鲤log api
-export KOI_LOG_NUMS ="" 获取锦鲤数量 默认100
 export PROXY_URL ="" ip代理api
+export Rabbit_Url =""
 脚本兼容: QuantumultX, Surge,Loon, JSBox, Node.js
 =================================Quantumultx=========================
 [task_local]
 #愤怒的锦鲤
-30 0,8 * * * https://raw.githubusercontent.com/LingFeng0918/LF_JD/main/jd_angryKoi.js, tag=愤怒的锦鲤, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
+30 0,8 * * * jd_angryKoi_log.js, tag=愤怒的锦鲤, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jd.png, enabled=true
 =================================Loon===================================
 [Script]
-cron "30 0,8  * * *" script-path=https://raw.githubusercontent.com/LingFeng0918/LF_JD/main/jd_angryKoi.js,tag=愤怒的锦鲤
+cron "30 0,8  * * *" script-path=jd_angryKoi_log.js,tag=愤怒的锦鲤
 ===================================Surge================================
-愤怒的锦鲤 = type=cron,cronexp="30 0,8  * * *",wake-system=1,timeout=3600,script-path=https://raw.githubusercontent.com/LingFeng0918/LF_JD/main/jd_angryKoi.js
+愤怒的锦鲤 = type=cron,cronexp="30 0,8  * * *",wake-system=1,timeout=3600,script-path=jd_angryKoi_log.js
 ====================================小火箭=============================
-愤怒的锦鲤 = type=cron,script-path=https://raw.githubusercontent.com/LingFeng0918/LF_JD/main/jd_angryKoi.js, cronexpr="30 0,8  * * *", timeout=3600, enable=true
+愤怒的锦鲤 = type=cron,script-path=jd_angryKoi_log.js, cronexpr="30 0,8  * * *", timeout=3600, enable=true
  */
-const $ = new Env("愤怒的锦鲤 - LingFeng自用版 ")
+const $ = new Env("愤怒的锦鲤-LOG版 ")
 require("global-agent/bootstrap");
 const JD_API_HOST = 'https://api.m.jd.com/client.action';
 //const ua = `jdltapp;iPhone;3.1.0;${Math.ceil(Math.random() * 4 + 10)}.${Math.ceil(Math.random() * 4)};${randomString(40)}`
@@ -35,35 +37,29 @@ const ua = "Mozilla/5.0 (Linux; U; Android 8.0.0; zh-cn; Mi Note 2 Build/OPR1.17
 let fair_mode = process.env.KOI_FAIR_MODE == "true" ? true : false
 let chetou_number = process.env.KOI_CHETOU_NUMBER ? Number(process.env.KOI_CHETOU_NUMBER) : 0
 var kois = process.env.kois ?? ""
-let koiLogUrl = process.env.KOI_LOG_URL ?? ""
 let proxyUrl = process.env.PROXY_URL ?? ""; // 代理的api地址
 let proxy = "";
-let logNums = process.env.KOI_LOG_NUMS ? Number(process.env.KOI_LOG_NUMS) : 100
+let RabbitUrl = process.env.Rabbit_Url ?? ""; // logurl
+let jdlogurl = process.env.Jdlog_Url ?? ""; // logurl
 let nums = 0;
 let cookiesArr = []
 let scriptsLogArr = []
 var tools = []
-let logs;
-
 if (proxyUrl){
     let urlRex =
         /[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+\.?/g;
     global.GLOBAL_AGENT.NO_PROXY = `${urlRex.exec(proxyUrl)[0]},log.catttt.com`;
 }
+if (!jdlogurl && !RabbitUrl){
+    console.log(`请填写普通获取的logurl,变量是Jdlog_Url 或者填写Rabbit获取的logurl，变量是Rabbit_Url`)
+    return;
+}
+var logs;
 
 let notify, allMessage = '';
 
 !(async () => {
     await requireConfig()
-    let res = await getJinliLogs(koiLogUrl)
-    scriptsLogArr = [...(res || []), ...scriptsLogArr]
-    console.log(`共${scriptsLogArr.length}个助力logn`)
-    if (scriptsLogArr.length == 0){
-        console.log(`LingFeng提醒: log为空,脚本停止运行！`)
-        return
-    }
-    console.log(`\n 锦鲤红包助力log需要手动抓取 \n`)
-    console.log(`\n 拿你小号口令助力抓包,搜关键字 jinli_h5assist 查看请求文本里，再通过URL转码（推荐 https://tool.chinaz.com/tools/urlencode.aspx）拿到对应参数,青龙环境变量里添加 logs \n`)
     console.log(`\n 示例: logs 值 "random":"75831714","log":"1646396568418~1jD94......太长省略...Qwt9i"\n`)
     console.log(`当前配置的车头数目：${chetou_number}，是否开启公平模式：${fair_mode}`)
     console.log("开始获取用于助力的账号列表")
@@ -230,7 +226,7 @@ function shuffle(array) {
 
 async function getHelpInfoForCk(cookieIndex, cookie) {
     console.log(`开始请求第 ${cookieIndex} 个账号的信息`)
-    logs = await getLog()
+    logs = await getJinliLogs()
     if(proxyUrl){
         if (nums % 8 == 0) {
             await getProxy();
@@ -238,7 +234,7 @@ async function getHelpInfoForCk(cookieIndex, cookie) {
         }
         nums++;
     }
-    let random = logs.substring(10,18),log = logs.substring(27,logs.length-1)
+    let random = logs["random"].toString(),log =logs["log"].toString()
     //let random = decodeURIComponent(logs.match(/"random":"(\d+)"/)[1]),log = decodeURIComponent(logs.match(/"log":"(.*)"/)[1])
     let data;
     // 开启红包
@@ -425,9 +421,9 @@ async function with_retry(ctx = "", callback_func, max_retry_times = 3, retry_in
 }
 
 async function openRedPacket(cookie) {
-    logs = await getLog()
+    logs = await getJinliLogs()
     //let random = decodeURIComponent(logs.match(/"random":"(\d+)"/)[1]),log = decodeURIComponent(logs.match(/"log":"(.*)"/)[1])
-    let random = logs.substring(10,18),log = logs.substring(27,logs.length-1)
+   let random = logs["random"].toString(),log =logs["log"].toString()
     // https://api.m.jd.com/api?appid=jinlihongbao&functionId=h5receiveRedpacketAll&loginType=2&client=jinlihongbao&t=1638189287348&clientVersion=10.2.4&osVersion=-1
     let resp = await requestApi('h5receiveRedpacketAll', cookie, {
         "random": random,
@@ -442,9 +438,9 @@ async function openRedPacket(cookie) {
 }
 
 async function helpThisUser(help, tool) {
-    logs = await getLog()
+    logs = await getJinliLogs()
     var num = "";
-    let random = logs.substring(10,18),log = logs.substring(27,logs.length-1)
+   let random = logs["random"].toString(),log =logs["log"].toString()
     if (proxyUrl){
         if (nums % 8 == 0) {
             await getProxy();
@@ -519,19 +515,12 @@ async function requireConfig() {
     return new Promise(resolve => {
         notify = $.isNode() ? require('./sendNotify') : '';
         const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-        const scriptsLog = $.isNode() ? require('./ql_jlhb_log.js') : '';
         if ($.isNode()) {
             Object.keys(jdCookieNode).forEach((item) => {
                 if (jdCookieNode[item]) {
                     cookiesArr.push(jdCookieNode[item])
                 }
             })
-            Object.keys(scriptsLog).forEach((item) => {
-                if (scriptsLog[item]) {
-                    scriptsLogArr.push(scriptsLog[item])
-                }
-            })
-
             if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
             };
         } else {
@@ -541,42 +530,83 @@ async function requireConfig() {
         resolve()
     })
 }
-function getJinliLogs(url) {
-    return new Promise(async resolve => {
-        const options = {
-            url: `${url}?logNums=${logNums}`, "timeout": 10000, headers: {
-                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 Edg/87.0.4280.88"
-            }
-        };
-        if ($.isNode() && process.env.TG_PROXY_HOST && process.env.TG_PROXY_PORT) {
-            const tunnel = require("tunnel");
-            const agent = {
-                https: tunnel.httpsOverHttp({
-                    proxy: {
-                        host: process.env.TG_PROXY_HOST,
-                        port: process.env.TG_PROXY_PORT * 1
-                    }
-                })
-            }
-            Object.assign(options, { agent })
+function getJinliLogs() {
+    if (jdlogurl && RabbitUrl){
+        console.info('进入rabbit接口获取log!')
+        return rabbitLogs();
+    }
+    if(jdlogurl && !RabbitUrl){
+        console.info('进入普通接口获取log!')
+        return JdLogs();
+    }
+    if(RabbitUrl && !jdlogurl){
+        console.info('进入rabbit接口获取log!')
+        return rabbitLogs();
+    }
+    return '';
+}
+function JdLogs(){
+    var logs = '';
+    return new Promise((resolve) => {
+        let url = {
+            url:`${jdlogurl}`,
+            timeout: 30000
         }
-        $.get(options, async (err, resp, data) => {
+        $.get(url, async(err, resp, data) => {
             try {
-                resolve(JSON.parse(data))
-            } catch (e) {
-                // $.logErr(e, resp)
-            } finally {
-                resolve();
+                data = JSON.parse(data);
+                if (data && data.status == 0) {
+                    logs = {
+                        random: data.random,
+                        log: data.log
+                    }
+                    //console.info(logs['random']+"----"+logs['log'])
+                    if (logs != '')
+                        resolve(logs);
+                    else
+                        console.log("log获取失败.");
+                } else {
+                    console.log("log获取失败.");
+                }
+
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+                resolve(logs);
             }
         })
-        await $.wait(20000)
-        resolve();
     })
 }
-async function getLog() {
-    var num = Math.floor(Math.random() * (scriptsLogArr.length - 0 + 1) + 0);
-    logs = scriptsLogArr[num]
-    return logs
+function rabbitLogs(){
+    var logs = '';
+    return new Promise((resolve) => {
+        let url = {
+            url:`${RabbitUrl}`,
+            followRedirect: false,
+            timeout: 30000
+        }
+        $.get(url, async(err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if (data && data.data.status === 0) {
+                    logs = {
+                        random: data.data.random,
+                        log: data.data.log
+                    }
+                } else if (data.data.error === '\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86') {
+                    console.log("\u8ba1\u7b97\u670d\u52a1\u51fa\u9519\u4e86");
+                } else if (data.success === false) {
+                    console.log("获取Log次数达到上限");
+                } else {
+                    console.log("Log获取失败");
+                }
+            }catch (e) {
+                $.logErr(e, resp);
+            }finally {
+                resolve(logs);
+            }
+        })
+    })
 }
 // 获取代理
 function getProxy() {

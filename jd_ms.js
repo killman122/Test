@@ -74,7 +74,6 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
         }
         continue
       }
-      //await tttsign()
       await jdMs()
     }
   }
@@ -250,31 +249,6 @@ async function doTask(body) {
   })
 }
 
-function tttsign() {
-  return new Promise(resolve => {
-      body = 'appid=babelh5&body=%7B%22encryptProjectId%22%3A%224NzhoLbAJtBXbyRj5zGwprtf6GDv%22%2C%22encryptAssignmentId%22%3A%223yRMFkp3SN8nXpX49xAdCWsdy5XP%22%2C%22completionFlag%22%3Atrue%2C%22itemId%22%3A%221%22%2C%22sourceCode%22%3A%22aceaceqingzhan%22%7D&sign=11&t=1642929553660'
-    $.post(ttt(body), (err, resp, data) => {
-      try {
-        if (err) {
-          console.log(`${err},${jsonParse(resp.body)['message']}`)
-          console.log(`${$.name} API请求失败，请检查网路重试`)
-        } else {
-          if (safeGet(data)) {
-            data = JSON.parse(data)
-            if (data.code === 0) {
-              rewardsInfo = data.rewardsInfo.failRewards[0].msg
-              console.log(`${rewardsInfo}`)
-            }else console.log(data.msg)
-          }
-        }
-      } catch (e) {
-        $.logErr(e, resp)
-      } finally {
-        resolve(data);
-      }
-    })
-  })
-}
 async function readpacksign() {
 	logs = await getJinliLogs()
 	let random = logs["random"].toString(),log =logs["log"].toString()
@@ -335,7 +309,6 @@ function readpack(body) {
     headers: {
       "Cookie": cookie,
       "origin": "https://h5.m.jd.com",
-     
       'Content-Type': 'application/x-www-form-urlencoded',
       "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
     }
