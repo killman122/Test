@@ -279,7 +279,7 @@ async function readpacksign() {
 	logs = await getJinliLogs()
 	let random = logs["random"].toString(),log =logs["log"].toString()
   return new Promise(resolve => {
-      body = 'uuid=16488990475261100141756.111.1650014649515&clientVersion=10.3.0&client=wh5&osVersion=&area=4_48201_54794_0&networkType=unknown&functionId=signRedPackage&body={"random":random,"log":log,"sceneid":"MShPageh5","ext":{"platform":"1","eid":"","referUrl":-1,"userAgent":-1}}&appid=SecKill2020'
+      body = 'uuid=16493969838751463860270.294.1650425421528&clientVersion=10.5.0&client=wh5&osVersion=&area=8_560_50824_61241&networkType=unknown&functionId=signRedPackage&body={"random":random,"log":log,"sceneid":"MShPageh5","ext":{"platform":"1","eid":"","referUrl":-1,"userAgent":-1}}&appid=SecKill2020'
     $.post(readpack(body), (err, resp, data) => {
     
       try {
