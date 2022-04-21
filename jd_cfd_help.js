@@ -67,7 +67,7 @@ if ($.isNode()) {
   }
   $.CryptoJS = $.isNode() ? require('crypto-js') : CryptoJS;
   await requestAlgo();
-  await $.wait(1000)
+  await $.wait(5000)
   for (let i = 0; i < cookiesArr.length; i++) {
     if (cookiesArr[i]) {
       cookie = cookiesArr[i];
@@ -92,7 +92,7 @@ if ($.isNode()) {
       token = await getJxToken()
       lnrun++;
 	  await cfd();
-	  await $.wait(2000);
+	  await $.wait(5000);
       if (lnrun === 5) {
               console.log(`\n【访问接口次数达到5次，休息半分钟.....】\n`);
               await $.wait(30 * 1000);
@@ -115,7 +115,7 @@ if ($.isNode()) {
         console.log(`账号${$.UserName} 去助力 ${$.newShareCodes[j]}`)
         $.delcode = false
 		await helpByStage($.newShareCodes[j])
-        await $.wait(2000)
+        await $.wait(5000)
         if ($.delcode) {
           $.newShareCodes.splice(j, 1)
           j--
