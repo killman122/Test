@@ -3,19 +3,22 @@
  * cron: 10 0,12,18 * * *
  */
 
-import axios from 'axios'
+import * as path from "path"
 import {Md5} from "ts-md5"
 import {sendNotify} from './sendNotify'
-import {requireConfig, getBeanShareCode, getFarmShareCode, wait, o2s, randomWord, getshareCodeHW} from './TS_USER_AGENTS'
-import {requestAlgo, geth5st} from "./utils/V3";
+import {requireConfig, getBeanShareCode, getFarmShareCode, wait, o2s, randomWord, getshareCodeHW, exceptCookie, get} from './TS_USER_AGENTS'
+import {H5ST} from "./utils/h5st";
 import {existsSync, readFileSync} from "fs";
+import axios from "axios";
 
 const token = require('./utils/jd_jxmc.js').token
+const h5stTool: H5ST = new H5ST("00df8", "jdpingou;", "")
 
 let cookie: string = '', res: any = '', shareCodes: string[] = [], homePageInfo: any = '', jxToken: any = '', UserName: string = '', ua: string = null, account: { pt_pin: string, remarks: string, jdpingou: string }[] = []
 let shareCodesSelf: string[] = [], shareCodesHW: string[] = []
 
 !(async () => {
+  let except: string[] = exceptCookie(path.basename(__filename))
   if (existsSync('./utils/account.json')) {
     try {
       account = JSON.parse(readFileSync('./utils/account.json').toString())
@@ -24,12 +27,15 @@ let shareCodesSelf: string[] = [], shareCodesHW: string[] = []
     }
   }
 
-  await requestAlgo('00df8', 'jdpingou;')
   let cookiesArr: any = await requireConfig()
   for (let [index, value] of cookiesArr.entries()) {
     cookie = value
     UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
     console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
+    if (except.includes(encodeURIComponent(UserName))) {
+      console.log('已设置跳过')
+      continue
+    }
     ua = null
     for (let acc of account) {
       if (acc?.pt_pin.includes(UserName)) {
@@ -38,6 +44,7 @@ let shareCodesSelf: string[] = [], shareCodesHW: string[] = []
       }
     }
 
+    await h5stTool.__genAlgo()
     jxToken = await token(cookie)
     homePageInfo = await api('queryservice/GetHomePageInfo', 'activeid,activekey,channel,isgift,isqueryinviteicon,isquerypicksite,jxmc_jstoken,phoneid,sceneid,timestamp', {isgift: 1, isquerypicksite: 1, isqueryinviteicon: 1})
     let lastgettime: number
@@ -203,7 +210,7 @@ let shareCodesSelf: string[] = [], shareCodesHW: string[] = []
         console.log('Feed未知错误:', res)
         break
       }
-      await wait(8000)
+      await wait(10000)
     }
     await wait(8000)
 
@@ -326,25 +333,25 @@ async function getTask() {
 }
 
 async function api(fn: string, stk: string, params: Params = {}) {
-  let url: string, t: { key: string, value: string } [] = [
-    {key: 'activeid', value: 'jxmc_active_0001'},
-    {key: 'activekey', value: 'null'},
-    {key: 'channel', value: '7'},
-    {key: 'jxmc_jstoken', value: jxToken['farm_jstoken']},
-    {key: 'phoneid', value: jxToken['phoneid']},
-    {key: 'sceneid', value: '1001'},
-    {key: 'timestamp', value: jxToken['timestamp']},
-  ]
+  let url: string, t: { [key: string]: string } = {
+    activeid: 'jxmc_active_0001',
+    activekey: 'null',
+    channel: '7',
+    jxmc_jstoken: jxToken['farm_jstoken'],
+    phoneid: jxToken['phoneid'],
+    sceneid: '1001',
+    timestamp: jxToken['timestamp'],
+  }
   if (['GetUserTaskStatusList', 'DoTask', 'Award'].indexOf(fn) > -1)
     url = `https://m.jingxi.com/newtasksys/newtasksys_front/${fn}?_=${Date.now()}&source=jxmc&bizCode=jxmc&_stk=${encodeURIComponent(stk)}&_ste=1&sceneval=2&g_login_type=1&callback=jsonpCBK${randomWord()}&g_ty=ls`
   else
     url = `https://m.jingxi.com/jxmc/${fn}?channel=7&sceneid=1001&activeid=jxmc_active_0001&activekey=null&jxmc_jstoken=${jxToken['farm_jstoken']}&timestamp=${jxToken['timestamp']}&phoneid=${jxToken['phoneid']}&_stk=${encodeURIComponent(stk)}&_ste=1&_=${Date.now()}&sceneval=2&g_login_type=1&callback=jsonpCBK${randomWord()}&g_ty=ls`
 
   for (let [key, value] of Object.entries(params)) {
-    t.push({key, value})
+    t[key] = value
     url += `&${key}=${value}`
   }
-  let h5st = geth5st(t, '00df8')
+  let h5st: string = h5stTool.__genH5st(t)
   url += `&h5st=${h5st}`
   try {
     let {data}: any = await axios.get(url, {
@@ -368,7 +375,7 @@ async function makeShareCodes(code: string) {
     let bean: string = await getBeanShareCode(cookie)
     let farm: string = await getFarmShareCode(cookie)
     let pin: string = Md5.hashStr(cookie.match(/pt_pin=([^;]*)/)![1])
-    let {data}: any = await axios.get(`https://api.jdsharecode.xyz/api/autoInsert/jxmc?sharecode=${code}&bean=${bean}&farm=${farm}&pin=${pin}`)
+    let data = await get(`https://api.jdsharecode.xyz/api/autoInsert/jxmc?sharecode=${code}&bean=${bean}&farm=${farm}&pin=${pin}`)
     console.log(data.message)
   } catch (e) {
     console.log('自动提交失败')
